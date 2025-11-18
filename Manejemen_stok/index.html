@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coffee POS - Inventori Stok</title>
+    <link rel="stylesheet" href="my-app.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">  
+                <i class="fas fa-coffee"></i>
+                <span>DigiCaf</span>
+            </div>
+            <div class="admin-info">
+                <i class="fas fa-user-circle"></i>
+                <span>Admin</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Add Stock Button -->
+        <button class="add-stock-btn" onclick="showAddForm()">
+            <i class="fas fa-plus"></i>
+            Tambah Stok Baru
+        </button>
+
+        <!-- Simple Add Form -->
+        <div class="add-form" id="addForm" style="display: none;">
+            <h3>Tambah Stok</h3>
+            <input type="text" id="productName" placeholder="Nama Produk" class="input-field">
+            <input type="number" id="quantity" placeholder="Jumlah Stok" class="input-field">
+            <input type="number" id="minStock" placeholder="Minimum Stok" class="input-field">
+            
+            <div class="form-buttons">
+                <button onclick="saveStock()" class="save-btn">Simpan</button>
+                <button onclick="cancelAdd()" class="cancel-btn">Batal</button>
+            </div>
+        </div>
+
+        <!-- Stock List -->
+        <div class="stock-section">
+            <h2>Daftar Stok</h2>
+            <div class="stock-list" id="stockList">
+                <!-- Stock items akan ditampilkan di sini -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <div class="nav-item active">
+            <i class="fas fa-boxes"></i>
+            <span>Stok</span>
+        </div>
+        <div class="nav-item">
+            <i class="fas fa-cash-register"></i>
+            <span>POS</span>
+        </div>
+        <div class="nav-item">
+            <i class="fas fa-chart-line"></i>
+            <span>Laporan</span>
+        </div>
+        <div class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>Admin</span>
+        </div>
+    </nav>
+
+    <script src="my-app.js"></script>
+</body>
+</html>
