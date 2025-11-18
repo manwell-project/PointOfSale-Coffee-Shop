@@ -1,0 +1,14 @@
+{
+  "name": "framework7-app",
+  "version": "1.0.0",
+  "description": "A simple Framework7 app",
+  "main": "index.js",
+  "scripts": {
+    "start": "serve ."
+  },
+  "dependencies": {
+    "framework7": "^7.1.5"
+  },
+  "author": "",
+  "license": "ISC"
+}
