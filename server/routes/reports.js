@@ -10,8 +10,8 @@ router.get('/daily', async (req, res, next) => {
     const report = await dbHelpers.get(`
       SELECT 
         COUNT(*) as total_transactions,
-        SUM(total_amount) as total_revenue,
-        AVG(total_amount) as avg_transaction
+        COALESCE(SUM(total_amount), 0) as total_revenue,
+        COALESCE(AVG(total_amount), 0) as avg_transaction
       FROM transactions
       WHERE DATE(created_at) = ?
     `, [today]);
@@ -51,8 +51,8 @@ router.get('/monthly', async (req, res, next) => {
     const report = await dbHelpers.get(`
       SELECT 
         COUNT(*) as total_transactions,
-        SUM(total_amount) as total_revenue,
-        AVG(total_amount) as avg_transaction
+        COALESCE(SUM(total_amount), 0) as total_revenue,
+        COALESCE(AVG(total_amount), 0) as avg_transaction
       FROM transactions
       WHERE strftime('%Y-%m', created_at) = ?
     `, [`${year}-${month}`]);

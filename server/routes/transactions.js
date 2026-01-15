@@ -56,16 +56,39 @@ router.post('/', async (req, res, next) => {
       return res.status(400).json({ error: 'Transaction must have at least one item' });
     }
 
+    // Compute totals on server to keep reports consistent with items sold
+    const normalizedItems = items.map((item) => {
+      const quantity = Number(item.quantity);
+      const unit_price = Number(item.unit_price);
+      if (!Number.isFinite(quantity) || quantity <= 0) {
+        throw new Error('Invalid item quantity');
+      }
+      if (!Number.isFinite(unit_price) || unit_price < 0) {
+        throw new Error('Invalid item unit_price');
+      }
+      const subtotal = quantity * unit_price;
+      return {
+        product_id: item.product_id,
+        quantity,
+        unit_price,
+        subtotal
+      };
+    });
+
+    const computedTotalAmount = normalizedItems.reduce((sum, item) => sum + Number(item.subtotal || 0), 0);
+    const clientTotal = Number(total_amount);
+    const finalTotalAmount = Number.isFinite(clientTotal) && clientTotal > 0 ? computedTotalAmount : computedTotalAmount;
+
     // Create transaction
     const result = await dbHelpers.run(
       'INSERT INTO transactions (customer_id, employee_id, total_amount, payment_method, status) VALUES (?, ?, ?, ?, ?)',
-      [customer_id || null, employee_id || null, total_amount, payment_method || 'cash', 'completed']
+      [customer_id || null, employee_id || null, finalTotalAmount, payment_method || 'cash', 'completed']
     );
 
     const transactionId = result.id;
 
     // Insert items and update stock
-    for (const item of items) {
+    for (const item of normalizedItems) {
       // Insert transaction item
       await dbHelpers.run(
         'INSERT INTO transaction_items (transaction_id, product_id, quantity, unit_price, subtotal) VALUES (?, ?, ?, ?, ?)',
@@ -93,7 +116,7 @@ router.post('/', async (req, res, next) => {
     if (customer_id) {
       await dbHelpers.run(
         'UPDATE customers SET total_transactions = total_transactions + 1, total_spent = total_spent + ? WHERE id = ?',
-        [total_amount, customer_id]
+        [finalTotalAmount, customer_id]
       );
     }
 
@@ -101,10 +124,10 @@ router.post('/', async (req, res, next) => {
       id: transactionId, 
       customer_id, 
       employee_id,
-      total_amount,
+      total_amount: finalTotalAmount,
       payment_method: payment_method || 'cash',
       status: 'completed',
-      items
+      items: normalizedItems
     });
   } catch (err) {
     next(err);
