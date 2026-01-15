@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#8B4513" />
+  <meta name="digicaf-auth" content="disabled" />
+  <title>DigiCaf - Login</title>
+
+  <link rel="stylesheet" href="../css/shared-ui.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <style>
+    .auth-page{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px 16px;
+      background:
+        radial-gradient(1200px 600px at 20% 10%, rgba(139,69,19,0.20), transparent 60%),
+        radial-gradient(900px 500px at 80% 20%, rgba(160,82,45,0.18), transparent 55%),
+        var(--bg);
+    }
+
+    .auth-card{
+      width:100%;
+      max-width:440px;
+      background:rgba(255,255,255,0.92);
+      border:1px solid rgba(0,0,0,0.06);
+      border-radius:16px;
+      box-shadow:0 14px 40px rgba(0,0,0,0.12);
+      overflow:hidden;
+    }
+
+    .auth-card__top{
+      background:linear-gradient(135deg,var(--primary),var(--accent));
+      color:#fff;
+      padding:22px 22px;
+    }
+
+    .brand-row{display:flex;gap:12px;align-items:center}
+    .brand-badge{
+      width:44px;height:44px;border-radius:14px;
+      background:rgba(255,255,255,0.18);
+      display:flex;align-items:center;justify-content:center;
+      font-size:20px;
+    }
+    .brand-title{margin:0;font-size:20px;font-weight:800;line-height:1.1}
+    .brand-sub{margin:2px 0 0 0;opacity:0.92;font-size:13px}
+
+    .auth-card__body{padding:18px 22px 22px 22px}
+
+    .field{margin-top:12px}
+    .field label{display:block;font-weight:700;color:var(--text);font-size:13px;margin-bottom:6px}
+    .input{
+      width:100%;
+      padding:12px 12px;
+      border-radius:12px;
+      border:1.8px solid rgba(139,69,19,0.35);
+      background:#fff;
+      color:var(--text);
+      outline:none;
+      font-size:15px;
+    }
+    .input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(139,69,19,0.12)}
+
+    .password-row{display:flex;gap:10px;align-items:center}
+    .toggle-btn{
+      white-space:nowrap;
+      background:rgba(139,69,19,0.08);
+      color:var(--primary);
+      border:1px solid rgba(139,69,19,0.18);
+      border-radius:10px;
+      padding:10px 12px;
+      cursor:pointer;
+      font-weight:700;
+    }
+
+    #loginError{
+      display:none;
+      margin-top:12px;
+      padding:12px 12px;
+      border-radius:12px;
+      background:rgba(244,67,54,0.10);
+      border:1px solid rgba(244,67,54,0.28);
+      color:#a32017;
+      font-weight:700;
+      font-size:13px;
+    }
+
+    .auth-actions{margin-top:16px}
+
+    .hint{
+      margin-top:10px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.5;
+    }
+
+    .auth-footer{
+      margin-top:14px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    .auth-link{color:var(--primary);text-decoration:none;font-weight:800}
+    .auth-link:hover{text-decoration:underline}
+  </style>
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-card" role="dialog" aria-label="Login DigiCaf">
+      <div class="auth-card__top">
+        <div class="brand-row">
+          <div class="brand-badge">☕</div>
+          <div>
+            <h1 class="brand-title">DigiCaf</h1>
+            <p class="brand-sub">Login untuk akses Point of Sale & Dashboard</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-card__body">
+        <form id="loginForm" autocomplete="on">
+          <div class="field">
+            <label for="email">Email</label>
+            <input class="input" id="email" name="email" type="email" placeholder="contoh: admin@gmail.com" autocomplete="username" inputmode="email" />
+          </div>
+
+          <div class="field">
+            <label for="password">Password</label>
+            <div class="password-row">
+              <input class="input" id="password" name="password" type="password" placeholder="Masukkan password" autocomplete="current-password" />
+              <button class="toggle-btn" id="togglePassword" type="button">Tampilkan</button>
+            </div>
+          </div>
+
+          <div id="loginError" aria-live="polite"></div>
+
+          <div class="auth-actions">
+            <button class="primary-action-btn" id="loginBtn" type="submit">
+              <i class="fas fa-right-to-bracket"></i> Masuk
+            </button>
+          </div>
+
+          <!-- <div class="hint">
+            Login demo:<br>
+            <b>Admin</b>: <b>admin@gmail.com</b> / <b>123456</b><br>
+            <b>Kasir</b>: <b>kasir@gmail.com</b> / <b>123456</b>
+          </div> -->
+
+          <!-- <div class="auth-footer">
+            <a class="auth-link" href="../index.html"><i class="fas fa-arrow-left"></i> Kembali</a>
+            <span>© DigiCaf</span>
+          </div> -->
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/auth.js"></script>
+  <script src="../js/login.js"></script>
+</body>
+</html>

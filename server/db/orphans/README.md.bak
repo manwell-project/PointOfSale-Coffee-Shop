@@ -1,0 +1,26 @@
+DigiCaf - Database helpers (SQLite)
+
+Files:
+- migrations/001_init.sql  : initial schema (products, transactions, transaction_items, stocks, employees, customers)
+- migrate.js              : migration runner that applies .sql files and creates db/digicaf.db
+- models.js               : simple synchronous models using better-sqlite3
+
+Usage:
+1. Install dependencies:
+   npm install
+
+2. Run migrations (creates db/digicaf.db):
+   npm run migrate
+
+3. Seed example data:
+   node db/seed.js
+
+4. Use `db/models/index.js` in small scripts to seed or query data. Example:
+
+   const models = require('./db/models');
+   models.products.create('SKU001','Espresso',12000);
+
+Notes:
+- This is intentionally minimal and synchronous to keep examples easy to follow.
+- For production or multi-user use, consider a proper server process and connection pooling.
+Backup of db/README.md

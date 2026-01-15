@@ -1,0 +1,2 @@
+// Backup of top-level db/run-seed-and-check.js
+module.exports = require('../../db/run-seed-and-check');

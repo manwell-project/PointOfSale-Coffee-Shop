@@ -1,0 +1,7 @@
+const products = require('../../db/models/products');
+const stocks = require('../../db/models/stocks');
+const employees = require('../../db/models/employees');
+const customers = require('../../db/models/customers');
+const transactions = require('../../db/models/transactions');
+
+module.exports = { products, stocks, employees, customers, transactions };

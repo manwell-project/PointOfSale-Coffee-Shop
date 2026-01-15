@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DigiCaf - Laporan</title>
+    <link rel="stylesheet" href="../css/shared-ui.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .app {
+            max-width: 980px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            position: relative;
+            box-shadow: 0 0 18px rgba(0,0,0,0.06);
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: background 0.2s ease;
+        }
+
+        .header-right:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 20px 16px 100px 16px;
+            background: #f5f5f5;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .stats-card {
+            background: white;
+            padding: 20px 16px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            position: relative;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(139, 69, 19, 0.15);
+        }
+
+        .stats-card:active {
+            transform: translateY(1px);
+        }
+
+        .stats-icon {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            font-size: 20px;
+            opacity: 0.7;
+        }
+
+        .stats-label {
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .stats-value {
+            color: #8B4513;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        /* Chart Section */
+        .chart-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .chart-title {
+            color: #333;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .chart-container {
+            height: 200px;
+            position: relative;
+            background: linear-gradient(to bottom, rgba(139, 69, 19, 0.05) 0%, transparent 100%);
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            align-items: end;
+            gap: 8px;
+        }
+
+        .chart-bar {
+            flex: 1;
+            background: linear-gradient(to top, #8B4513, #A0522D);
+            border-radius: 4px 4px 0 0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .chart-bar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(139, 69, 19, 0.3);
+        }
+
+        .chart-label {
+            position: absolute;
+            bottom: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .chart-footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #999;
+            font-size: 13px;
+        }
+
+        /* Reports Section */
+        .reports-section h3 {
+            margin-left: 4px;
+            margin-bottom: 16px;
+            color: #333;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .report-item {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s ease;
+        }
+
+        .report-item:active {
+            transform: translateY(1px);
+        }
+
+        .report-info h4 {
+            color: #333;
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .report-info p {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .download-btn {
+            background: #8B4513;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .download-btn:hover {
+            background: #A0522D;
+            transform: translateY(-1px);
+        }
+
+        .download-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 414px;
+            background: white;
+            border-top: 1px solid #eee;
+            display: flex;
+            padding: 8px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 8px 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-radius: 8px;
+            margin: 0 4px;
+        }
+
+        .nav-item.active {
+            color: #8B4513;
+            background: rgba(139, 69, 19, 0.1);
+        }
+
+        .nav-item:not(.active) {
+            color: #999;
+        }
+
+        .nav-item:hover:not(.active) {
+            color: #666;
+            background: #f8f8f8;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 2px;
+            display: block;
+        }
+
+        .nav-label {
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        /* Animations */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stats-card {
+            animation: slideUp 0.6s ease forwards;
+        }
+
+        .stats-card:nth-child(1) { animation-delay: 0.1s; }
+        .stats-card:nth-child(2) { animation-delay: 0.2s; }
+        .stats-card:nth-child(3) { animation-delay: 0.3s; }
+        .stats-card:nth-child(4) { animation-delay: 0.4s; }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 14px;
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            margin: 20px;
+            max-width: 300px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #333;
+        }
+
+        .modal-text {
+            color: #666;
+            margin-bottom: 24px;
+            line-height: 1.4;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .modal-btn.primary {
+            background: #8B4513;
+            color: white;
+        }
+
+        .modal-btn.primary:hover {
+            background: #A0522D;
+        }
+
+        .modal-btn.secondary {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .modal-btn.secondary:hover {
+            background: #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <div class="app" data-digicaf-layout="auto" data-page-title="Laporan">
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stats-card" onclick="showPendapatanDetail()">
+                    <div class="stats-icon">📊</div>
+                    <div class="stats-label">Pendapatan Bulan Ini</div>
+                    <div class="stats-value" id="monthRevenue">Rp 0</div>
+                </div>
+                <div class="stats-card" onclick="showPenjualanHarianDetail()">
+                    <div class="stats-icon">🧾</div>
+                    <div class="stats-label">Pendapatan Hari Ini</div>
+                    <div class="stats-value" id="todayRevenue">Rp 0</div>
+                </div>
+                <div class="stats-card" onclick="showPenjualanHarianDetail()">
+                    <div class="stats-icon">🧮</div>
+                    <div class="stats-label">Transaksi Hari Ini</div>
+                    <div class="stats-value" id="todayTransactions">0</div>
+                </div>
+                <div class="stats-card" onclick="showMenuTerlarisDetail()">
+                    <div class="stats-icon">☕</div>
+                    <div class="stats-label">Menu Terlaris</div>
+                    <div class="stats-value" id="bestSeller">-</div>
+                </div>
+            </div>
+
+            <!-- Chart Section -->
+            <div class="chart-section">
+                <div class="chart-title">Grafik Penjualan</div>
+                <div class="chart-container" id="salesChart"></div>
+                <div class="chart-footer">
+                    📊 Grafik Penjualan 7 Hari Terakhir (dari database)
+                </div>
+            </div>
+
+            <!-- Reports Section -->
+            <div class="reports-section">
+                <h3>Laporan Tersedia</h3>
+                
+                <div class="report-item">
+                    <div class="report-info">
+                        <h4>Laporan Penjualan Harian</h4>
+                        <p>Data penjualan hari ini</p>
+                    </div>
+                    <button class="download-btn" onclick="downloadReport('daily')">
+                        <span>⬇️</span>
+                    </button>
+                </div>
+
+                <div class="report-item">
+                    <div class="report-info">
+                        <h4>Laporan Stok Bulanan</h4>
+                        <p>Laporan stok dan inventory</p>
+                    </div>
+                    <button class="download-btn" onclick="downloadReport('monthly')">
+                        <span>⬇️</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation will be injected by js/navbar.js -->
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Modal -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-title" id="modalTitle"></div>
+            <div class="modal-text" id="modalText"></div>
+            <div class="modal-buttons">
+                <button class="modal-btn secondary" onclick="closeModal()">Batal</button>
+                <button class="modal-btn primary" id="modalConfirm">Download</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal" id="profileModal">
+        <div class="modal-content" style="max-width: 350px;">
+            <div class="modal-title">Profil Admin</div>
+            <div style="text-align: center; margin: 20px 0;">
+                <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #8B4513, #A0522D); display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 32px; color: white;">👤</div>
+                <h3 style="margin: 10px 0 5px; color: #333;">Administrator</h3>
+                <p style="color: #666; font-size: 14px; margin: 0;">System Administrator</p>
+            </div>
+            <div style="text-align: left; margin: 20px 0;">
+                <div style="margin-bottom: 15px;">
+                    <div style="font-size: 12px; color: #999; text-transform: uppercase; margin-bottom: 4px;">Email</div>
+                    <div style="color: #333; font-weight: 500;">admin@digicaf.com</div>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <div style="font-size: 12px; color: #999; text-transform: uppercase; margin-bottom: 4px;">Role</div>
+                    <div style="color: #333; font-weight: 500;">Super Administrator</div>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <div style="font-size: 12px; color: #999; text-transform: uppercase; margin-bottom: 4px;">Login Terakhir</div>
+                    <div style="color: #333; font-weight: 500;" id="lastLogin"></div>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <div style="font-size: 12px; color: #999; text-transform: uppercase; margin-bottom: 4px;">Status</div>
+                    <div style="color: #28a745; font-weight: 500; display: flex; align-items: center; gap: 6px;">
+                        <span style="width: 8px; height: 8px; background: #28a745; border-radius: 50%;"></span>
+                        Online
+                    </div>
+                </div>
+            </div>
+            <div class="modal-buttons" style="gap: 8px;">
+                <button class="modal-btn secondary" onclick="closeProfileModal()">Tutup</button>
+                <button class="modal-btn primary" onclick="editProfile()" style="background: #8B4513;">Edit Profil</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detail Modal -->
+    <div class="modal" id="detailModal">
+        <div class="modal-content" style="max-width: 400px; max-height: 80vh; overflow-y: auto;">
+            <div class="modal-title" id="detailModalTitle"></div>
+            <div id="detailModalContent" style="text-align: left; margin: 20px 0; line-height: 1.6;"></div>
+            <div class="modal-buttons">
+                <button class="modal-btn secondary" onclick="closeDetailModal()">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Navigation handled by centralized js/navbar.js
+
+        // ========= Live data state =========
+        let dailyReport = null;
+        let monthlyReport = null;
+        let last7Days = [];
+
+        function downloadTextFile(filename, content, mime) {
+            const blob = new Blob([content], { type: mime || 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+        }
+
+        // Download report function (exports JSON from API)
+        function downloadReport(type) {
+            const reportName = type === 'daily' ? 'Laporan Penjualan Harian' : 'Laporan Bulanan (Stok & Penjualan)';
+
+            document.getElementById('modalTitle').textContent = 'Download Laporan';
+            document.getElementById('modalText').textContent = `Apakah Anda ingin mengunduh ${reportName} (JSON) dari database?`;
+            document.getElementById('modalConfirm').onclick = async function() {
+                closeModal();
+
+                try {
+                    showToast('Menyiapkan laporan...');
+
+                    if (!window.API || !window.API.Reports) {
+                        throw new Error('API Helper belum dimuat.');
+                    }
+
+                    if (type === 'daily') {
+                        const data = await window.API.Reports.getDaily();
+                        downloadTextFile(`digicaf-report-daily-${data.date}.json`, JSON.stringify(data, null, 2), 'application/json');
+                    } else {
+                        const now = new Date();
+                        const year = now.getFullYear();
+                        const month = String(now.getMonth() + 1).padStart(2, '0');
+                        const monthly = await window.API.Reports.getMonthly(year, month);
+                        const stockSummary = await window.API.Reports.getStockSummary();
+                        const payload = { monthly, stockSummary };
+                        downloadTextFile(`digicaf-report-monthly-${year}-${month}.json`, JSON.stringify(payload, null, 2), 'application/json');
+                    }
+
+                    showToast(`${reportName} berhasil diunduh!`);
+                } catch (e) {
+                    showToast(`Gagal download: ${e.message || e}`);
+                }
+            };
+
+            document.getElementById('modal').classList.add('show');
+        }
+
+        // Toast notification function
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Close modal function
+        function closeModal() {
+            document.getElementById('modal').classList.remove('show');
+        }
+
+        // Profile functions
+        function openProfile() {
+            // Set current date and time for last login
+            const now = new Date();
+            const lastLoginTime = now.toLocaleString('id-ID', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            document.getElementById('lastLogin').textContent = lastLoginTime;
+            
+            document.getElementById('profileModal').classList.add('show');
+        }
+
+        function closeProfileModal() {
+            document.getElementById('profileModal').classList.remove('show');
+        }
+
+        function editProfile() {
+            closeProfileModal();
+            showToast('Fitur edit profil sedang dalam pengembangan...');
+        }
+
+        // Detail modal functions
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.remove('show');
+        }
+
+        function showPendapatanDetail() {
+            const summary = (monthlyReport && monthlyReport.summary) ? monthlyReport.summary : {};
+            const period = monthlyReport && monthlyReport.period ? monthlyReport.period : '-';
+            const totalRevenue = Number(summary.total_revenue || 0);
+            const txCount = Number(summary.total_transactions || 0);
+            const avg = Number(summary.avg_transaction || 0);
+
+            document.getElementById('detailModalTitle').textContent = 'Detail Pendapatan Bulan Ini';
+            document.getElementById('detailModalContent').innerHTML = `
+                <div style="text-align: center; margin-bottom: 16px;">
+                    <div style="font-size: 36px; margin-bottom: 8px;">📊</div>
+                    <div style="font-size: 24px; font-weight: bold; color: #8B4513;">${formatRupiah(totalRevenue)}</div>
+                    <div style="color: #666; font-size: 14px;">Periode: ${period}</div>
+                </div>
+                <div style="background:#f8f8f8;padding:12px;border-radius:10px;">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span>Total Transaksi</span><b>${txCount}</b></div>
+                    <div style="display:flex;justify-content:space-between;"><span>Rata-rata / Transaksi</span><b>${formatRupiah(avg)}</b></div>
+                </div>
+                <div style="margin-top:14px;color:#666;font-size:13px;line-height:1.5;">
+                    Data diambil dari tabel <b>transactions</b> dan <b>transaction_items</b> di database.
+                </div>
+            `;
+            document.getElementById('detailModal').classList.add('show');
+        }
+
+        function showPenjualanHarianDetail() {
+            const summary = (dailyReport && dailyReport.summary) ? dailyReport.summary : {};
+            const date = dailyReport && dailyReport.date ? dailyReport.date : '-';
+            const txCount = Number(summary.total_transactions || 0);
+            const revenue = Number(summary.total_revenue || 0);
+            const top = (dailyReport && Array.isArray(dailyReport.top_products)) ? dailyReport.top_products.slice(0, 5) : [];
+
+            const topHtml = top.length
+                ? top.map(p => `
+                    <div style="background:#f8f8f8;padding:12px;border-radius:8px;margin-bottom:6px;">
+                        <div style="display:flex;justify-content:space-between;gap:12px;">
+                            <span>${p.name}</span>
+                            <span style="font-weight:700;">${Number(p.qty_sold || 0)}x</span>
+                        </div>
+                    </div>
+                `).join('')
+                : '<div style="color:#666;font-size:13px;">Belum ada penjualan hari ini.</div>';
+
+            document.getElementById('detailModalTitle').textContent = 'Detail Penjualan Hari Ini';
+            document.getElementById('detailModalContent').innerHTML = `
+                <div style="text-align:center;margin-bottom:16px;">
+                    <div style="font-size:36px;margin-bottom:8px;">🧾</div>
+                    <div style="font-size:24px;font-weight:bold;color:#8B4513;">${txCount}</div>
+                    <div style="color:#666;font-size:14px;">Tanggal: ${date}</div>
+                    <div style="margin-top:6px;color:#333;font-weight:700;">${formatRupiah(revenue)}</div>
+                    <div style="color:#666;font-size:13px;">Total pendapatan hari ini</div>
+                </div>
+
+                <div style="margin-bottom:12px;">
+                    <h4 style="margin-bottom:10px;color:#333;">Top Produk Hari Ini</h4>
+                    ${topHtml}
+                </div>
+            `;
+            document.getElementById('detailModal').classList.add('show');
+        }
+
+        function showMenuTerlarisDetail() {
+            const top = (monthlyReport && Array.isArray(monthlyReport.top_products)) ? monthlyReport.top_products.slice(0, 10) : [];
+            const best = top[0];
+
+            const topHtml = top.length
+                ? top.map((p, idx) => `
+                    <div style="background:${idx===0 ? '#e8f5e8' : '#f8f8f8'};padding:12px;border-radius:8px;margin-bottom:6px;">
+                        <div style="display:flex;justify-content:space-between;gap:12px;">
+                            <span>${idx===0 ? '🥇' : ''} ${p.name}</span>
+                            <span style="font-weight:700;">${Number(p.qty_sold || 0)}x</span>
+                        </div>
+                        <div style="color:#666;font-size:12px;margin-top:4px;">Revenue: ${formatRupiah(Number(p.revenue || 0))}</div>
+                    </div>
+                `).join('')
+                : '<div style="color:#666;font-size:13px;">Belum ada data penjualan bulan ini.</div>';
+
+            document.getElementById('detailModalTitle').textContent = 'Detail Menu Terlaris';
+            document.getElementById('detailModalContent').innerHTML = `
+                <div style="text-align:center;margin-bottom:16px;">
+                    <div style="font-size:36px;margin-bottom:8px;">☕</div>
+                    <div style="font-size:22px;font-weight:bold;color:#8B4513;">${best ? best.name : '-'}</div>
+                    <div style="color:#666;font-size:14px;">Menu terlaris periode ${monthlyReport ? monthlyReport.period : '-'}</div>
+                </div>
+
+                <div style="margin-bottom:12px;">
+                    <h4 style="margin-bottom:10px;color:#333;">Top Produk Bulan Ini</h4>
+                    ${topHtml}
+                </div>
+            `;
+            document.getElementById('detailModal').classList.add('show');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Close profile modal when clicking outside
+        document.getElementById('profileModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeProfileModal();
+            }
+        });
+
+        // Close detail modal when clicking outside
+        document.getElementById('detailModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDetailModal();
+            }
+        });
+
+        function dayLabelFromISO(dateStr) {
+            try {
+                const d = new Date(dateStr);
+                const labels = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+                return labels[d.getDay()];
+            } catch (e) {
+                return '';
+            }
+        }
+
+        function renderChart(days) {
+            const container = document.getElementById('salesChart');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const values = (days || []).map(d => Number(d.total_sales || 0));
+            const max = Math.max(1, ...values);
+
+            (days || []).forEach((d, idx) => {
+                const v = Number(d.total_sales || 0);
+                const pct = Math.max(6, Math.round((v / max) * 100));
+                const bar = document.createElement('div');
+                bar.className = 'chart-bar';
+                bar.style.height = pct + '%';
+                bar.title = `${d.date}: ${formatRupiah(v)} (${d.transaction_count} trx)`;
+                bar.innerHTML = `<div class="chart-label">${dayLabelFromISO(d.date)}</div>`;
+                bar.style.transform = 'scaleY(0)';
+                bar.style.transformOrigin = 'bottom';
+                bar.style.transition = 'transform 0.6s ease';
+                container.appendChild(bar);
+                setTimeout(() => { bar.style.transform = 'scaleY(1)'; }, 500 + (idx * 80));
+            });
+        }
+
+        async function loadReportsFromApi() {
+            try {
+                if (!window.API || !window.API.Reports || !window.API.Transactions) {
+                    throw new Error('API Helper belum dimuat.');
+                }
+
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+
+                // Fetch in parallel
+                const [daily, monthly, summaryDaily] = await Promise.all([
+                    window.API.Reports.getDaily(),
+                    window.API.Reports.getMonthly(year, month),
+                    window.API.Transactions.getDailySummary()
+                ]);
+
+                dailyReport = daily;
+                monthlyReport = monthly;
+
+                // Update cards
+                const monthRevenue = document.getElementById('monthRevenue');
+                const todayRevenue = document.getElementById('todayRevenue');
+                const todayTransactions = document.getElementById('todayTransactions');
+                const bestSeller = document.getElementById('bestSeller');
+
+                const mRev = Number((monthly && monthly.summary && monthly.summary.total_revenue) || 0);
+                const tRev = Number((daily && daily.summary && daily.summary.total_revenue) || 0);
+                const tCount = Number((daily && daily.summary && daily.summary.total_transactions) || 0);
+                const best = (daily && Array.isArray(daily.top_products) && daily.top_products[0]) ? daily.top_products[0].name : '-';
+
+                if (monthRevenue) monthRevenue.textContent = formatRupiah(mRev);
+                if (todayRevenue) todayRevenue.textContent = formatRupiah(tRev);
+                if (todayTransactions) todayTransactions.textContent = String(tCount);
+                if (bestSeller) bestSeller.textContent = best;
+
+                // Chart (last 7 days)
+                const rows = Array.isArray(summaryDaily) ? summaryDaily.slice() : [];
+                // API gives DESC order; take last 7 entries and sort ascending
+                last7Days = rows.slice(0, 7).sort((a, b) => String(a.date).localeCompare(String(b.date)));
+                renderChart(last7Days);
+            } catch (e) {
+                showToast(`Gagal memuat data laporan: ${e.message || e}`);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadReportsFromApi();
+        });
+
+        // Add click effect to cards
+        document.querySelectorAll('.stats-card, .report-item').forEach(card => {
+            card.addEventListener('click', function() {
+                this.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+            });
+        });
+    </script>
+    <script src="../js/api-helper.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/layout.js"></script>
+    <script src="../js/navbar.js"></script>
+</body>
+</html>

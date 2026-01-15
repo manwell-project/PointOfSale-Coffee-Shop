@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#8B4513">
+    <title>Manajemen Karyawan - DigiCaf</title>
+    <link rel="stylesheet" href="../css/shared-ui.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="css/karyawan.css">
+</head>
+<body>
+    <div data-digicaf-layout="auto" data-page-title="Manajemen Karyawan">
+        <div class="search-bar">
+            <input type="text" id="searchInputEmp" placeholder="Cari karyawan...">
+            <i class="fas fa-search"></i>
+        </div>
+
+        <div class="employee-stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalEmployees">0</div>
+                <div class="stat-label">Total</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="shiftPagiCount">0</div>
+                <div class="stat-label">Pagi</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="shiftSiangCount">0</div>
+                <div class="stat-label">Siang/Full</div>
+            </div>
+        </div>
+
+        <button type="button" class="primary-action-btn add-employee-btn">
+            <i class="fas fa-plus"></i>
+            Tambah Karyawan
+        </button>
+
+        <div class="tabs" id="empTabs">
+            <div class="tab active" data-filter="all">Semua</div>
+            <div class="tab" data-filter="Pagi">Pagi</div>
+            <div class="tab" data-filter="Siang">Siang</div>
+            <div class="tab" data-filter="Full Time">Full Time</div>
+        </div>
+
+        <div class="employee-list" id="employeeList">
+            <div class="empty-state">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Memuat data...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="employeeModal" class="modal-overlay" aria-hidden="true">
+        <div class="modal-content card">
+            <div class="modal-header">
+                <h3 id="form-title">Tambah Karyawan</h3>
+                <button class="modal-close" aria-label="Tutup">&times;</button>
+            </div>
+            <div class="card-content">
+                <form id="employeeForm">
+                    <input type="hidden" id="employeeId">
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label>Nama Lengkap *</label>
+                            <input type="text" id="employee-name" placeholder="Nama lengkap" required>
+                        </div>
+                        <div class="form-field">
+                            <label>Shift *</label>
+                            <select id="employee-shift" required>
+                                <option value="">Pilih Shift</option>
+                                <option value="Pagi">Pagi (07:00 - 15:00)</option>
+                                <option value="Siang">Siang (15:00 - 23:00)</option>
+                                <option value="Full Time">Full Time</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label>No. Telepon</label>
+                            <input type="tel" id="employee-phone" placeholder="+62 xxx-xxxx-xxxx">
+                        </div>
+                        <div class="form-field">
+                            <label>Email</label>
+                            <input type="email" id="employee-email" placeholder="email@example.com">
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary cancel-btn">Batal</button>
+                        <button type="submit" class="btn btn-primary save-employee-btn">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/auth.js"></script>
+    <script src="../js/layout.js"></script>
+    <script src="../js/navbar.js"></script>
+    <script src="../js/api-helper.js"></script>
+    <script src="js/karyawan.js"></script>
+</body>
+</html>

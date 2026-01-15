@@ -1,0 +1,285 @@
+/* ========================================
+   DigiCaf - Enhanced Animations & Effects
+   ======================================== */
+
+/* Smooth Transitions untuk semua interactive elements */
+button,
+.btn,
+.action-btn,
+.tab,
+.product-card,
+.customer-card,
+.employee-card,
+.stock-item,
+.home-menu-tile,
+.action-card,
+.stat-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hover Effects yang lebih halus */
+.home-menu-tile:hover,
+.action-card:hover,
+.customer-card:hover,
+.employee-card:hover,
+.stock-item:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 12px 24px rgba(139, 69, 19, 0.15);
+}
+
+/* Button Press Effect */
+button:active,
+.btn:active,
+.action-btn:active {
+    transform: scale(0.95);
+}
+
+/* Loading Animation */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.fa-spinner {
+    animation: spin 1s linear infinite;
+}
+
+/* Fade In Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.customer-card,
+.employee-card,
+.stock-item,
+.product-card {
+    animation: fadeIn 0.4s ease-out;
+}
+
+/* Stagger Animation untuk list items */
+.customer-card:nth-child(1) { animation-delay: 0.05s; }
+.customer-card:nth-child(2) { animation-delay: 0.1s; }
+.customer-card:nth-child(3) { animation-delay: 0.15s; }
+.customer-card:nth-child(4) { animation-delay: 0.2s; }
+.customer-card:nth-child(5) { animation-delay: 0.25s; }
+
+.employee-card:nth-child(1) { animation-delay: 0.05s; }
+.employee-card:nth-child(2) { animation-delay: 0.1s; }
+.employee-card:nth-child(3) { animation-delay: 0.15s; }
+.employee-card:nth-child(4) { animation-delay: 0.2s; }
+.employee-card:nth-child(5) { animation-delay: 0.25s; }
+
+/* Pulse Animation untuk stat cards */
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.stat-card:hover .stat-number {
+    animation: pulse 0.6s ease-in-out;
+}
+
+/* Shake Animation untuk errors */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+.error {
+    animation: shake 0.5s ease-in-out;
+}
+
+/* Slide In untuk modals */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal-content {
+    animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Glow Effect untuk primary buttons */
+@keyframes glow {
+    0%, 100% {
+        box-shadow: 0 0 5px rgba(139, 69, 19, 0.3),
+                    0 0 10px rgba(139, 69, 19, 0.2),
+                    0 0 15px rgba(139, 69, 19, 0.1);
+    }
+    50% {
+        box-shadow: 0 0 10px rgba(139, 69, 19, 0.5),
+                    0 0 20px rgba(139, 69, 19, 0.3),
+                    0 0 30px rgba(139, 69, 19, 0.2);
+    }
+}
+
+.primary-action-btn:hover {
+    animation: glow 2s ease-in-out infinite;
+}
+
+/* Ripple Effect */
+.ripple {
+    position: relative;
+    overflow: hidden;
+}
+
+.ripple::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.ripple:active::after {
+    width: 300px;
+    height: 300px;
+}
+
+/* Smooth scroll behavior */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Focus styles untuk accessibility */
+button:focus,
+input:focus,
+select:focus,
+.tab:focus {
+    outline: 3px solid rgba(139, 69, 19, 0.3);
+    outline-offset: 2px;
+}
+
+/* Subtle breathing animation untuk icons */
+@keyframes breathe {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+}
+
+.home-menu-icon i,
+.stat-icon i,
+.action-icon i {
+    animation: breathe 3s ease-in-out infinite;
+}
+
+/* Gradient Animation untuk headers */
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.dashboard-header,
+.welcome-banner {
+    background: linear-gradient(135deg, #8B4513, #A0522D, #8B4513);
+    background-size: 200% 200%;
+    animation: gradientShift 10s ease infinite;
+}
+
+/* Card hover lift effect */
+.stat-card,
+.action-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stat-card:hover {
+    transform: translateY(-8px) rotate(1deg);
+    box-shadow: 0 15px 30px rgba(139, 69, 19, 0.2);
+}
+
+/* Toast slide animation */
+@keyframes toastSlide {
+    0% {
+        transform: translateX(-50%) translateY(-100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+}
+
+.toast.show {
+    animation: toastSlide 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Badge pulse */
+@keyframes badgePulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.15);
+    }
+}
+
+.badge-new,
+.badge-low {
+    animation: badgePulse 2s ease-in-out infinite;
+}
+
+/* Skeleton loading animation */
+@keyframes skeleton {
+    0% {
+        background-position: -200px 0;
+    }
+    100% {
+        background-position: calc(200px + 100%) 0;
+    }
+}
+
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200px 100%;
+    animation: skeleton 1.5s ease-in-out infinite;
+}
+
+/* Responsive improvements */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Dark mode support (future enhancement) */
+@media (prefers-color-scheme: dark) {
+    /* Reserved for future dark mode implementation */
+}

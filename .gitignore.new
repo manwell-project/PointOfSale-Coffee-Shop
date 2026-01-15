@@ -1,0 +1,10 @@
+node_modules/
+*.log
+.DS_Store
+.env
+dist/
+build/
+.vscode/
+server/db/digicaf.db
+server/db/digicaf.db-wal
+server/db/digicaf.db-shm

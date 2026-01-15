@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#8B4513">
+    <title>Manajemen Stok - DigiCaf</title>
+    <link rel="stylesheet" href="../css/shared-ui.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        .search-bar {
+            position: relative;
+            margin: 16px 0;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 14px 50px 14px 20px;
+            border-radius: 25px;
+            border: 2px solid #8B4513;
+            background-color: white;
+            font-size: 16px;
+        }
+
+        .search-bar i {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8B4513;
+            font-size: 18px;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin: 18px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            color: white;
+            border-radius: 12px;
+            padding: 20px 16px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .stock-list {
+            display: grid;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .stock-item {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-left: 4px solid #8B4513;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .stock-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 69, 19, 0.2);
+        }
+
+        .stock-item.low-stock {
+            border-left-color: #dc3545;
+            background: #fff5f5;
+        }
+
+        .stock-info {
+            flex: 1;
+        }
+
+        .stock-name {
+            font-weight: 600;
+            font-size: 17px;
+            color: #333;
+            margin-bottom: 6px;
+        }
+
+        .stock-details {
+            font-size: 14px;
+            color: #666;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .stock-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-low {
+            background: #dc3545;
+            color: white;
+        }
+
+        .badge-normal {
+            background: #28a745;
+            color: white;
+        }
+
+        .stock-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #8B4513;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(139, 69, 19, 0.3);
+        }
+
+        .action-btn.delete {
+            background: #dc3545;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            width: 90%;
+            max-width: 500px;
+            animation: modalAppear 0.3s ease;
+        }
+
+        @keyframes modalAppear {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .modal-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #8B4513;
+        }
+
+        .close-btn {
+            font-size: 28px;
+            cursor: pointer;
+            color: #666;
+            background: none;
+            border: none;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        .close-btn:hover {
+            background: #f0f0f0;
+            color: #8B4513;
+        }
+
+        .form-field {
+            margin-bottom: 18px;
+        }
+
+        .form-field label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .form-field input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            font-size: 15px;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-field input:focus {
+            outline: none;
+            border-color: #8B4513;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            font-size: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #666;
+            border: 2px solid #ddd;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.4;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.85);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 14px;
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div data-digicaf-layout="auto" data-page-title="Inventori Stok">
+        <div class="search-bar">
+            <input type="text" id="searchStockInput" placeholder="Cari stok...">
+            <i class="fas fa-search"></i>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-number" id="totalProducts">0</div>
+                <div class="stat-label">Produk</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalStockQty">0</div>
+                <div class="stat-label">Total Stok</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="lowStockCount">0</div>
+                <div class="stat-label">Stok Rendah</div>
+            </div>
+        </div>
+
+        <button type="button" class="primary-action-btn" id="addStockBtn">
+            <i class="fas fa-plus"></i>
+            Tambah Stok Baru
+        </button>
+
+        <div class="stock-list" id="stockList">
+            <div class="empty-state">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Memuat data...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Tambah/Edit Stok -->
+    <div class="modal-overlay" id="stockModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Tambah Stok</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <form id="stockForm">
+                <input type="hidden" id="stockId">
+                <div class="form-field">
+                    <label for="productName">Nama Produk *</label>
+                    <input type="text" id="productName" required placeholder="Masukkan nama produk">
+                </div>
+                <div class="form-field">
+                    <label for="quantity">Jumlah Stok *</label>
+                    <input type="number" id="quantity" required min="0" placeholder="0">
+                </div>
+                <div class="form-field">
+                    <label for="minStock">Minimum Stok *</label>
+                    <input type="number" id="minStock" required min="0" placeholder="0">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelBtn">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <script src="../js/auth.js"></script>
+    <script src="../js/layout.js"></script>
+    <script src="../js/navbar.js"></script>
+    <script src="../js/api-helper.js"></script>
+    <script>
+        // Data will be loaded from API
+        let stocks = [];
+
+        // DOM Elements
+        const stockModal = document.getElementById('stockModal');
+        const stockForm = document.getElementById('stockForm');
+        const searchInput = document.getElementById('searchStockInput');
+        const stockList = document.getElementById('stockList');
+        const toast = document.getElementById('toast');
+
+        // State
+        let currentStockId = null;
+
+        // Initialize
+        function init() {
+            renderStocks();
+            updateStats();
+
+            // Event Listeners
+            document.getElementById('addStockBtn').addEventListener('click', () => openModal());
+            document.querySelector('.close-btn').addEventListener('click', closeModal);
+            document.getElementById('cancelBtn').addEventListener('click', closeModal);
+            stockForm.addEventListener('submit', saveStock);
+            searchInput.addEventListener('input', renderStocks);
+
+            // Close on outside click
+            stockModal.addEventListener('click', (e) => {
+                if (e.target === stockModal) closeModal();
+            });
+        }
+
+        async function renderStocks() {
+            const searchTerm = searchInput.value ? searchInput.value.toLowerCase() : '';
+            try {
+                stocks = await window.API.Stocks.getAll();
+            } catch (err) {
+                stockList.innerHTML = `<div class="empty-state"><i class="fas fa-box-open"></i><p>Gagal memuat stok:<br>${err.message}</p></div>`;
+                return;
+            }
+
+            let filtered = stocks.filter(s => {
+                if (searchTerm && !(s.name || '').toLowerCase().includes(searchTerm)) return false;
+                return true;
+            });
+
+            filtered.sort((a, b) => a.name.localeCompare(b.name));
+
+            if (filtered.length === 0) {
+                stockList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-box-open"></i>
+                        <p>Tidak ada stok</p>
+                    </div>
+                `;
+                updateStats();
+                return;
+            }
+
+            stockList.innerHTML = filtered.map(s => {
+                const qty = s.quantity || 0;
+                const minStock = s.min_stock !== undefined ? s.min_stock : (s.minStock || 0);
+                const isLow = qty <= minStock;
+                const badge = isLow ? '<span class="stock-badge badge-low">RENDAH</span>' : '<span class="stock-badge badge-normal">NORMAL</span>';
+
+                return `
+                    <div class="stock-item ${isLow ? 'low-stock' : ''}">
+                        <div class="stock-info">
+                            <div class="stock-name">${s.name}</div>
+                            <div class="stock-details">
+                                <span>Stok: <strong>${qty}</strong></span>
+                                <span>Min: <strong>${minStock}</strong></span>
+                                ${badge}
+                            </div>
+                        </div>
+                        <div class="stock-actions">
+                            <button class="action-btn" onclick="openModal(${s.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn delete" onclick="deleteStock(${s.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            updateStats();
+        }
+
+        function updateStats() {
+            document.getElementById('totalProducts').textContent = stocks.length;
+            document.getElementById('totalStockQty').textContent = stocks.reduce((sum, s) => sum + (s.quantity || 0), 0);
+            document.getElementById('lowStockCount').textContent = stocks.filter(s => (s.quantity || 0) <= (s.min_stock !== undefined ? s.min_stock : (s.minStock || 0))).length;
+        }
+
+        function openModal(id = null) {
+            currentStockId = id;
+            const title = document.getElementById('modalTitle');
+            
+            if (id) {
+                const stock = stocks.find(s => s.id === id);
+                title.textContent = 'Edit Stok';
+                document.getElementById('stockId').value = stock.id;
+                document.getElementById('productName').value = stock.name;
+                document.getElementById('quantity').value = stock.quantity || 0;
+                document.getElementById('minStock').value = stock.min_stock !== undefined ? stock.min_stock : (stock.minStock || 0);
+            } else {
+                title.textContent = 'Tambah Stok';
+                stockForm.reset();
+            }
+            
+            stockModal.classList.add('show');
+        }
+
+        function closeModal() {
+            stockModal.classList.remove('show');
+            currentStockId = null;
+        }
+
+        async function saveStock(e) {
+            e.preventDefault();
+            const id = document.getElementById('stockId').value;
+            const name = document.getElementById('productName').value.trim();
+            const quantity = parseInt(document.getElementById('quantity').value) || 0;
+            const minStock = parseInt(document.getElementById('minStock').value) || 0;
+
+            try {
+                if (id) {
+                    // Update existing stock
+                    await window.API.Stocks.update(id, { quantity, min_stock: minStock });
+                    showToast('Stok berhasil diperbarui!');
+                } else {
+                    // Create new raw material via Stocks.create (it will create product with is_menu=0 and stock)
+                    await window.API.Stocks.create({ name, category: 'Raw Material', price: 0, description: '', quantity, min_stock: minStock, is_menu: 0 });
+                    showToast('Bahan baku berhasil ditambahkan!');
+                }
+
+                closeModal();
+                await renderStocks();
+            } catch (err) {
+                showToast('Gagal menyimpan stok: ' + err.message);
+            }
+        }
+
+        async function deleteStock(id) {
+            if (!confirm('Yakin ingin menghapus stok ini?')) return;
+            try {
+                // Delete associated product (which will cascade to stocks)
+                const stock = stocks.find(s => s.id === id);
+                if (stock && stock.product_id) {
+                    await window.API.Products.delete(stock.product_id);
+                    showToast((stock.name || '') + ' berhasil dihapus!');
+                }
+                await renderStocks();
+            } catch (err) {
+                showToast('Gagal menghapus stok: ' + err.message);
+            }
+        }
+
+        function showToast(message) {
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            init();
+            // Poll stocks every 10s to keep dashboard and POS consistency
+            setInterval(() => {
+                renderStocks();
+            }, 10000);
+        });
+    </script>
+</body>
+</html>

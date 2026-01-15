@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#8B4513">
+    <title>Point of Sale - DigiCaf</title>
+    <link rel="stylesheet" href="../css/shared-ui.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        .pos-container {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 16px;
+            height: calc(100vh - 180px);
+        }
+
+        /* Product Panel */
+        .product-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow-y: auto;
+        }
+
+        .panel-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #8B4513;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 3px solid #8B4513;
+            box-shadow: 0 2px 8px rgba(139, 69, 19, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #8B4513, #A0522D, #8B4513);
+            background-size: 200% 100%;
+            animation: borderGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes borderGlow {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 8px 20px rgba(139, 69, 19, 0.25);
+            border-color: #A0522D;
+            background: linear-gradient(135deg, #ffffff, #fef9f5);
+        }
+
+        .product-card:active {
+            transform: translateY(-2px) scale(0.98);
+        }
+
+        .product-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 12px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            border: 3px solid white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-card:hover .product-icon {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 6px 12px rgba(139, 69, 19, 0.3);
+        }
+
+        /* Image placeholder - siap untuk gambar produk */
+        .product-image {
+            width: 100%;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            display: none; /* Akan dishow ketika ada gambar */
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-card.has-image .product-icon {
+            display: none;
+        }
+
+        .product-card.has-image .product-image {
+            display: block;
+        }
+
+        /* Shimmer effect untuk image loading */
+        @keyframes shimmer {
+            0% { background-position: -200px 0; }
+            100% { background-position: 200px 0; }
+        }
+
+        .product-image[src=""] {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200px 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        .product-name {
+            font-weight: 700;
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 8px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .product-price {
+            color: #8B4513;
+            font-weight: bold;
+            font-size: 15px;
+            padding: 6px 12px;
+            background: rgba(139, 69, 19, 0.1);
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        .product-card:hover .product-price {
+            background: rgba(139, 69, 19, 0.15);
+            transform: scale(1.05);
+        }
+
+        /* Cart Panel */
+        .cart-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cart-items {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 16px;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #f8f8f8;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .cart-item-price {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .cart-item-qty {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .qty-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #8B4513;
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .qty-btn:hover {
+            background: #A0522D;
+            transform: scale(1.1);
+        }
+
+        .qty-value {
+            min-width: 24px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .remove-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #dc3545;
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .empty-cart i {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.4;
+        }
+
+        .cart-summary {
+            border-top: 2px solid #f0f0f0;
+            padding-top: 16px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 15px;
+        }
+
+        .summary-row.total {
+            font-size: 20px;
+            font-weight: bold;
+            color: #8B4513;
+            margin-top: 8px;
+        }
+
+        .payment-input {
+            margin: 16px 0;
+        }
+
+        .payment-input label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .payment-input input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .payment-input input:focus {
+            outline: none;
+            border-color: #8B4513;
+        }
+
+        .change-display {
+            background: #f8f8f8;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .change-label {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .change-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 8px;
+            border: none;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.85);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 14px;
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .pos-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            }
+
+            .product-card {
+                padding: 14px;
+                border-width: 3px;
+            }
+
+            .product-icon {
+                width: 70px;
+                height: 70px;
+                font-size: 28px;
+            }
+
+            .product-name {
+                font-size: 14px;
+            }
+
+            .product-price {
+                font-size: 13px;
+                padding: 5px 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .product-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div data-digicaf-layout="auto" data-page-title="Point of Sale">
+        <div class="pos-container">
+            <!-- Product Panel -->
+            <div class="product-panel">
+                <div class="panel-title">
+                    <i class="fas fa-coffee"></i>
+                    Daftar Menu
+                </div>
+                <div class="product-grid" id="productGrid">
+                    <!-- Products will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Cart Panel -->
+            <div class="cart-panel">
+                <div class="panel-title">
+                    <i class="fas fa-shopping-cart"></i>
+                    Keranjang
+                </div>
+                
+                <div class="cart-items" id="cartItems">
+                    <div class="empty-cart">
+                        <i class="fas fa-shopping-basket"></i>
+                        <p>Keranjang kosong</p>
+                    </div>
+                </div>
+
+                <div class="cart-summary">
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span id="subtotal">Rp 0</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Total</span>
+                        <span id="total">Rp 0</span>
+                    </div>
+
+                    <div class="payment-input">
+                        <label>Uang Dibayar</label>
+                        <input type="number" id="paymentAmount" placeholder="Masukkan jumlah..." min="0">
+                    </div>
+
+                    <div class="change-display" id="changeDisplay" style="display: none;">
+                        <div class="change-label">Kembalian</div>
+                        <div class="change-value" id="changeAmount">Rp 0</div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary" id="clearBtn">
+                            <i class="fas fa-trash"></i> Bersihkan
+                        </button>
+                        <button class="btn btn-primary" id="payBtn" disabled>
+                            <i class="fas fa-check"></i> Bayar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script src="../js/auth.js"></script>
+    <script src="../js/layout.js"></script>
+    <script src="../js/navbar.js"></script>
+    <script src="../js/api-helper.js"></script>
+    <script>
+        // Products will be loaded from API
+        let products = [];
+        let cart = [];
+
+        // Format currency
+        function formatCurrency(amount) {
+            return 'Rp ' + amount.toLocaleString('id-ID');
+        }
+
+        // Load products using API
+        function loadProducts() {
+            const grid = document.getElementById('productGrid');
+            grid.innerHTML = products.map(p => {
+                const hasImage = p.image ? 'has-image' : '';
+                const imageHTML = p.image ? `<img src="${p.image}" alt="${p.name}" class="product-image" onerror="this.style.display='none'; this.parentElement.querySelector('.product-icon').style.display='flex';">` : '';
+                const price = p.price || p.price === 0 ? p.price : (p.price || 0);
+                const icon = p.icon || 'coffee';
+                return `
+                    <div class="product-card ${hasImage}" onclick="addToCart(${p.id})">
+                        ${imageHTML}
+                        <div class="product-icon">
+                            <i class="fas fa-${icon}"></i>
+                        </div>
+                        <div class="product-name">${p.name}</div>
+                        <div class="product-price">${formatCurrency(price)}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Add to cart
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            const existingItem = cart.find(item => item.id === productId);
+
+            if (existingItem) {
+                existingItem.qty++;
+            } else {
+                cart.push({ ...product, qty: 1 });
+            }
+
+            renderCart();
+            showToast(`${product.name} ditambahkan`);
+        }
+
+        // Update quantity
+        function updateQty(productId, change) {
+            const item = cart.find(i => i.id === productId);
+            if (item) {
+                item.qty += change;
+                if (item.qty <= 0) {
+                    removeFromCart(productId);
+                } else {
+                    renderCart();
+                }
+            }
+        }
+
+        // Remove from cart
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            renderCart();
+            showToast('Item dihapus');
+        }
+
+        // Render cart
+        function renderCart() {
+            const cartItems = document.getElementById('cartItems');
+            
+            if (cart.length === 0) {
+                cartItems.innerHTML = `
+                    <div class="empty-cart">
+                        <i class="fas fa-shopping-basket"></i>
+                        <p>Keranjang kosong</p>
+                    </div>
+                `;
+            } else {
+                cartItems.innerHTML = cart.map(item => `
+                    <div class="cart-item">
+                        <div class="cart-item-info">
+                            <div class="cart-item-name">${item.name}</div>
+                            <div class="cart-item-price">${formatCurrency(item.price)}</div>
+                        </div>
+                        <div class="cart-item-qty">
+                            <button class="qty-btn" onclick="updateQty(${item.id}, -1)">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <span class="qty-value">${item.qty}</span>
+                            <button class="qty-btn" onclick="updateQty(${item.id}, 1)">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        <button class="remove-btn" onclick="removeFromCart(${item.id})">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `).join('');
+            }
+
+            updateSummary();
+        }
+
+        // Update summary
+        function updateSummary() {
+            const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            document.getElementById('subtotal').textContent = formatCurrency(total);
+            document.getElementById('total').textContent = formatCurrency(total);
+            
+            calculateChange();
+        }
+
+        // Calculate change
+        function calculateChange() {
+            const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const payment = parseInt(document.getElementById('paymentAmount').value) || 0;
+            const change = payment - total;
+
+            const changeDisplay = document.getElementById('changeDisplay');
+            const payBtn = document.getElementById('payBtn');
+
+            if (payment >= total && total > 0) {
+                changeDisplay.style.display = 'block';
+                document.getElementById('changeAmount').textContent = formatCurrency(change);
+                payBtn.disabled = false;
+            } else {
+                changeDisplay.style.display = 'none';
+                payBtn.disabled = true;
+            }
+        }
+
+        // Clear cart
+        function clearCart() {
+            if (cart.length > 0 && confirm('Kosongkan keranjang?')) {
+                cart = [];
+                renderCart();
+                document.getElementById('paymentAmount').value = '';
+                showToast('Keranjang dikosongkan');
+            }
+        }
+
+        // Process payment (sends to API and persists transaction)
+        async function processPayment() {
+            const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const paymentInput = document.getElementById('paymentAmount');
+            const payment = parseInt(paymentInput.value, 10) || 0;
+
+            if (cart.length === 0) {
+                showToast('Keranjang kosong');
+                return;
+            }
+            if (payment < total) {
+                showToast('Uang customer kurang!');
+                return;
+            }
+
+            const payBtn = document.getElementById('payBtn');
+            payBtn.disabled = true;
+            payBtn.textContent = 'Processing...';
+
+            try {
+                const payload = {
+                    items: cart.map(it => ({ product_id: it.id, quantity: it.qty, unit_price: it.price, subtotal: it.price * it.qty })),
+                    customer_id: null,
+                    employee_id: null,
+                    payment_method: 'cash',
+                    total_amount: total
+                };
+
+                const trx = await window.API.Transactions.create(payload);
+
+                const kembali = payment - total;
+                showToast(`✅ Transaksi #${trx.id} berhasil!`);
+
+                alert(
+                    `TRANSAKSI BERHASIL\n` +
+                    `================\n` +
+                    `No: ${trx.id}\n` +
+                    `Total: ${formatCurrency(total)}\n` +
+                    `Uang: ${formatCurrency(payment)}\n` +
+                    `Kembali: ${formatCurrency(kembali)}\n` +
+                    `\nTerima kasih!`
+                );
+
+                // Reset UI
+                cart = [];
+                renderCart();
+                paymentInput.value = '';
+            } catch (err) {
+                showToast('Gagal menyimpan transaksi: ' + (err.message || err));
+            } finally {
+                payBtn.disabled = false;
+                payBtn.textContent = 'Bayar';
+            }
+        }
+
+        // Show toast
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Event listeners
+        document.getElementById('paymentAmount').addEventListener('input', calculateChange);
+        document.getElementById('clearBtn').addEventListener('click', clearCart);
+        document.getElementById('payBtn').addEventListener('click', processPayment);
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Load products from products API (POS should only show menu items)
+                const prods = await window.API.Products.getAll();
+                // Filter out raw materials where is_menu == 0
+                products = (prods || [])
+                    .filter(p => (p.is_menu === undefined) ? true : Number(p.is_menu) === 1)
+                    .map(p => ({
+                        id: p.id,
+                        name: p.name,
+                        price: p.price || 0,
+                        quantity: p.quantity || 0,
+                        icon: p.icon || 'coffee',
+                        image: p.image || null
+                    }));
+            } catch (err) {
+                const grid = document.getElementById('productGrid');
+                grid.innerHTML = `<div style="padding:12px;color:#f44336">⚠️ Gagal memuat produk: ${err.message}</div>`;
+                products = [];
+            }
+
+            loadProducts();
+            renderCart();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+:root{
+  --primary:#8B4513;
+  --accent:#A0522D;
+  --bg:#FCDFBB;
+  --surface:#ffffff;
+  --surface-alt:#f5f5f5;
+  --text:#333333;
+  --muted:#666666;
+  --app-max-width:980px;
+  --radius:12px;
+  --shadow:0 2px 8px rgba(0,0,0,0.08);
+}
+
+*{box-sizing:border-box}
+
+html,body{height:100%}
+
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+
+/* Standard app container for all pages (including Framework7 pages using #app) */
+.app-shell,
+.app{
+  max-width:var(--app-max-width);
+  margin:0 auto;
+  background:var(--surface);
+  min-height:100vh;
+  box-shadow:0 0 18px rgba(0,0,0,0.06);
+  position:relative;
+}
+
+/* Consistent top header across pages */
+.top-header,
+.header{
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  color:#fff;
+  padding:16px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+
+.top-header .title,
+.header .title,
+.header-title,
+.logo{
+  font-weight:700;
+}
+
+.top-header .user,
+.header-right,
+.admin-info{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.digicaf-logout-btn{
+  margin-left:8px;
+  background:rgba(255,255,255,0.16);
+  border:1px solid rgba(255,255,255,0.35);
+  color:#fff;
+  border-radius:10px;
+  padding:8px 10px;
+  font-weight:800;
+  cursor:pointer;
+}
+.digicaf-logout-btn:hover{filter:brightness(1.05)}
+.digicaf-logout-btn:active{transform:translateY(0.5px)}
+
+/* Main content spacing; keep room for bottom nav */
+.main,
+.main-content,
+.page-content{
+  padding:22px 20px 110px 20px;
+  background:var(--surface-alt);
+}
+
+/* When a page keeps its own .main/.main-content/.page-content wrapper, disable injected padding */
+.main.main--passthrough{
+  padding:0;
+  background:transparent;
+}
+
+.page-title{
+  font-size:24px;
+  font-weight:700;
+  color:var(--primary);
+  margin:0 0 18px 0;
+}
+
+/* Common components (search + stats) used across pages */
+.search-bar{position:relative}
+.search-bar input{
+  width:100%;
+  padding:14px 48px 14px 18px;
+  border-radius:35px;
+  border:2px solid var(--primary);
+  font-size:16px;
+  background:#fff;
+  color:var(--text);
+}
+.search-bar input::placeholder{color:var(--muted);opacity:0.85}
+.search-bar i{position:absolute;right:18px;top:50%;transform:translateY(-50%);color:var(--primary)}
+
+/* Primary full-width action button (used for 'Tambah' actions) */
+.primary-action-btn{
+  width:100%;
+  padding:15px;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  color:#fff;
+  border:none;
+  border-radius:10px;
+  font-size:16px;
+  font-weight:700;
+  cursor:pointer;
+  margin:14px 0 18px 0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+}
+.primary-action-btn:hover{filter:brightness(0.97)}
+.primary-action-btn:active{transform:translateY(0.5px)}
+
+.stats-row{display:flex;gap:12px;margin-top:14px;margin-bottom:18px}
+.stat-card{background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;border-radius:12px;padding:16px;flex:1;text-align:center}
+.stat-number{font-size:26px;font-weight:700}
+.stat-label{font-size:13px;opacity:0.9}
+
+@media (max-width:720px){
+  .stats-row{flex-direction:column}
+}
+
+/* Standard card */
+.card,
+.stats-card,
+.report-item,
+.stock-section,
+.add-form,
+.customer-card,
+.employee-card{
+  border-radius:var(--radius);
+}
+
+/* Helpful defaults */
+h1,h2,h3{color:var(--text)}
+
+@media (max-width:720px){
+  .app-shell,.app,#app{margin:0 8px;max-width:calc(100% - 16px)}
+  .top-header,.header{padding:14px 16px}
+  .main,.main-content,.page-content{padding:18px 16px 110px 16px}
+}
+
+/* Home (index.html) menu tiles */
+.home-menu-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.home-menu-tile{background:#fff;border-radius:12px;box-shadow:var(--shadow);padding:14px;cursor:pointer;display:flex;gap:12px;align-items:center}
+.home-menu-icon{width:44px;height:44px;border-radius:12px;background:rgba(139,69,19,0.10);display:flex;align-items:center;justify-content:center;color:var(--primary);font-size:18px;flex:0 0 auto}
+.home-menu-title{font-weight:700;color:var(--text);margin:0 0 2px 0}
+.home-menu-desc{color:var(--muted);font-size:13px;margin:0}
+@media (max-width:520px){.home-menu-grid{grid-template-columns:1fr}}

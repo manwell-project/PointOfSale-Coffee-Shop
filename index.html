@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#8B4513" />
+  <title>DigiCaf - Beranda</title>
+
+  <link rel="stylesheet" href="./css/shared-ui.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    .welcome-banner {
+      background: linear-gradient(135deg, #8B4513, #A0522D);
+      color: white;
+      padding: 32px 24px;
+      border-radius: 16px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
+      text-align: center;
+    }
+
+    .welcome-title {
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .welcome-subtitle {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+
+    .info-card {
+      padding: 20px;
+      margin-bottom: 20px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .info-card p {
+      margin: 0;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    .home-menu-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 80px;
+    }
+
+    .home-menu-tile {
+      background: white;
+      padding: 24px;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .home-menu-tile:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(139, 69, 19, 0.2);
+    }
+
+    .home-menu-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #8B4513, #A0522D);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin-bottom: 16px;
+    }
+
+    .home-menu-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+      margin: 8px 0 4px 0;
+    }
+
+    .home-menu-desc {
+      font-size: 13px;
+      color: #666;
+      margin: 0;
+    }
+
+    @media (max-width: 640px) {
+      .home-menu-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div data-digicaf-layout="auto" data-page-title="Beranda">
+    <div class="welcome-banner">
+      <div class="welcome-title">☕ Selamat Datang di DigiCaf</div>
+      <div class="welcome-subtitle">Sistem Point of Sale Coffee Shop Modern</div>
+    </div>
+
+    <div class="info-card">
+      <p>Pilih modul di bawah untuk mulai menggunakan DigiCaf. Kelola bisnis kopi Anda dengan lebih efisien!</p>
+    </div>
+
+    <div class="home-menu-grid">
+      <div class="home-menu-tile" onclick="location.href='./Dashboard/index.html'">
+        <div class="home-menu-icon"><i class="fas fa-chart-line"></i></div>
+        <div class="home-menu-title">Dashboard</div>
+        <div class="home-menu-desc">Ringkasan & aktivitas bisnis</div>
+      </div>
+
+      <div class="home-menu-tile" onclick="location.href='./Transaksi/index.html'">
+        <div class="home-menu-icon"><i class="fas fa-cash-register"></i></div>
+        <div class="home-menu-title">Point of Sale</div>
+        <div class="home-menu-desc">Transaksi penjualan</div>
+      </div>
+
+      <div class="home-menu-tile" onclick="location.href='./Manejemen_stok/index.html'">
+        <div class="home-menu-icon"><i class="fas fa-box"></i></div>
+        <div class="home-menu-title">Manajemen Stok</div>
+        <div class="home-menu-desc">Inventori & minimum stok</div>
+      </div>
+
+      <div class="home-menu-tile" onclick="location.href='./Manajemen_Karyawan/index.html'">
+        <div class="home-menu-icon"><i class="fas fa-users"></i></div>
+        <div class="home-menu-title">Manajemen Karyawan</div>
+        <div class="home-menu-desc">Data & shift karyawan</div>
+      </div>
+
+      <div class="home-menu-tile" onclick="location.href='./Manajemen_Pelanggan/index.html'">
+        <div class="home-menu-icon"><i class="fas fa-user-friends"></i></div>
+        <div class="home-menu-title">Manajemen Pelanggan</div>
+        <div class="home-menu-desc">Data pelanggan & loyalitas</div>
+      </div>
+
+      <div class="home-menu-tile" onclick="location.href='./Laporan%20POS/coffee-pos.html'">
+        <div class="home-menu-icon"><i class="fas fa-file-alt"></i></div>
+        <div class="home-menu-title">Laporan</div>
+        <div class="home-menu-desc">Laporan keuangan & analisis</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="./js/auth.js"></script>
+  <script src="./js/layout.js"></script>
+  <script src="./js/navbar.js"></script>
+</body>
+</html>

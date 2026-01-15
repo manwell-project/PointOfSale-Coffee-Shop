@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coffee POS - Inventori Stok</title>
+    <link rel="stylesheet" href="../css/shared-ui.css">
+    <link rel="stylesheet" href="my-app.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div data-digicaf-layout="auto" data-page-title="Inventori Stok">
+    <main class="main-content">
+
+        <div class="search-bar" style="margin-top:14px;">
+            <input type="text" id="searchStockInput" placeholder="Cari stok...">
+            <i class="fas fa-search"></i>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-number" id="totalProducts">0</div>
+                <div class="stat-label">Produk</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalStockQty">0</div>
+                <div class="stat-label">Total Stok</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="lowStockCount">0</div>
+                <div class="stat-label">Stok Rendah</div>
+            </div>
+        </div>
+
+        <!-- Add Stock Button -->
+        <button class="add-stock-btn" onclick="showAddForm()">
+            <i class="fas fa-plus"></i>
+            Tambah Stok Baru
+        </button>
+
+        <!-- Simple Add Form -->
+        <div class="add-form" id="addForm" style="display: none;">
+            <h3>Tambah Stok</h3>
+            <input type="text" id="productName" placeholder="Nama Produk" class="input-field">
+            <input type="number" id="quantity" placeholder="Jumlah Stok" class="input-field">
+            <input type="number" id="minStock" placeholder="Minimum Stok" class="input-field">
+            
+            <div class="form-buttons">
+                <button onclick="saveStock()" class="save-btn">Simpan</button>
+                <button onclick="cancelAdd()" class="cancel-btn">Batal</button>
+            </div>
+        </div>
+
+        <!-- Stock List -->
+        <div class="stock-section">
+            <h2>Daftar Stok</h2>
+            <div class="stock-list" id="stockList">
+                <!-- Stock items akan ditampilkan di sini -->
+            </div>
+        </div>
+    </main>
+    </div>
+
+    <script src="../js/layout.js"></script>
+    <script src="my-app.js"></script>
+    <script src="../js/navbar.js"></script>
+</body>
+</html>

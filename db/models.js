@@ -1,0 +1,68 @@
+const path = require('path');
+const Database = require('better-sqlite3');
+
+const DB_FILE = path.join(__dirname, 'digicaf.db');
+const db = new Database(DB_FILE, { verbose: console.log });
+
+// Products
+const createProduct = (sku, name, price) => {
+  const stmt = db.prepare('INSERT INTO products(sku,name,price) VALUES (?,?,?)');
+  const info = stmt.run(sku, name, price);
+  return { id: info.lastInsertRowid, sku, name, price };
+};
+
+const getProducts = () => db.prepare('SELECT * FROM products ORDER BY name').all();
+
+// Stocks
+const addStock = (name, quantity, minStock, productId = null) => {
+  const stmt = db.prepare('INSERT INTO stocks(product_id,name,quantity,min_stock) VALUES (?,?,?,?)');
+  const info = stmt.run(productId, name, quantity, minStock);
+  return { id: info.lastInsertRowid, productId, name, quantity, minStock };
+};
+
+const getStocks = () => db.prepare('SELECT * FROM stocks ORDER BY name').all();
+
+// Employees
+const addEmployee = (name, shift, phone, email) => {
+  const stmt = db.prepare('INSERT INTO employees(name,shift,phone,email) VALUES (?,?,?,?)');
+  const info = stmt.run(name, shift, phone, email);
+  return { id: info.lastInsertRowid, name, shift, phone, email };
+};
+
+const getEmployees = () => db.prepare('SELECT * FROM employees ORDER BY name').all();
+
+// Customers
+const addCustomer = (name, phone, email, type = 'regular') => {
+  const stmt = db.prepare('INSERT INTO customers(name,phone,email,type) VALUES (?,?,?,?)');
+  const info = stmt.run(name, phone, email, type);
+  return { id: info.lastInsertRowid, name, phone, email, type };
+};
+
+const getCustomers = () => db.prepare('SELECT * FROM customers ORDER BY created_at DESC').all();
+
+// Transactions
+const createTransaction = (transactionNo, paidAmount, totalAmount, items) => {
+  const trx = db.transaction((trxNo, paid, total, itemsArr) => {
+    const tStmt = db.prepare('INSERT INTO transactions(transaction_no,paid_amount,total_amount) VALUES (?,?,?)');
+    const tInfo = tStmt.run(trxNo, paid, total);
+    const trxId = tInfo.lastInsertRowid;
+
+    const itStmt = db.prepare('INSERT INTO transaction_items(transaction_id,product_id,product_name,price,qty,subtotal) VALUES (?,?,?,?,?,?)');
+    itemsArr.forEach(it => {
+      itStmt.run(trxId, it.productId || null, it.productName, it.price, it.qty, it.price * it.qty);
+    });
+    return trxId;
+  });
+
+  return trx(transactionNo, paidAmount, totalAmount, items);
+};
+
+const getTransactions = () => db.prepare('SELECT * FROM transactions ORDER BY created_at DESC').all();
+
+module.exports = {
+  createProduct, getProducts,
+  addStock, getStocks,
+  addEmployee, getEmployees,
+  addCustomer, getCustomers,
+  createTransaction, getTransactions,
+};

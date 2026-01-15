@@ -1,0 +1,177 @@
+/* ...existing code... */
+body, .page-content {
+  background: #fdf6ec;
+  color: #6d4c2c;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+.transaksi-container {
+  max-width: 500px;
+  margin: 32px auto;
+  background: #fff8ee;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px #e0c9a6;
+  padding: 24px;
+}
+
+.transaksi-container h2, .transaksi-container h3 {
+  color: #6d4c2c;
+}
+
+.transaksi-flex {
+  display: flex;
+  gap: 32px;
+  justify-content: center;
+  align-items: flex-start;
+  margin-top: 32px;
+}
+
+.produk-list {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.produk-card {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px #e0c9a6;
+  padding: 18px 16px;
+  width: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.produk-info {
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.produk-nama {
+  display: block;
+  font-weight: bold;
+  font-size: 1.1em;
+  color: #6d4c2c;
+}
+
+.produk-harga {
+  display: block;
+  color: #8d6742;
+  margin-top: 4px;
+  font-size: 1em;
+}
+
+.produk-jumlah {
+  width: 45px;
+  border: 1px solid #d2b48c;
+  border-radius: 4px;
+  padding: 2px 6px;
+  background: #fff;
+  color: #6d4c2c;
+}
+
+.produk-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.touch-input {
+  font-size: 1.2em;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #d2b48c;
+  width: 60px;
+  text-align: center;
+  background: #fff;
+  color: #6d4c2c;
+}
+
+.btn-tambah, .btn-bayar, .btn-remove {
+  background: #6d4c2c;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-tambah:hover, .btn-bayar:hover, .btn-remove:hover {
+  background: #8d6742;
+}
+
+.keranjang {
+  margin-top: 24px;
+  background: #f5e6d3;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.keranjang-panel {
+  background: #fff8ee;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px #e0c9a6;
+  padding: 24px;
+  width: 320px;
+}
+
+.keranjang-panel h2 {
+  color: #6d4c2c;
+  margin-bottom: 16px;
+}
+
+.keranjang-panel ul {
+  padding-left: 18px;
+  margin-bottom: 12px;
+}
+
+.total {
+  font-weight: bold;
+  margin-bottom: 12px;
+  font-size: 1.1em;
+}
+
+.input-uang {
+  margin-bottom: 10px;
+}
+
+.input-uang label {
+  margin-right: 8px;
+  color: #6d4c2c;
+}
+
+.input-uang input {
+  width: 120px;
+  border: 1px solid #d2b48c;
+  border-radius: 4px;
+  padding: 2px 8px;
+  background: #fff;
+  color: #6d4c2c;
+}
+
+.kembalian {
+  font-weight: bold;
+  margin-bottom: 14px;
+  color: #6d4c2c;
+}
+
+.btn-remove {
+  background: #d2b48c;
+  color: #6d4c2c;
+  border: none;
+  border-radius: 6px;
+  padding: 3px 12px;
+  cursor: pointer;
+  margin-left: 8px;
+  transition: background 0.2s;
+}
+
+.btn-remove:hover {
+  background: #c2a178;
+}
+/* ...existing code... */

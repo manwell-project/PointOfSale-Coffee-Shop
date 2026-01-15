@@ -1,0 +1,2 @@
+// Backup of top-level db/seed.js
+module.exports = require('../../db/seed');

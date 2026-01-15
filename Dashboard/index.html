@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#8B4513">
+    <title>Dashboard - DigiCaf</title>
+    <link rel="stylesheet" href="../css/shared-ui.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        .dashboard-header {
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            color: white;
+            padding: 24px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
+        }
+
+        .welcome-text {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        .date-text {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-left: 4px solid #8B4513;
+            transition: all 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 69, 19, 0.2);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin-bottom: 12px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
+        .stat-value {
+            color: #8B4513;
+            font-weight: bold;
+            font-size: 24px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .action-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .action-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 69, 19, 0.2);
+        }
+
+        .action-icon {
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 12px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+        }
+
+        .action-label {
+            font-weight: 600;
+            color: #333;
+            font-size: 15px;
+        }
+
+        .activity-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #f8f8f8;
+            color: #8B4513;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .activity-info {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 600;
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 2px;
+        }
+
+        .activity-time {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.4;
+        }
+    </style>
+</head>
+<body>
+    <div data-digicaf-layout="auto" data-page-title="Dashboard">
+        <!-- Welcome Header -->
+        <div class="dashboard-header">
+            <div class="welcome-text">Selamat Datang di DigiCaf!</div>
+            <div class="date-text" id="currentDate"></div>
+        </div>
+
+        <!-- Statistics Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <div class="stat-label">Pendapatan Hari Ini</div>
+                <div class="stat-value" id="todayRevenue">Rp 0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <div class="stat-label">Transaksi</div>
+                <div class="stat-value" id="todayTransactions">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-fire"></i>
+                </div>
+                <div class="stat-label">Menu Terlaris</div>
+                <div class="stat-value" id="bestSeller">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="stat-label">Stok Rendah</div>
+                <div class="stat-value" id="lowStock">0</div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="section-title">Tindakan Cepat</div>
+        <div class="quick-actions">
+            <div class="action-card" onclick="location.href='../Transaksi/index.html'">
+                <div class="action-icon">
+                    <i class="fas fa-cash-register"></i>
+                </div>
+                <div class="action-label">Buka POS</div>
+            </div>
+            <div class="action-card" onclick="location.href='../Manejemen_stok/index.html'">
+                <div class="action-icon">
+                    <i class="fas fa-box"></i>
+                </div>
+                <div class="action-label">Kelola Stok</div>
+            </div>
+            <div class="action-card" data-role="admin-only" onclick="location.href='../Manajemen_Karyawan/index.html'">
+                <div class="action-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="action-label">Karyawan</div>
+            </div>
+            <div class="action-card" onclick="location.href='../Manajemen_Pelanggan/index.html'">
+                <div class="action-icon">
+                    <i class="fas fa-user-friends"></i>
+                </div>
+                <div class="action-label">Pelanggan</div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="section-title">Aktivitas Terbaru</div>
+        <div class="activity-section" id="activityList">
+            <div class="empty-state">
+                <i class="fas fa-clock"></i>
+                <p>Belum ada aktivitas</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/auth.js"></script>
+    <script src="../js/layout.js"></script>
+    <script src="../js/navbar.js"></script>
+    <script src="../js/api-helper.js"></script>
+    <script>
+        // Set current date
+        function setCurrentDate() {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const date = new Date().toLocaleDateString('id-ID', options);
+            document.getElementById('currentDate').textContent = date;
+        }
+
+        // Format currency
+        function formatCurrency(amount) {
+            return 'Rp ' + amount.toLocaleString('id-ID');
+        }
+
+        // Sample activities
+        const activities = [
+            { icon: 'shopping-cart', title: 'Transaksi baru - Espresso x2', time: '5 menit yang lalu' },
+            { icon: 'box', title: 'Stok Cappuccino diperbarui', time: '15 menit yang lalu' },
+            { icon: 'user-plus', title: 'Pelanggan baru terdaftar', time: '1 jam yang lalu' },
+            { icon: 'money-bill', title: 'Pembayaran diterima - Rp 150.000', time: '2 jam yang lalu' }
+        ];
+
+        // Load dashboard data (fetch from API; default empty/fresh if no data)
+        async function loadDashboard() {
+            const activityList = document.getElementById('activityList');
+            try {
+                const daily = await API.Reports.getDaily();
+                // Fetch raw stocks list directly and compute low-stock count from Stocks page data
+                const stocksList = await API.Stocks.getAll();
+
+                const revenue = (daily && daily.summary && daily.summary.total_revenue) ? daily.summary.total_revenue : 0;
+                const txCount = (daily && daily.summary && daily.summary.total_transactions) ? daily.summary.total_transactions : 0;
+                const best = (daily && daily.top_products && daily.top_products.length > 0) ? daily.top_products[0].name : '-';
+                const lowCount = Array.isArray(stocksList) ? stocksList.filter(s => Number(s.quantity) <= Number(s.min_stock)).length : 0;
+
+                document.getElementById('todayRevenue').textContent = formatRupiah(revenue);
+                document.getElementById('todayTransactions').textContent = String(txCount);
+                document.getElementById('bestSeller').textContent = best;
+                document.getElementById('lowStock').textContent = String(lowCount);
+
+                // Build activity area: prefer top products, otherwise low-stock alerts, otherwise empty state
+                let html = '';
+                if (daily && daily.top_products && daily.top_products.length > 0) {
+                    html += daily.top_products.slice(0,5).map((p,i) => `
+                        <div class="activity-item">
+                            <div class="activity-icon"><i class="fas fa-fire"></i></div>
+                            <div class="activity-info">
+                                <div class="activity-title">${i+1}. ${p.name}</div>
+                                <div class="activity-time">Terjual: ${p.qty_sold} | Revenue: ${formatRupiah(p.revenue)}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else if (Array.isArray(stocksList) && stocksList.filter(s => Number(s.quantity) <= Number(s.min_stock)).length > 0) {
+                    const lowStocks = stocksList.filter(s => Number(s.quantity) <= Number(s.min_stock));
+                    html += lowStocks.slice(0,5).map(s => `
+                        <div class="activity-item">
+                            <div class="activity-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                            <div class="activity-info">
+                                <div class="activity-title">Stok Rendah: ${s.name}</div>
+                                <div class="activity-time">Stok: ${s.quantity} / Min: ${s.min_stock}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else if (activities && activities.length > 0) {
+                    html = activities.map(activity => `
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-${activity.icon}"></i>
+                            </div>
+                            <div class="activity-info">
+                                <div class="activity-title">${activity.title}</div>
+                                <div class="activity-time">${activity.time}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    html = '<div class="empty-state"><i class="fas fa-clock"></i><p>Belum ada aktivitas</p></div>';
+                }
+
+                activityList.innerHTML = html;
+            } catch (err) {
+                activityList.innerHTML = `<div style="color:#f44336;padding:12px">⚠️ Error: ${err.message || err}</div>`;
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                const session = window.DigiCafAuth && typeof window.DigiCafAuth.getSession === 'function'
+                    ? window.DigiCafAuth.getSession()
+                    : null;
+                const role = (session && session.role ? String(session.role) : '').toLowerCase();
+                if (role === 'kasir') {
+                    document.querySelectorAll('[data-role="admin-only"]').forEach(el => el.remove());
+                }
+            } catch (e) {}
+
+            setCurrentDate();
+            loadDashboard();
+
+            // Auto refresh every 30 seconds
+            setInterval(loadDashboard, 30000);
+        });
+    </script>
+</body>
+</html>
