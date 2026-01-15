@@ -1,0 +1,891 @@
+/**
+ * Badge & Label Components
+ * Coffee Shop POS System
+ * 
+ * Status badges, labels, tags, and counters
+ * Compatible with Framework7 badges
+ * Import design-tokens.css before this file
+ */
+
+/* ============================================
+   BADGE BASE
+   ============================================ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 8px;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.4;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  vertical-align: middle;
+  background-color: var(--color-gray-200);
+  color: var(--color-text-secondary);
+  transition: var(--transition-fast);
+}
+
+/* Badge Sizes */
+.badge-sm {
+  padding: 1px 6px;
+  font-size: 10px;
+}
+
+.badge-md {
+  padding: 2px 8px;
+  font-size: var(--font-size-xs);
+}
+
+.badge-lg {
+  padding: 4px 12px;
+  font-size: var(--font-size-sm);
+}
+
+/* Badge Variants */
+.badge-primary {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+}
+
+.badge-secondary {
+  background-color: var(--color-secondary);
+  color: var(--color-white);
+}
+
+.badge-success {
+  background-color: var(--color-success);
+  color: var(--color-white);
+}
+
+.badge-warning {
+  background-color: var(--color-warning);
+  color: var(--color-text-primary);
+}
+
+.badge-danger {
+  background-color: var(--color-danger);
+  color: var(--color-white);
+}
+
+.badge-info {
+  background-color: var(--color-info);
+  color: var(--color-white);
+}
+
+.badge-dark {
+  background-color: var(--color-gray-800);
+  color: var(--color-white);
+}
+
+.badge-light {
+  background-color: var(--color-gray-100);
+  color: var(--color-text-primary);
+}
+
+/* Badge Outline Variants */
+.badge-outline {
+  background-color: transparent;
+  border: 1px solid currentColor;
+}
+
+.badge-outline-primary {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  background-color: transparent;
+}
+
+.badge-outline-success {
+  color: var(--color-success);
+  border-color: var(--color-success);
+  background-color: transparent;
+}
+
+.badge-outline-warning {
+  color: var(--color-warning-dark);
+  border-color: var(--color-warning);
+  background-color: transparent;
+}
+
+.badge-outline-danger {
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+  background-color: transparent;
+}
+
+.badge-outline-info {
+  color: var(--color-info);
+  border-color: var(--color-info);
+  background-color: transparent;
+}
+
+/* Badge Soft Variants (Light backgrounds) */
+.badge-soft-primary {
+  background-color: rgba(107, 68, 35, 0.1);
+  color: var(--color-primary-dark);
+}
+
+.badge-soft-success {
+  background-color: var(--color-success-bg);
+  color: var(--color-success-dark);
+}
+
+.badge-soft-warning {
+  background-color: var(--color-warning-bg);
+  color: var(--color-warning-dark);
+}
+
+.badge-soft-danger {
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger-dark);
+}
+
+.badge-soft-info {
+  background-color: var(--color-info-bg);
+  color: var(--color-info-dark);
+}
+
+/* Badge with Dot Indicator */
+.badge-dot {
+  padding-left: 18px;
+  position: relative;
+}
+
+.badge-dot::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-circle);
+  background-color: currentColor;
+}
+
+/* Badge with Icon */
+.badge-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.badge-icon .icon,
+.badge-icon .f7-icons {
+  font-size: 12px;
+  margin-right: 2px;
+}
+
+/* Badge Pill (More rounded) */
+.badge-pill {
+  border-radius: var(--radius-full);
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+/* Badge Square */
+.badge-square {
+  border-radius: var(--radius-sm);
+}
+
+/* Badge Circle (for single character or number) */
+.badge-circle {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border-radius: var(--radius-circle);
+  font-size: 11px;
+}
+
+.badge-circle-lg {
+  width: 28px;
+  height: 28px;
+  font-size: var(--font-size-sm);
+}
+
+/* ============================================
+   LABEL / TAG COMPONENT
+   ============================================ */
+
+.label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  padding: 4px 10px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.5;
+  border-radius: var(--radius-md);
+  background-color: var(--color-gray-100);
+  color: var(--color-text-primary);
+  transition: var(--transition-fast);
+}
+
+.label-primary {
+  background-color: rgba(107, 68, 35, 0.1);
+  color: var(--color-primary-dark);
+}
+
+.label-success {
+  background-color: var(--color-success-bg);
+  color: var(--color-success-dark);
+}
+
+.label-warning {
+  background-color: var(--color-warning-bg);
+  color: var(--color-warning-dark);
+}
+
+.label-danger {
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger-dark);
+}
+
+.label-info {
+  background-color: var(--color-info-bg);
+  color: var(--color-info-dark);
+}
+
+/* Label with Remove Button */
+.label-removable {
+  padding-right: 6px;
+}
+
+.label-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  margin-left: var(--spacing-1);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-circle);
+  color: currentColor;
+  opacity: 0.6;
+  cursor: pointer;
+  padding: 0;
+  transition: var(--transition-fast);
+}
+
+.label-remove:hover {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.label-remove .icon,
+.label-remove .f7-icons {
+  font-size: 12px;
+}
+
+/* ============================================
+   STATUS BADGE (for Stock, Order Status)
+   ============================================ */
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-full);
+  line-height: 1.5;
+}
+
+.status-badge::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-circle);
+  background-color: currentColor;
+  flex-shrink: 0;
+}
+
+/* Stock Status */
+.status-in-stock {
+  background-color: var(--color-success-bg);
+  color: var(--color-success-dark);
+}
+
+.status-low-stock {
+  background-color: var(--color-warning-bg);
+  color: var(--color-warning-dark);
+}
+
+.status-out-of-stock {
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger-dark);
+}
+
+/* Order Status */
+.status-pending {
+  background-color: var(--color-warning-bg);
+  color: var(--color-warning-dark);
+}
+
+.status-processing {
+  background-color: var(--color-info-bg);
+  color: var(--color-info-dark);
+}
+
+.status-completed {
+  background-color: var(--color-success-bg);
+  color: var(--color-success-dark);
+}
+
+.status-cancelled {
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger-dark);
+}
+
+/* Employee Status */
+.status-active {
+  background-color: var(--color-success-bg);
+  color: var(--color-success-dark);
+}
+
+.status-inactive {
+  background-color: var(--color-gray-100);
+  color: var(--color-text-secondary);
+}
+
+.status-on-break {
+  background-color: var(--color-warning-bg);
+  color: var(--color-warning-dark);
+}
+
+/* ============================================
+   COUNTER BADGE
+   ============================================ */
+
+.counter-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  font-size: 11px;
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+  border-radius: var(--radius-full);
+  background-color: var(--color-danger);
+  color: var(--color-white);
+}
+
+.counter-badge-sm {
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  font-size: 10px;
+}
+
+.counter-badge-lg {
+  min-width: 24px;
+  height: 24px;
+  padding: 0 8px;
+  font-size: var(--font-size-xs);
+}
+
+.counter-badge-primary {
+  background-color: var(--color-primary);
+}
+
+.counter-badge-success {
+  background-color: var(--color-success);
+}
+
+.counter-badge-warning {
+  background-color: var(--color-warning);
+  color: var(--color-text-primary);
+}
+
+.counter-badge-info {
+  background-color: var(--color-info);
+}
+
+/* Counter Badge Positions (on buttons, icons) */
+.has-counter {
+  position: relative;
+}
+
+.has-counter .counter-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  border: 2px solid var(--color-white);
+}
+
+/* ============================================
+   TAG GROUPS
+   ============================================ */
+
+.tag-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  padding: 4px 10px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-md);
+  background-color: var(--color-gray-100);
+  color: var(--color-text-secondary);
+  cursor: default;
+  transition: var(--transition-fast);
+}
+
+.tag-clickable {
+  cursor: pointer;
+}
+
+.tag-clickable:hover {
+  background-color: var(--color-gray-200);
+  color: var(--color-text-primary);
+}
+
+/* Tag with icon */
+.tag .icon,
+.tag .f7-icons {
+  font-size: 14px;
+}
+
+/* ============================================
+   PRICE TAG (for Products)
+   ============================================ */
+
+.price-tag {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+}
+
+.price-tag-currency {
+  font-size: 0.75em;
+  font-weight: var(--font-weight-semibold);
+}
+
+.price-tag-amount {
+  font-size: 1em;
+}
+
+.price-tag-decimal {
+  font-size: 0.75em;
+}
+
+/* Price sizes */
+.price-tag-sm {
+  font-size: var(--font-size-sm);
+}
+
+.price-tag-md {
+  font-size: var(--font-size-lg);
+}
+
+.price-tag-lg {
+  font-size: var(--font-size-2xl);
+}
+
+.price-tag-xl {
+  font-size: var(--font-size-4xl);
+}
+
+/* Discount price */
+.price-tag-discount {
+  color: var(--color-danger);
+}
+
+.price-tag-old {
+  text-decoration: line-through;
+  color: var(--color-text-tertiary);
+  font-weight: var(--font-weight-normal);
+  font-size: 0.875em;
+}
+
+/* ============================================
+   PRODUCT BADGES (Hot, New, Sale)
+   ============================================ */
+
+.product-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: var(--radius-sm);
+  line-height: 1;
+}
+
+.product-badge-hot {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+  color: var(--color-white);
+  box-shadow: 0 2px 8px rgba(255, 82, 82, 0.3);
+}
+
+.product-badge-new {
+  background: linear-gradient(135deg, var(--color-success) 0%, #20c997 100%);
+  color: var(--color-white);
+  box-shadow: 0 2px 8px rgba(39, 174, 96, 0.3);
+}
+
+.product-badge-sale {
+  background: linear-gradient(135deg, var(--color-warning) 0%, #ffa940 100%);
+  color: var(--color-text-primary);
+  box-shadow: 0 2px 8px rgba(250, 173, 20, 0.3);
+}
+
+.product-badge-promo {
+  background: linear-gradient(135deg, var(--color-info) 0%, #40a9ff 100%);
+  color: var(--color-white);
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
+}
+
+.product-badge-bestseller {
+  background: linear-gradient(135deg, var(--color-primary) 0%, #8b5d33 100%);
+  color: var(--color-white);
+  box-shadow: 0 2px 8px rgba(107, 68, 35, 0.3);
+}
+
+/* Position on product card */
+.product-badge-positioned {
+  position: absolute;
+  top: var(--spacing-2);
+  right: var(--spacing-2);
+  z-index: 1;
+}
+
+/* ============================================
+   PERCENTAGE BADGE (Discount)
+   ============================================ */
+
+.percentage-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  height: 48px;
+  padding: var(--spacing-2);
+  border-radius: var(--radius-circle);
+  background: linear-gradient(135deg, var(--color-danger) 0%, #ff4d4f 100%);
+  color: var(--color-white);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-md);
+  box-shadow: 0 4px 12px rgba(245, 34, 45, 0.3);
+  line-height: 1;
+  text-align: center;
+}
+
+.percentage-badge-sm {
+  min-width: 36px;
+  height: 36px;
+  font-size: var(--font-size-sm);
+}
+
+.percentage-badge-lg {
+  min-width: 64px;
+  height: 64px;
+  font-size: var(--font-size-xl);
+}
+
+/* ============================================
+   RATING BADGE (Stars)
+   ============================================ */
+
+.rating-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background-color: var(--color-warning-bg);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-warning-dark);
+}
+
+.rating-badge .icon,
+.rating-badge .f7-icons {
+  font-size: 14px;
+  color: var(--color-warning);
+}
+
+/* ============================================
+   CATEGORY BADGE
+   ============================================ */
+
+.category-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-gray-100);
+  color: var(--color-text-secondary);
+  transition: var(--transition-fast);
+}
+
+.category-badge .icon,
+.category-badge .f7-icons {
+  font-size: 16px;
+}
+
+.category-badge:hover {
+  background-color: var(--color-gray-200);
+  color: var(--color-text-primary);
+}
+
+/* Category Colors */
+.category-coffee {
+  background-color: rgba(107, 68, 35, 0.1);
+  color: var(--color-primary-dark);
+}
+
+.category-tea {
+  background-color: rgba(39, 174, 96, 0.1);
+  color: #27ae60;
+}
+
+.category-food {
+  background-color: rgba(255, 152, 0, 0.1);
+  color: #f57c00;
+}
+
+.category-dessert {
+  background-color: rgba(233, 30, 99, 0.1);
+  color: #c2185b;
+}
+
+.category-snack {
+  background-color: rgba(255, 193, 7, 0.1);
+  color: #f57f17;
+}
+
+/* ============================================
+   ROLE BADGE (Employee)
+   ============================================ */
+
+.role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: var(--radius-full);
+  background-color: var(--color-gray-200);
+  color: var(--color-text-secondary);
+}
+
+.role-admin {
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger-dark);
+}
+
+.role-manager {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary-dark);
+}
+
+.role-cashier {
+  background-color: var(--color-info-bg);
+  color: var(--color-info-dark);
+}
+
+.role-barista {
+  background-color: var(--color-success-bg);
+  color: var(--color-success-dark);
+}
+
+/* ============================================
+   PAYMENT METHOD BADGE
+   ============================================ */
+
+.payment-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-white);
+  color: var(--color-text-secondary);
+}
+
+.payment-badge .icon,
+.payment-badge .f7-icons {
+  font-size: 16px;
+}
+
+.payment-cash {
+  border-color: var(--color-success);
+  color: var(--color-success-dark);
+}
+
+.payment-card {
+  border-color: var(--color-info);
+  color: var(--color-info-dark);
+}
+
+.payment-ewallet {
+  border-color: var(--color-primary);
+  color: var(--color-primary-dark);
+}
+
+/* ============================================
+   BADGE IN CARD / TABLE
+   ============================================ */
+
+.card-badge {
+  position: absolute;
+  top: var(--spacing-3);
+  right: var(--spacing-3);
+  z-index: 1;
+}
+
+.table .badge,
+.table .status-badge {
+  vertical-align: middle;
+}
+
+/* ============================================
+   BADGE ANIMATIONS
+   ============================================ */
+
+.badge-pulse {
+  animation: badge-pulse 2s ease-in-out infinite;
+}
+
+@keyframes badge-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+.badge-bounce {
+  animation: badge-bounce 1s ease-in-out infinite;
+}
+
+@keyframes badge-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+/* ============================================
+   RESPONSIVE BADGES
+   ============================================ */
+
+@media (max-width: 768px) {
+  .badge-lg,
+  .label {
+    font-size: var(--font-size-xs);
+    padding: 3px 8px;
+  }
+  
+  .status-badge {
+    font-size: var(--font-size-xs);
+    padding: 3px 10px;
+  }
+  
+  .product-badge {
+    font-size: 10px;
+    padding: 3px 8px;
+  }
+  
+  .percentage-badge {
+    min-width: 40px;
+    height: 40px;
+    font-size: var(--font-size-sm);
+  }
+}
+
+/* Hide certain badges on mobile */
+@media (max-width: 576px) {
+  .badge-hide-mobile {
+    display: none;
+  }
+}
+
+/* ============================================
+   DARK MODE SUPPORT
+   ============================================ */
+
+[data-theme="dark"] .badge,
+[data-theme="dark"] .label,
+[data-theme="dark"] .tag {
+  background-color: var(--color-gray-700);
+  color: var(--color-gray-100);
+}
+
+[data-theme="dark"] .badge-light {
+  background-color: var(--color-gray-600);
+  color: var(--color-white);
+}
+
+[data-theme="dark"] .category-badge {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .payment-badge {
+  background-color: var(--color-gray-800);
+  border-color: var(--color-gray-600);
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+.badge[aria-label],
+.status-badge[aria-label] {
+  /* Screen reader support */
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+
+@media print {
+  .badge,
+  .label,
+  .status-badge {
+    border: 1px solid #000;
+    color: #000 !important;
+    background-color: transparent !important;
+  }
+  
+  .counter-badge,
+  .notification-badge {
+    display: none;
+  }
+  
+  .product-badge {
+    border: 1px solid #000;
+    box-shadow: none;
+  }
+}

@@ -1,0 +1,849 @@
+/**
+ * Card Components
+ * Coffee Shop POS System
+ * 
+ * Versatile card system for dashboard, products, and data display
+ * Import design-tokens.css before this file
+ */
+
+/* ============================================
+   BASE CARD STYLES
+   ============================================ */
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-bg-secondary);
+  border: var(--card-border-width) solid var(--card-border-color);
+  border-radius: var(--card-border-radius);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  transition: var(--transition-base);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* Card with no border */
+.card-borderless {
+  border: none;
+}
+
+/* Card with no shadow */
+.card-flat {
+  box-shadow: none;
+}
+
+/* Elevated card */
+.card-elevated {
+  box-shadow: var(--shadow-lg);
+}
+
+.card-elevated:hover {
+  box-shadow: var(--shadow-xl);
+  transform: translateY(-2px);
+}
+
+/* ============================================
+   CARD SECTIONS
+   ============================================ */
+
+/* Card Header */
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--card-padding);
+  border-bottom: 1px solid var(--color-border-light);
+  background-color: var(--color-bg-secondary);
+}
+
+.card-header-transparent {
+  background-color: transparent;
+  border-bottom: none;
+}
+
+.card-header-sm {
+  padding: var(--spacing-4);
+}
+
+.card-header-lg {
+  padding: var(--spacing-8);
+}
+
+/* Card Title */
+.card-title {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  line-height: 1.2;
+}
+
+.card-title-sm {
+  font-size: var(--font-size-md);
+}
+
+.card-title-lg {
+  font-size: var(--font-size-xl);
+}
+
+/* Card Subtitle */
+.card-subtitle {
+  margin: var(--spacing-1) 0 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+/* Card Actions in Header */
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+/* Card Body */
+.card-body {
+  flex: 1 1 auto;
+  padding: var(--card-padding);
+}
+
+.card-body-sm {
+  padding: var(--spacing-4);
+}
+
+.card-body-lg {
+  padding: var(--spacing-8);
+}
+
+.card-body-no-padding {
+  padding: 0;
+}
+
+/* Card Footer */
+.card-footer {
+  padding: var(--card-padding);
+  border-top: 1px solid var(--color-border-light);
+  background-color: var(--color-bg-primary);
+}
+
+.card-footer-transparent {
+  background-color: transparent;
+  border-top: none;
+}
+
+.card-footer-sm {
+  padding: var(--spacing-4);
+}
+
+.card-footer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacing-2);
+}
+
+/* ============================================
+   CARD VARIANTS
+   ============================================ */
+
+/* Clickable/Interactive Card */
+.card-interactive {
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.card-interactive:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-primary);
+}
+
+.card-interactive:active {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Highlighted Card */
+.card-highlight {
+  border-left: 4px solid var(--color-primary);
+}
+
+.card-highlight-success {
+  border-left: 4px solid var(--color-success);
+}
+
+.card-highlight-warning {
+  border-left: 4px solid var(--color-warning);
+}
+
+.card-highlight-danger {
+  border-left: 4px solid var(--color-danger);
+}
+
+/* Colored Cards */
+.card-primary {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  border-color: var(--color-primary);
+}
+
+.card-primary .card-title,
+.card-primary .card-subtitle,
+.card-primary .card-text {
+  color: var(--color-white);
+}
+
+.card-success {
+  background-color: var(--color-success-bg);
+  border-color: var(--color-success-border);
+}
+
+.card-warning {
+  background-color: var(--color-warning-bg);
+  border-color: var(--color-warning-border);
+}
+
+.card-danger {
+  background-color: var(--color-danger-bg);
+  border-color: var(--color-danger-border);
+}
+
+.card-info {
+  background-color: var(--color-info-bg);
+  border-color: var(--color-info-border);
+}
+
+/* ============================================
+   STAT CARD (Dashboard)
+   ============================================ */
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  padding: var(--spacing-6);
+  background: var(--color-white);
+  border-radius: var(--card-border-radius);
+  box-shadow: var(--card-shadow);
+  transition: var(--transition-base);
+}
+
+.stat-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.stat-card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-lg);
+  flex-shrink: 0;
+}
+
+.stat-card-icon .icon,
+.stat-card-icon .f7-icons {
+  font-size: 28px;
+  color: var(--color-white);
+}
+
+/* Stat Card Icon Variants */
+.stat-card-icon-primary {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+}
+
+.stat-card-icon-success {
+  background: linear-gradient(135deg, var(--color-success) 0%, var(--color-success-light) 100%);
+}
+
+.stat-card-icon-warning {
+  background: linear-gradient(135deg, var(--color-warning) 0%, var(--color-warning-light) 100%);
+}
+
+.stat-card-icon-danger {
+  background: linear-gradient(135deg, var(--color-danger) 0%, var(--color-danger-light) 100%);
+}
+
+.stat-card-icon-info {
+  background: linear-gradient(135deg, var(--color-info) 0%, var(--color-info-light) 100%);
+}
+
+.stat-card-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.stat-card-value {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-1) 0;
+  line-height: 1;
+}
+
+.stat-card-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--spacing-2) 0;
+}
+
+.stat-card-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-sm);
+}
+
+.stat-card-trend-up {
+  color: var(--color-success);
+  background-color: var(--color-success-bg);
+}
+
+.stat-card-trend-down {
+  color: var(--color-danger);
+  background-color: var(--color-danger-bg);
+}
+
+.stat-card-trend-neutral {
+  color: var(--color-text-secondary);
+  background-color: var(--color-gray-100);
+}
+
+/* ============================================
+   PRODUCT CARD (POS Menu)
+   ============================================ */
+
+.product-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-white);
+  border-radius: var(--card-border-radius);
+  overflow: hidden;
+  cursor: pointer;
+  transition: var(--transition-base);
+  border: 2px solid var(--color-border-light);
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-primary);
+}
+
+.product-card:active {
+  transform: translateY(-2px);
+}
+
+.product-card-image {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background-color: var(--color-gray-100);
+}
+
+.product-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: var(--transition-base);
+}
+
+.product-card:hover .product-card-image img {
+  transform: scale(1.05);
+}
+
+.product-card-badge {
+  position: absolute;
+  top: var(--spacing-2);
+  right: var(--spacing-2);
+  padding: var(--spacing-1) var(--spacing-2);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white);
+  background-color: var(--color-danger);
+  border-radius: var(--radius-sm);
+  z-index: 1;
+}
+
+.product-card-badge-hot {
+  background-color: var(--color-danger);
+}
+
+.product-card-badge-new {
+  background-color: var(--color-success);
+}
+
+.product-card-badge-sale {
+  background-color: var(--color-warning);
+  color: var(--color-text-primary);
+}
+
+.product-card-info {
+  padding: var(--spacing-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.product-card-name {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.3;
+}
+
+.product-card-category {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.product-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-2) var(--spacing-3);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.product-card-price {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  margin: 0;
+}
+
+.product-card-stock {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.product-card-stock-low {
+  color: var(--color-warning);
+  font-weight: var(--font-weight-medium);
+}
+
+.product-card-stock-out {
+  color: var(--color-danger);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Product Card - Out of Stock Overlay */
+.product-card-disabled {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.product-card-disabled::after {
+  content: "Habis";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: var(--spacing-3) var(--spacing-6);
+  background-color: var(--color-danger);
+  color: var(--color-white);
+  font-weight: var(--font-weight-bold);
+  border-radius: var(--radius-lg);
+  z-index: 2;
+}
+
+/* ============================================
+   TRANSACTION CARD (Cart Item)
+   ============================================ */
+
+.transaction-card {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-3);
+  background: var(--color-gray-50);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-2);
+  transition: var(--transition-fast);
+}
+
+.transaction-card:hover {
+  background: var(--color-gray-100);
+}
+
+.transaction-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.transaction-card-name {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-1) 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.transaction-card-price {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.transaction-card-quantity {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  flex-shrink: 0;
+}
+
+.transaction-card-qty-display {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  min-width: 24px;
+  text-align: center;
+}
+
+.transaction-card-subtotal {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  margin-left: var(--spacing-3);
+  min-width: 80px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.transaction-card-remove {
+  flex-shrink: 0;
+  margin-left: var(--spacing-2);
+}
+
+/* ============================================
+   QUICK ACTION CARD
+   ============================================ */
+
+.quick-action-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-6);
+  background: var(--color-white);
+  border: 2px solid var(--color-border-light);
+  border-radius: var(--card-border-radius);
+  cursor: pointer;
+  transition: var(--transition-base);
+  text-align: center;
+  min-height: 120px;
+}
+
+.quick-action-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-primary);
+  transform: translateY(-2px);
+}
+
+.quick-action-card .icon,
+.quick-action-card .f7-icons {
+  font-size: 40px;
+  color: var(--color-primary);
+}
+
+.quick-action-card-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+/* ============================================
+   LIST CARD
+   ============================================ */
+
+.list-card {
+  background: var(--color-white);
+  border-radius: var(--card-border-radius);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+}
+
+.list-card-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4);
+  border-bottom: 1px solid var(--color-border-light);
+  transition: var(--transition-fast);
+  cursor: pointer;
+}
+
+.list-card-item:last-child {
+  border-bottom: none;
+}
+
+.list-card-item:hover {
+  background-color: var(--color-gray-50);
+}
+
+.list-card-item-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background-color: var(--color-gray-100);
+  flex-shrink: 0;
+}
+
+.list-card-item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.list-card-item-title {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-1) 0;
+}
+
+.list-card-item-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.list-card-item-meta {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+/* ============================================
+   CHART CARD
+   ============================================ */
+
+.chart-card {
+  background: var(--color-white);
+  border-radius: var(--card-border-radius);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+}
+
+.chart-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-6);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.chart-card-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.chart-card-filters {
+  display: flex;
+  gap: var(--spacing-2);
+}
+
+.chart-card-body {
+  padding: var(--spacing-6);
+}
+
+.chart-card-canvas {
+  width: 100%;
+  height: 300px;
+}
+
+/* ============================================
+   EMPLOYEE/CUSTOMER CARD
+   ============================================ */
+
+.profile-card {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  padding: var(--spacing-5);
+  background: var(--color-white);
+  border-radius: var(--card-border-radius);
+  box-shadow: var(--card-shadow);
+  transition: var(--transition-base);
+}
+
+.profile-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.profile-card-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-circle);
+  overflow: hidden;
+  background-color: var(--color-gray-200);
+  flex-shrink: 0;
+}
+
+.profile-card-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-card-avatar-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+}
+
+.profile-card-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-card-name {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-1) 0;
+}
+
+.profile-card-role {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--spacing-2) 0;
+}
+
+.profile-card-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}
+
+.profile-card-actions {
+  display: flex;
+  gap: var(--spacing-2);
+  flex-shrink: 0;
+}
+
+/* ============================================
+   EMPTY STATE CARD
+   ============================================ */
+
+.empty-state-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-12);
+  text-align: center;
+  background: var(--color-white);
+  border-radius: var(--card-border-radius);
+}
+
+.empty-state-icon {
+  font-size: 64px;
+  color: var(--color-text-tertiary);
+  margin-bottom: var(--spacing-4);
+}
+
+.empty-state-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-2) 0;
+}
+
+.empty-state-description {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--spacing-6) 0;
+  max-width: 400px;
+}
+
+/* ============================================
+   RESPONSIVE CARDS
+   ============================================ */
+
+@media (max-width: 768px) {
+  .stat-card {
+    padding: var(--spacing-4);
+  }
+  
+  .stat-card-icon {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .stat-card-value {
+    font-size: var(--font-size-xl);
+  }
+  
+  .product-card-info {
+    padding: var(--spacing-2);
+  }
+  
+  .profile-card {
+    padding: var(--spacing-4);
+  }
+  
+  .profile-card-avatar {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+
+@media print {
+  .card {
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+  
+  .card-interactive,
+  .product-card,
+  .quick-action-card {
+    cursor: default;
+  }
+  
+  .card-actions,
+  .transaction-card-remove {
+    display: none;
+  }
+}
