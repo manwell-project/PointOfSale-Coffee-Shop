@@ -33,10 +33,8 @@
     btn.textContent = isLoading ? 'Memproses…' : 'Masuk';
   }
 
-  function getDefaultRedirectUrl(role) {
-    const r = String(role || '').toLowerCase();
-    // Requirement: Admin langsung ke Dashboard
-    const rel = (r === 'admin') ? '../Dashboard/index.html' : '../index.html';
+  function getDashboardUrl() {
+    const rel = '../Dashboard/index.html';
     try {
       return new URL(rel, location.href).href;
     } catch {
@@ -44,21 +42,17 @@
     }
   }
 
-  function redirectAfterLogin(role) {
-    const next = window.DigiCafAuth && window.DigiCafAuth.getNextUrl ? window.DigiCafAuth.getNextUrl() : null;
-    if (next) {
-      location.replace(next);
-      return;
-    }
-
-    location.replace(getDefaultRedirectUrl(role));
+  function redirectAfterLogin() {
+    // Requirement: Admin dan Kasir setelah login langsung ke Dashboard
+    // (abaikan parameter `next` agar konsisten)
+    location.replace(getDashboardUrl());
   }
 
   document.addEventListener('DOMContentLoaded', function () {
     // If already logged in, skip login page
     const existing = window.DigiCafAuth && window.DigiCafAuth.getSession ? window.DigiCafAuth.getSession() : null;
     if (existing) {
-      redirectAfterLogin(existing.role);
+      redirectAfterLogin();
       return;
     }
 
@@ -130,7 +124,7 @@
           localStorage.setItem('digicaf.session.v1', JSON.stringify(session));
         }
 
-        redirectAfterLogin(session.role);
+        redirectAfterLogin();
       } catch (err) {
         showError(err?.message || 'Gagal login. Coba lagi.');
       } finally {
