@@ -1,0 +1,648 @@
+/**
+ * Icon System
+ * Coffee Shop POS System
+ * 
+ * Standardizes Framework7 Icons usage across the application
+ * Import design-tokens.css before this file
+ */
+
+/* ============================================
+   BASE ICON STYLES
+   ============================================ */
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-style: normal;
+  line-height: 1;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+/* Framework7 Icons Base */
+.f7-icons, i.f7-icons {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-style: normal;
+  line-height: 1;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+/* ============================================
+   ICON SIZES
+   ============================================ */
+
+/* Extra Small - 16px */
+.icon-xs, .f7-icons.icon-xs {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+/* Small - 20px */
+.icon-sm, .f7-icons.icon-sm {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+/* Medium (Default) - 24px */
+.icon-md, .f7-icons.icon-md, .f7-icons {
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+}
+
+/* Large - 28px */
+.icon-lg, .f7-icons.icon-lg {
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+}
+
+/* Extra Large - 32px */
+.icon-xl, .f7-icons.icon-xl {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+}
+
+/* 2X Large - 40px */
+.icon-2xl, .f7-icons.icon-2xl {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+}
+
+/* 3X Large - 48px */
+.icon-3xl, .f7-icons.icon-3xl {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+}
+
+/* ============================================
+   ICON COLORS
+   ============================================ */
+
+.icon-primary, .f7-icons.icon-primary {
+  color: var(--color-primary);
+}
+
+.icon-secondary, .f7-icons.icon-secondary {
+  color: var(--color-secondary);
+}
+
+.icon-accent, .f7-icons.icon-accent {
+  color: var(--color-accent);
+}
+
+.icon-success, .f7-icons.icon-success {
+  color: var(--color-success);
+}
+
+.icon-warning, .f7-icons.icon-warning {
+  color: var(--color-warning);
+}
+
+.icon-danger, .f7-icons.icon-danger {
+  color: var(--color-danger);
+}
+
+.icon-info, .f7-icons.icon-info {
+  color: var(--color-info);
+}
+
+.icon-muted, .f7-icons.icon-muted {
+  color: var(--color-text-secondary);
+}
+
+.icon-light, .f7-icons.icon-light {
+  color: var(--color-text-tertiary);
+}
+
+.icon-white, .f7-icons.icon-white {
+  color: var(--color-white);
+}
+
+.icon-dark, .f7-icons.icon-dark {
+  color: var(--color-text-primary);
+}
+
+/* ============================================
+   ICON STATES
+   ============================================ */
+
+.icon-disabled, .f7-icons.icon-disabled {
+  color: var(--color-text-disabled);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.icon-hover:hover, .f7-icons.icon-hover:hover {
+  color: var(--color-primary);
+  transition: var(--transition-colors);
+}
+
+.icon-active, .f7-icons.icon-active {
+  color: var(--color-primary);
+}
+
+/* Interactive Icon - with hover effect */
+.icon-interactive, .f7-icons.icon-interactive {
+  cursor: pointer;
+  transition: var(--transition-colors);
+}
+
+.icon-interactive:hover, .f7-icons.icon-interactive:hover {
+  color: var(--color-primary);
+}
+
+.icon-interactive:active, .f7-icons.icon-interactive:active {
+  transform: scale(0.95);
+}
+
+/* ============================================
+   ICON WITH BACKGROUND
+   ============================================ */
+
+.icon-circle, .f7-icons.icon-circle {
+  border-radius: var(--radius-circle);
+  background-color: var(--color-gray-100);
+  padding: var(--spacing-2);
+}
+
+.icon-rounded, .f7-icons.icon-rounded {
+  border-radius: var(--radius-md);
+  background-color: var(--color-gray-100);
+  padding: var(--spacing-2);
+}
+
+.icon-square, .f7-icons.icon-square {
+  border-radius: var(--radius-sm);
+  background-color: var(--color-gray-100);
+  padding: var(--spacing-2);
+}
+
+/* Icon Background Colors */
+.icon-bg-primary {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+}
+
+.icon-bg-secondary {
+  background-color: var(--color-secondary);
+  color: var(--color-white);
+}
+
+.icon-bg-success {
+  background-color: var(--color-success);
+  color: var(--color-white);
+}
+
+.icon-bg-warning {
+  background-color: var(--color-warning);
+  color: var(--color-white);
+}
+
+.icon-bg-danger {
+  background-color: var(--color-danger);
+  color: var(--color-white);
+}
+
+.icon-bg-info {
+  background-color: var(--color-info);
+  color: var(--color-white);
+}
+
+/* Light Backgrounds */
+.icon-bg-primary-light {
+  background-color: rgba(107, 68, 35, 0.1);
+  color: var(--color-primary);
+}
+
+.icon-bg-success-light {
+  background-color: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.icon-bg-warning-light {
+  background-color: var(--color-warning-bg);
+  color: var(--color-warning-dark);
+}
+
+.icon-bg-danger-light {
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+.icon-bg-info-light {
+  background-color: var(--color-info-bg);
+  color: var(--color-info);
+}
+
+/* ============================================
+   ICON POSITIONING & SPACING
+   ============================================ */
+
+/* Icon with Text */
+.icon-left {
+  margin-right: var(--spacing-2);
+}
+
+.icon-right {
+  margin-left: var(--spacing-2);
+}
+
+.icon-top {
+  margin-bottom: var(--spacing-2);
+}
+
+.icon-bottom {
+  margin-top: var(--spacing-2);
+}
+
+/* Icon Spacing Variants */
+.icon-left-sm {
+  margin-right: var(--spacing-1);
+}
+
+.icon-left-lg {
+  margin-right: var(--spacing-3);
+}
+
+.icon-right-sm {
+  margin-left: var(--spacing-1);
+}
+
+.icon-right-lg {
+  margin-left: var(--spacing-3);
+}
+
+/* ============================================
+   ICON BUTTON (ICON ONLY)
+   ============================================ */
+
+.icon-button, .btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition-base);
+  flex-shrink: 0;
+}
+
+.icon-button:hover, .btn-icon:hover {
+  background-color: var(--color-gray-100);
+  color: var(--color-primary);
+}
+
+.icon-button:active, .btn-icon:active {
+  transform: scale(0.95);
+}
+
+.icon-button:focus, .btn-icon:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.icon-button:disabled, .btn-icon:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Icon Button Sizes */
+.icon-button-sm, .btn-icon-sm {
+  width: 32px;
+  height: 32px;
+}
+
+.icon-button-lg, .btn-icon-lg {
+  width: 56px;
+  height: 56px;
+}
+
+/* Icon Button Variants */
+.icon-button-primary {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+}
+
+.icon-button-primary:hover {
+  background-color: var(--color-primary-dark);
+}
+
+.icon-button-danger {
+  background-color: transparent;
+  color: var(--color-danger);
+}
+
+.icon-button-danger:hover {
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger-dark);
+}
+
+/* ============================================
+   ICON BADGE (Notification Dot)
+   ============================================ */
+
+.icon-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.icon-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white);
+  background-color: var(--color-danger);
+  border-radius: var(--radius-full);
+  border: 2px solid var(--color-white);
+}
+
+.icon-badge-dot {
+  min-width: 8px;
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border-radius: var(--radius-circle);
+}
+
+.icon-badge-primary {
+  background-color: var(--color-primary);
+}
+
+.icon-badge-success {
+  background-color: var(--color-success);
+}
+
+.icon-badge-warning {
+  background-color: var(--color-warning);
+}
+
+/* ============================================
+   ICON CONTAINERS
+   ============================================ */
+
+.icon-container {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.icon-container-vertical {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+/* Icon with Label */
+.icon-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.icon-label-vertical {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-1);
+  text-align: center;
+}
+
+.icon-label-vertical .icon,
+.icon-label-vertical .f7-icons {
+  margin-bottom: var(--spacing-1);
+}
+
+.icon-label-vertical span {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+/* ============================================
+   ICON LIST
+   ============================================ */
+
+.icon-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.icon-list-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-2) 0;
+}
+
+.icon-list-item .icon,
+.icon-list-item .f7-icons {
+  flex-shrink: 0;
+  color: var(--color-primary);
+}
+
+/* ============================================
+   ANIMATED ICONS
+   ============================================ */
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.icon-spin, .f7-icons.icon-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.icon-pulse, .f7-icons.icon-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.icon-bounce, .f7-icons.icon-bounce {
+  animation: bounce 1s ease-in-out infinite;
+}
+
+/* ============================================
+   COMMON ICON MAPPINGS
+   ============================================ */
+
+/* Action Icons - For semantic consistency */
+.icon-add::before {
+  content: "plus";
+}
+
+.icon-edit::before {
+  content: "pencil";
+}
+
+.icon-delete::before {
+  content: "trash";
+}
+
+.icon-search::before {
+  content: "search";
+}
+
+.icon-filter::before {
+  content: "line_horizontal_3_decrease";
+}
+
+.icon-sort::before {
+  content: "arrow_up_arrow_down";
+}
+
+.icon-refresh::before {
+  content: "arrow_clockwise";
+}
+
+.icon-download::before {
+  content: "arrow_down_circle";
+}
+
+.icon-upload::before {
+  content: "arrow_up_circle";
+}
+
+.icon-close::before {
+  content: "xmark";
+}
+
+.icon-check::before {
+  content: "checkmark";
+}
+
+.icon-menu::before {
+  content: "line_horizontal_3";
+}
+
+/* ============================================
+   RESPONSIVE ICON SIZES
+   ============================================ */
+
+@media (max-width: 768px) {
+  /* Slightly larger touch targets on mobile */
+  .icon-button, .btn-icon {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+  
+  .icon-button-sm, .btn-icon-sm {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+  }
+}
+
+/* ============================================
+   ICON LOADING STATE
+   ============================================ */
+
+.icon-loading {
+  position: relative;
+  pointer-events: none;
+}
+
+.icon-loading::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: var(--radius-circle);
+  animation: spin 0.6s linear infinite;
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+/* Hide icon from screen readers when decorative */
+.icon[aria-hidden="true"],
+.f7-icons[aria-hidden="true"] {
+  pointer-events: none;
+}
+
+/* Ensure icon buttons have accessible labels */
+.icon-button:not([aria-label]):not([aria-labelledby]),
+.btn-icon:not([aria-label]):not([aria-labelledby]) {
+  /* Add warning in development */
+  outline: 2px dashed red;
+}
+
+/* Screen reader only text for icon buttons */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+
+@media print {
+  .icon-button, .btn-icon {
+    display: none;
+  }
+  
+  .icon-badge {
+    display: none;
+  }
+}

@@ -1,0 +1,336 @@
+/**
+ * Design Tokens & Variables
+ * Coffee Shop POS System
+ * 
+ * Usage: Import this file first in all CSS files
+ * @import 'design-tokens.css';
+ */
+
+:root {
+  /* ============================================
+     COLOR PALETTE
+     ============================================ */
+  
+  /* Primary Colors - Coffee Theme */
+  --color-primary: #6B4423;
+  --color-primary-light: #8B5A3C;
+  --color-primary-lighter: #A67C52;
+  --color-primary-dark: #4A2E18;
+  --color-primary-darker: #2D1B0F;
+  
+  /* Secondary Colors */
+  --color-secondary: #D4A574;
+  --color-secondary-light: #E8C9A0;
+  --color-secondary-dark: #B8895F;
+  
+  /* Accent Colors */
+  --color-accent: #C17B5C;
+  --color-accent-light: #D99A7F;
+  --color-accent-dark: #A86344;
+  
+  /* Semantic Colors */
+  --color-success: #28A745;
+  --color-success-light: #48C764;
+  --color-success-dark: #1E7E34;
+  --color-success-bg: #D4EDDA;
+  --color-success-border: #C3E6CB;
+  
+  --color-warning: #FFC107;
+  --color-warning-light: #FFD54F;
+  --color-warning-dark: #FFA000;
+  --color-warning-bg: #FFF3CD;
+  --color-warning-border: #FFEAA7;
+  
+  --color-danger: #DC3545;
+  --color-danger-light: #E4606D;
+  --color-danger-dark: #BD2130;
+  --color-danger-bg: #F8D7DA;
+  --color-danger-border: #F5C6CB;
+  
+  --color-info: #17A2B8;
+  --color-info-light: #3FC1D3;
+  --color-info-dark: #117A8B;
+  --color-info-bg: #D1ECF1;
+  --color-info-border: #BEE5EB;
+  
+  /* Neutral/Gray Scale */
+  --color-white: #FFFFFF;
+  --color-gray-50: #F8F9FA;
+  --color-gray-100: #F1F3F5;
+  --color-gray-200: #E9ECEF;
+  --color-gray-300: #DEE2E6;
+  --color-gray-400: #CED4DA;
+  --color-gray-500: #ADB5BD;
+  --color-gray-600: #6C757D;
+  --color-gray-700: #495057;
+  --color-gray-800: #343A40;
+  --color-gray-900: #212529;
+  --color-black: #000000;
+  
+  /* Background Colors */
+  --color-bg-primary: #F8F9FA;
+  --color-bg-secondary: #FFFFFF;
+  --color-bg-tertiary: #F1F3F5;
+  --color-bg-overlay: rgba(0, 0, 0, 0.5);
+  
+  /* Text Colors */
+  --color-text-primary: #212529;
+  --color-text-secondary: #6C757D;
+  --color-text-tertiary: #ADB5BD;
+  --color-text-inverse: #FFFFFF;
+  --color-text-disabled: #CED4DA;
+  
+  /* Border Colors */
+  --color-border-light: #E9ECEF;
+  --color-border-medium: #DEE2E6;
+  --color-border-dark: #CED4DA;
+  
+  /* Link Colors */
+  --color-link: #6B4423;
+  --color-link-hover: #4A2E18;
+  --color-link-visited: #8B5A3C;
+  
+  /* ============================================
+     TYPOGRAPHY
+     ============================================ */
+  
+  /* Font Families */
+  --font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  --font-family-heading: 'Poppins', var(--font-family-base);
+  --font-family-mono: 'Fira Code', 'Courier New', monospace;
+  
+  /* Font Sizes */
+  --font-size-xs: 0.75rem;      /* 12px */
+  --font-size-sm: 0.875rem;     /* 14px */
+  --font-size-md: 1rem;         /* 16px - base */
+  --font-size-lg: 1.125rem;     /* 18px */
+  --font-size-xl: 1.25rem;      /* 20px */
+  --font-size-2xl: 1.5rem;      /* 24px */
+  --font-size-3xl: 1.875rem;    /* 30px */
+  --font-size-4xl: 2.25rem;     /* 36px */
+  --font-size-5xl: 3rem;        /* 48px */
+  
+  /* Font Weights */
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  
+  /* Line Heights */
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  --line-height-loose: 2;
+  
+  /* Letter Spacing */
+  --letter-spacing-tight: -0.025em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.025em;
+  --letter-spacing-wider: 0.05em;
+  
+  /* ============================================
+     SPACING SYSTEM (4px base unit)
+     ============================================ */
+  
+  --spacing-0: 0;
+  --spacing-1: 0.25rem;   /* 4px */
+  --spacing-2: 0.5rem;    /* 8px */
+  --spacing-3: 0.75rem;   /* 12px */
+  --spacing-4: 1rem;      /* 16px */
+  --spacing-5: 1.25rem;   /* 20px */
+  --spacing-6: 1.5rem;    /* 24px */
+  --spacing-8: 2rem;      /* 32px */
+  --spacing-10: 2.5rem;   /* 40px */
+  --spacing-12: 3rem;     /* 48px */
+  --spacing-16: 4rem;     /* 64px */
+  --spacing-20: 5rem;     /* 80px */
+  --spacing-24: 6rem;     /* 96px */
+  
+  /* Semantic Spacing */
+  --spacing-xs: var(--spacing-1);   /* 4px */
+  --spacing-sm: var(--spacing-2);   /* 8px */
+  --spacing-md: var(--spacing-4);   /* 16px */
+  --spacing-lg: var(--spacing-6);   /* 24px */
+  --spacing-xl: var(--spacing-8);   /* 32px */
+  --spacing-2xl: var(--spacing-12); /* 48px */
+  
+  /* ============================================
+     SHADOWS
+     ============================================ */
+  
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+  --shadow-none: none;
+  
+  /* Colored Shadows */
+  --shadow-primary: 0 4px 14px 0 rgba(107, 68, 35, 0.15);
+  --shadow-success: 0 4px 14px 0 rgba(40, 167, 69, 0.15);
+  --shadow-warning: 0 4px 14px 0 rgba(255, 193, 7, 0.15);
+  --shadow-danger: 0 4px 14px 0 rgba(220, 53, 69, 0.15);
+  
+  /* ============================================
+     BORDER RADIUS
+     ============================================ */
+  
+  --radius-none: 0;
+  --radius-sm: 0.25rem;   /* 4px */
+  --radius-md: 0.5rem;    /* 8px */
+  --radius-lg: 0.75rem;   /* 12px */
+  --radius-xl: 1rem;      /* 16px */
+  --radius-2xl: 1.5rem;   /* 24px */
+  --radius-3xl: 2rem;     /* 32px */
+  --radius-full: 9999px;
+  --radius-circle: 50%;
+  
+  /* ============================================
+     TRANSITIONS & ANIMATIONS
+     ============================================ */
+  
+  /* Transition Durations */
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 350ms;
+  --duration-slower: 500ms;
+  
+  /* Transition Timing Functions */
+  --ease-linear: linear;
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  
+  /* Common Transitions */
+  --transition-base: all var(--duration-normal) var(--ease-in-out);
+  --transition-fast: all var(--duration-fast) var(--ease-in-out);
+  --transition-slow: all var(--duration-slow) var(--ease-in-out);
+  --transition-colors: color var(--duration-normal) var(--ease-in-out), 
+                       background-color var(--duration-normal) var(--ease-in-out), 
+                       border-color var(--duration-normal) var(--ease-in-out);
+  --transition-transform: transform var(--duration-normal) var(--ease-in-out);
+  --transition-opacity: opacity var(--duration-normal) var(--ease-in-out);
+  
+  /* ============================================
+     Z-INDEX LAYERS
+     ============================================ */
+  
+  --z-index-dropdown: 1000;
+  --z-index-sticky: 1020;
+  --z-index-fixed: 1030;
+  --z-index-modal-backdrop: 1040;
+  --z-index-modal: 1050;
+  --z-index-popover: 1060;
+  --z-index-tooltip: 1070;
+  --z-index-notification: 1080;
+  
+  /* ============================================
+     BREAKPOINTS (for reference in JS)
+     ============================================ */
+  
+  --breakpoint-xs: 0;
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+  
+  /* ============================================
+     COMPONENT SPECIFIC
+     ============================================ */
+  
+  /* Input Fields */
+  --input-height: 2.75rem;        /* 44px - touch friendly */
+  --input-height-sm: 2rem;        /* 32px */
+  --input-height-lg: 3.5rem;      /* 56px */
+  --input-padding-x: var(--spacing-4);
+  --input-padding-y: var(--spacing-3);
+  --input-border-width: 2px;
+  --input-border-color: var(--color-border-light);
+  --input-border-radius: var(--radius-md);
+  --input-focus-border-color: var(--color-primary);
+  --input-focus-shadow: 0 0 0 3px rgba(107, 68, 35, 0.1);
+  
+  /* Buttons */
+  --button-height: 2.75rem;       /* 44px - touch friendly */
+  --button-height-sm: 2rem;       /* 32px */
+  --button-height-lg: 3.5rem;     /* 56px */
+  --button-padding-x: var(--spacing-6);
+  --button-padding-y: var(--spacing-3);
+  --button-border-radius: var(--radius-md);
+  --button-font-weight: var(--font-weight-medium);
+  
+  /* Cards */
+  --card-padding: var(--spacing-6);
+  --card-border-radius: var(--radius-lg);
+  --card-shadow: var(--shadow-sm);
+  --card-border-width: 1px;
+  --card-border-color: var(--color-border-light);
+  
+  /* Modals */
+  --modal-padding: var(--spacing-6);
+  --modal-border-radius: var(--radius-xl);
+  --modal-shadow: var(--shadow-2xl);
+  --modal-backdrop: var(--color-bg-overlay);
+  
+  /* Navbar */
+  --navbar-height: 64px;
+  --navbar-bg: var(--color-white);
+  --navbar-shadow: var(--shadow-sm);
+  
+  /* Sidebar */
+  --sidebar-width: 260px;
+  --sidebar-width-collapsed: 64px;
+  --sidebar-bg: var(--color-white);
+  
+  /* Bottom Navigation */
+  --bottom-nav-height: 64px;
+  --bottom-nav-bg: var(--color-white);
+  --bottom-nav-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  
+  /* Container */
+  --container-max-width: 1280px;
+  --container-padding: var(--spacing-4);
+}
+
+/* ============================================
+   DARK MODE VARIABLES (Optional - for future use)
+   ============================================ */
+
+[data-theme="dark"] {
+  --color-bg-primary: #1A1A1A;
+  --color-bg-secondary: #2D2D2D;
+  --color-bg-tertiary: #3D3D3D;
+  
+  --color-text-primary: #F8F9FA;
+  --color-text-secondary: #ADB5BD;
+  --color-text-tertiary: #6C757D;
+  
+  --color-border-light: #3D3D3D;
+  --color-border-medium: #4D4D4D;
+  --color-border-dark: #5D5D5D;
+  
+  --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  --navbar-bg: #2D2D2D;
+  --sidebar-bg: #2D2D2D;
+  --bottom-nav-bg: #2D2D2D;
+}
+
+/* ============================================
+   PRINT STYLES VARIABLES
+   ============================================ */
+
+@media print {
+  :root {
+    --color-bg-primary: white;
+    --color-bg-secondary: white;
+    --shadow-sm: none;
+    --shadow-md: none;
+    --shadow-lg: none;
+  }
+}
