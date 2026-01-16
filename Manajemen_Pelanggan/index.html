@@ -3,701 +3,337 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#8B4513">
+    <meta name="theme-color" content="#0ea5e9">
     <title>Manajemen Pelanggan - DigiCaf</title>
-    <link rel="stylesheet" href="../css/shared-ui.css">
+    <link rel="stylesheet" href="../css/design-tokens.css">
+    <link rel="stylesheet" href="css/customer-layout.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        .search-bar {
-            position: relative;
-            margin: 16px 0;
-        }
-
-        .search-bar input {
-            width: 100%;
-            padding: 14px 50px 14px 20px;
-            border-radius: 25px;
-            border: 2px solid #8B4513;
-            background-color: white;
-            font-size: 16px;
-        }
-
-        .search-bar i {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #8B4513;
-            font-size: 18px;
-        }
-
-        .customer-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin: 18px 0;
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, #8B4513, #A0522D);
-            color: white;
-            border-radius: 12px;
-            padding: 20px 16px;
-            text-align: center;
-            box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
-        }
-
-        .stat-number {
-            font-size: 32px;
-            font-weight: bold;
-            margin-bottom: 6px;
-        }
-
-        .stat-label {
-            font-size: 13px;
-            opacity: 0.9;
-        }
-
-        .tabs {
-            display: flex;
-            gap: 8px;
-            margin: 16px 0;
-            overflow-x: auto;
-        }
-
-        .tab {
-            padding: 10px 20px;
-            cursor: pointer;
-            font-weight: 500;
-            background: white;
-            border-radius: 20px;
-            white-space: nowrap;
-            transition: all 0.2s ease;
-            color: #8B4513;
-            border: 2px solid transparent;
-        }
-
-        .tab:hover {
-            background-color: rgba(139, 69, 19, 0.1);
-        }
-
-        .tab.active {
-            background: linear-gradient(135deg, #8B4513, #A0522D);
-            color: white;
-            font-weight: bold;
-        }
-
-        .customer-list {
-            display: grid;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .customer-card {
-            background-color: white;
-            border-radius: 12px;
-            padding: 16px;
-            display: flex;
-            align-items: center;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            border-left: 4px solid #8B4513;
-        }
-
-        .customer-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(139, 69, 19, 0.2);
-        }
-
-        .customer-avatar {
-            width: 55px;
-            height: 55px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #8B4513, #A0522D);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            margin-right: 16px;
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-
-        .customer-info {
-            flex: 1;
-        }
-
-        .customer-name {
-            font-weight: 600;
-            font-size: 17px;
-            margin-bottom: 4px;
-            color: #333;
-        }
-
-        .customer-details {
-            font-size: 14px;
-            color: #666;
-        }
-
-        .customer-badge {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 11px;
-            font-weight: 600;
-            margin-left: 4px;
-        }
-
-        .badge-vip {
-            background: #FFD700;
-            color: #8B4513;
-        }
-
-        .badge-new {
-            background: #4CAF50;
-            color: white;
-        }
-
-        .customer-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .action-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #8B4513;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: none;
-        }
-
-        .action-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 4px 8px rgba(139, 69, 19, 0.3);
-        }
-
-        .action-btn.delete {
-            background: #dc3545;
-        }
-
-        /* Modal Styles */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .modal-overlay.show {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 16px;
-            padding: 24px;
-            width: 90%;
-            max-width: 500px;
-            max-height: 85vh;
-            overflow-y: auto;
-            animation: modalAppear 0.3s ease;
-        }
-
-        @keyframes modalAppear {
-            from {
-                opacity: 0;
-                transform: scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 16px;
-            border-bottom: 2px solid #f0f0f0;
-        }
-
-        .modal-title {
-            font-size: 22px;
-            font-weight: bold;
-            color: #8B4513;
-        }
-
-        .close-btn {
-            font-size: 28px;
-            cursor: pointer;
-            color: #666;
-            background: none;
-            border: none;
-            padding: 0;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            transition: all 0.2s;
-        }
-
-        .close-btn:hover {
-            background: #f0f0f0;
-            color: #8B4513;
-        }
-
-        .form-field {
-            margin-bottom: 18px;
-        }
-
-        .form-field label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 500;
-            font-size: 14px;
-            color: #333;
-        }
-
-        .form-field input,
-        .form-field select {
-            width: 100%;
-            padding: 12px 16px;
-            border-radius: 8px;
-            border: 2px solid #ddd;
-            font-size: 15px;
-            transition: border-color 0.2s ease;
-        }
-
-        .form-field input:focus,
-        .form-field select:focus {
-            outline: none;
-            border-color: #8B4513;
-        }
-
-        .form-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-            margin-top: 24px;
-        }
-
-        .btn {
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            font-size: 15px;
-            transition: all 0.2s ease;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #8B4513, #A0522D);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
-        }
-
-        .btn-secondary {
-            background: #f5f5f5;
-            color: #666;
-            border: 2px solid #ddd;
-        }
-
-        .btn-secondary:hover {
-            background: #e0e0e0;
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #dc3545, #c82333);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #999;
-        }
-
-        .empty-state i {
-            font-size: 64px;
-            margin-bottom: 16px;
-            opacity: 0.4;
-        }
-
-        .empty-state p {
-            font-size: 16px;
-        }
-
-        .delete-modal .modal-body {
-            text-align: center;
-            padding: 20px 0;
-            font-size: 16px;
-            color: #333;
-        }
-
-        .customer-name-highlight {
-            font-weight: bold;
-            color: #8B4513;
-            margin: 12px 0;
-            font-size: 18px;
-        }
-
-        /* Toast Notification */
-        .toast {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.85);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 25px;
-            font-size: 14px;
-            z-index: 2000;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            pointer-events: none;
-        }
-
-        .toast.show {
-            opacity: 1;
-        }
+        /* No additional styles needed - all in customer-layout.css */
     </style>
 </head>
 <body>
-    <div data-digicaf-layout="auto" data-page-title="Manajemen Pelanggan">
-        <div class="search-bar">
-            <input type="text" id="searchInput" placeholder="Cari pelanggan...">
-            <i class="fas fa-search"></i>
-        </div>
-
-        <div class="customer-stats">
-            <div class="stat-card">
-                <div class="stat-number" id="totalCustomers">0</div>
-                <div class="stat-label">Total</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="newCustomers">0</div>
-                <div class="stat-label">Baru</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="vipCustomers">0</div>
-                <div class="stat-label">VIP</div>
-            </div>
-        </div>
-
-        <button type="button" class="primary-action-btn" id="addCustomerBtn">
-            <i class="fas fa-plus"></i>
-            Tambah Pelanggan
-        </button>
-
-        <div class="tabs">
-            <div class="tab active" data-filter="all">Semua</div>
-            <div class="tab" data-filter="regular">Reguler</div>
-            <div class="tab" data-filter="vip">VIP</div>
-            <div class="tab" data-filter="new">Baru</div>
-        </div>
-
-        <div class="customer-list" id="customerList">
-            <div class="empty-state">
-                <i class="fas fa-spinner fa-spin"></i>
-                <p>Memuat data...</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Tambah/Edit Pelanggan -->
-    <div class="modal-overlay" id="customerModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title" id="modalTitle">Tambah Pelanggan</h2>
-                <button class="close-btn">&times;</button>
-            </div>
-            <form id="customerForm">
-                <input type="hidden" id="customerId">
-                <div class="form-field">
-                    <label for="customerName">Nama Lengkap *</label>
-                    <input type="text" id="customerName" required placeholder="Masukkan nama lengkap">
-                </div>
-                <div class="form-field">
-                    <label for="customerPhone">Nomor Telepon *</label>
-                    <input type="tel" id="customerPhone" required placeholder="+62 812-xxxx-xxxx">
-                </div>
-                <div class="form-field">
-                    <label for="customerEmail">Email</label>
-                    <input type="email" id="customerEmail" placeholder="email@example.com">
-                </div>
-                <div class="form-field">
-                    <label for="customerType">Tipe Pelanggan</label>
-                    <select id="customerType">
-                        <option value="regular">Reguler</option>
-                        <option value="vip">VIP</option>
-                    </select>
-                </div>
-                <div class="form-field">
-                    <label for="customerOrders">Jumlah Pesanan</label>
-                    <input type="number" id="customerOrders" value="0" min="0">
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" id="cancelBtn">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal Konfirmasi Hapus -->
-    <div class="modal-overlay delete-modal" id="deleteModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Konfirmasi Hapus</h2>
-                <button class="close-btn">&times;</button>
-            </div>
-            <div class="modal-body">
-                <p>Apakah Anda yakin ingin menghapus pelanggan:</p>
-                <div class="customer-name-highlight" id="customerToDeleteName"></div>
-                <p style="font-size: 13px; color: #999; margin-top: 12px;">Tindakan ini tidak dapat dibatalkan.</p>
-            </div>
-            <div class="form-actions">
-                <button type="button" class="btn btn-secondary" id="cancelDeleteBtn">Batal</button>
-                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Hapus</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Toast Notification -->
-    <div class="toast" id="toast"></div>
-
-    <script src="../js/auth.js"></script>
-    <script src="../js/layout.js"></script>
-    <script src="../js/navbar.js"></script>
-    <script src="../js/api-helper.js"></script>
-    <script>
-        // Data will be loaded from API
-        let customers = [];
-
-        // DOM Elements
-        const customerModal = document.getElementById('customerModal');
-        const deleteModal = document.getElementById('deleteModal');
-        const customerForm = document.getElementById('customerForm');
-        const tabs = document.querySelectorAll('.tab');
-        const searchInput = document.getElementById('searchInput');
-        const customerList = document.getElementById('customerList');
-        const toast = document.getElementById('toast');
-
-        // State
-        let currentFilter = 'all';
-        let currentCustomerId = null;
-        let customerToDeleteId = null;
-
-        // Initialize
-        function init() {
-            renderCustomers();
-            updateStats();
-
-            // Event Listeners
-            document.getElementById('addCustomerBtn').addEventListener('click', () => openModal());
-            document.querySelectorAll('.close-btn').forEach(btn => {
-                btn.addEventListener('click', closeModals);
-            });
-            document.getElementById('cancelBtn').addEventListener('click', closeModals);
-            document.getElementById('cancelDeleteBtn').addEventListener('click', closeModals);
-            document.getElementById('confirmDeleteBtn').addEventListener('click', deleteCustomer);
-            customerForm.addEventListener('submit', saveCustomer);
-            searchInput.addEventListener('input', renderCustomers);
-
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    tabs.forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-                    currentFilter = tab.getAttribute('data-filter');
-                    renderCustomers();
-                });
-            });
-
-            // Close on outside click
-            [customerModal, deleteModal].forEach(modal => {
-                modal.addEventListener('click', (e) => {
-                    if (e.target === modal) closeModals();
-                });
-            });
-        }
-
-        async function renderCustomers() {
-            const searchTerm = searchInput.value.toLowerCase();
-            const search = searchInput.value ? searchInput.value.toLowerCase() : '';
-            try {
-                customers = await window.API.Customers.getAll();
-            } catch (err) {
-                customerList.innerHTML = `<div class="empty-state"><i class="fas fa-users"></i><p>Gagal memuat pelanggan:<br>${err.message}</p></div>`;
-                return;
-            }
-
-            let filtered = customers.filter(c => {
-                if (currentFilter === 'vip' && c.type !== 'vip') return false;
-                if (currentFilter === 'regular' && c.type !== 'regular') return false;
-                if (currentFilter === 'new' && !c.isNew) return false;
-                if (search && !c.name.toLowerCase().includes(search) && !(c.phone||'').includes(search) && !(c.email||'').toLowerCase().includes(search)) return false;
-                return true;
-            });
-
-            filtered.sort((a, b) => a.name.localeCompare(b.name));
-
-            if (filtered.length === 0) {
-                customerList.innerHTML = `
-                    <div class="empty-state">
+    <!-- Customer Wrapper -->
+    <div class="customer-wrapper">
+        <!-- Customer Container -->
+        <div class="customer-container">
+            <!-- Customer Header -->
+            <div class="customer-header">
+                <div class="customer-header-left">
+                    <h1 class="customer-title">
                         <i class="fas fa-users"></i>
-                        <p>Tidak ada pelanggan</p>
+                        Manajemen Pelanggan
+                    </h1>
+                    <p class="customer-subtitle">Kelola data pelanggan dan riwayat pembelian</p>
+                </div>
+                <div class="customer-header-actions">
+                    <button class="btn-export">
+                        <i class="fas fa-download"></i>
+                        Export
+                    </button>
+                    <button class="btn-add-customer" id="addCustomerBtn">
+                        <i class="fas fa-plus"></i>
+                        Tambah Pelanggan
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="customer-stats">
+                <div class="stat-card total">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
                     </div>
-                `;
-                updateStats();
-                return;
-            }
+                    <div class="stat-content">
+                        <div class="stat-label">Total Pelanggan</div>
+                        <div class="stat-value" id="totalCustomers">0</div>
+                        <div class="stat-subtext">Terdaftar dalam sistem</div>
+                    </div>
+                </div>
+                <div class="stat-card regular">
+                    <div class="stat-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-label">Pelanggan Regular</div>
+                        <div class="stat-value" id="regularCustomers">0</div>
+                        <div class="stat-subtext">Pelanggan standar</div>
+                    </div>
+                </div>
+                <div class="stat-card vip">
+                    <div class="stat-icon">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-label">Pelanggan VIP</div>
+                        <div class="stat-value" id="vipCustomers">0</div>
+                        <div class="stat-subtext">Member premium</div>
+                    </div>
+                </div>
+                <div class="stat-card new">
+                    <div class="stat-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-label">Pelanggan Baru</div>
+                        <div class="stat-value" id="newCustomers">0</div>
+                        <div class="stat-subtext positive">↑ Bulan ini</div>
+                    </div>
+                </div>
+            </div>
 
-            customerList.innerHTML = filtered.map(c => {
-                const initials = (c.name || '').split(' ').map(n => n[0]).join('').toUpperCase();
-                const badges = [];
-                if (c.type === 'vip') badges.push('<span class="customer-badge badge-vip">VIP</span>');
-                if (c.isNew) badges.push('<span class="customer-badge badge-new">BARU</span>');
+            <!-- Filters -->
+            <div class="customer-filters">
+                <div class="filter-row">
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="Cari nama, email, atau telepon...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="filter-select">
+                        <select id="filterType">
+                            <option value="all">Semua Tipe</option>
+                            <option value="regular">Regular</option>
+                            <option value="vip">VIP</option>
+                        </select>
+                    </div>
+                    <div class="filter-select">
+                        <select id="filterStatus">
+                            <option value="all">Semua Status</option>
+                            <option value="active">Aktif</option>
+                            <option value="inactive">Tidak Aktif</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
 
-                return `
-                    <div class="customer-card">
-                        <div class="customer-avatar">${initials}</div>
-                        <div class="customer-info">
-                            <div class="customer-name">${c.name}</div>
-                            <div class="customer-details">
-                                ${c.phone || ''} • ${c.orders || 0} pesanan ${badges.join('')}
+            <!-- Tabs -->
+            <div class="customer-tabs">
+                <button class="tab-item active" data-tab="all">
+                    Semua
+                    <span class="tab-badge" id="badgeAll">0</span>
+                </button>
+                <button class="tab-item" data-tab="regular">
+                    Regular
+                    <span class="tab-badge" id="badgeRegular">0</span>
+                </button>
+                <button class="tab-item" data-tab="vip">
+                    VIP
+                    <span class="tab-badge" id="badgeVip">0</span>
+                </button>
+                <button class="tab-item" data-tab="new">
+                    Baru Bulan Ini
+                    <span class="tab-badge" id="badgeNew">0</span>
+                </button>
+            </div>
+
+            <!-- Customer Content -->
+            <div class="customer-content">
+                <!-- View Controls -->
+                <div class="view-controls">
+                    <div class="results-info" id="resultsInfo">Menampilkan 0 pelanggan</div>
+                    <div class="view-toggle">
+                        <button class="active" data-view="table">
+                            <i class="fas fa-table"></i>
+                            Tabel
+                        </button>
+                        <button data-view="grid">
+                            <i class="fas fa-th-large"></i>
+                            Grid
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Customer Table -->
+                <div class="customer-table-wrapper">
+                    <table class="customer-table" id="customerTable">
+                        <thead>
+                            <tr>
+                                <th class="sortable" data-sort="name">Pelanggan</th>
+                                <th class="sortable hide-mobile" data-sort="phone">Telepon</th>
+                                <th class="sortable" data-sort="purchases">Total Pembelian</th>
+                                <th class="sortable hide-mobile" data-sort="lastPurchase">Pembelian Terakhir</th>
+                                <th class="hide-mobile">Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customerTableBody">
+                            <!-- Customer rows will be inserted here -->
+                        </tbody>
+                    </table>
+
+                    <!-- Loading State -->
+                    <div class="loading-container" id="loadingState" style="display: none;">
+                        <div class="loading-spinner"></div>
+                        <div class="loading-text">Memuat data pelanggan...</div>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div class="no-customers" id="emptyState" style="display: none;">
+                        <div class="no-customers-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="no-customers-title">Belum Ada Pelanggan</div>
+                        <div class="no-customers-text">Mulai tambahkan pelanggan baru untuk mengelola data mereka</div>
+                        <button class="btn-add-first" onclick="document.getElementById('addCustomerBtn').click()">
+                            <i class="fas fa-plus"></i>
+                            Tambah Pelanggan Pertama
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination-container" id="paginationContainer" style="display: none;">
+                    <div class="pagination-info" id="paginationInfo">Menampilkan 1-10 dari 50 pelanggan</div>
+                    <div class="pagination-controls">
+                        <button class="pagination-btn" id="btnPrevPage">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <div id="paginationButtons"></div>
+                        <button class="pagination-btn" id="btnNextPage">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="page-size-selector">
+                        <span>Tampilkan:</span>
+                        <select id="pageSizeSelect">
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Add/Edit Customer Modal -->
+    <div class="customer-modal-overlay" id="customerModal">
+        <div class="customer-modal">
+            <!-- Modal Header -->
+            <div class="customer-modal-header">
+                <h2 class="modal-title" id="modalTitle">
+                    <i class="fas fa-user-plus"></i>
+                    Tambah Pelanggan
+                </h2>
+                <button class="btn-close-modal" id="closeModalBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="customer-modal-body">
+                <form id="customerForm">
+                    <input type="hidden" id="customerId">
+
+                    <!-- Personal Information Section -->
+                    <div class="form-section">
+                        <div class="section-title">
+                            <i class="fas fa-user"></i>
+                            Informasi Pribadi
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label required" for="customerName">Nama Lengkap</label>
+                            <div class="form-input-group">
+                                <input type="text" id="customerName" class="form-input" placeholder="Masukkan nama lengkap" required>
+                                <i class="fas fa-user form-input-icon"></i>
+                            </div>
+                            <span class="form-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                Nama wajib diisi
+                            </span>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label required" for="customerPhone">Nomor Telepon</label>
+                                <div class="form-input-group">
+                                    <input type="tel" id="customerPhone" class="form-input" placeholder="+62 812-xxxx-xxxx" required>
+                                    <i class="fas fa-phone form-input-icon"></i>
+                                </div>
+                                <span class="form-error">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    Nomor telepon wajib diisi
+                                </span>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="customerEmail">Email</label>
+                                <div class="form-input-group">
+                                    <input type="email" id="customerEmail" class="form-input" placeholder="email@example.com">
+                                    <i class="fas fa-envelope form-input-icon"></i>
+                                </div>
+                                <span class="form-help">
+                                    <i class="fas fa-info-circle"></i>
+                                    Opsional
+                                </span>
                             </div>
                         </div>
-                        <div class="customer-actions">
-                            <button class="action-btn" onclick="openModal(${c.id})">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="action-btn delete" onclick="openDeleteModal(${c.id})">
-                                <i class="fas fa-trash"></i>
-                            </button>
+
+                        <div class="form-group">
+                            <label class="form-label" for="customerAddress">Alamat</label>
+                            <textarea id="customerAddress" class="form-textarea" placeholder="Masukkan alamat lengkap (opsional)"></textarea>
+                            <span class="form-help">
+                                <i class="fas fa-info-circle"></i>
+                                Alamat untuk pengiriman atau keperluan lainnya
+                            </span>
                         </div>
                     </div>
-                `;
-            }).join('');
 
-            updateStats();
-        }
+                    <!-- Customer Type Section -->
+                    <div class="form-section">
+                        <div class="section-title">
+                            <i class="fas fa-crown"></i>
+                            Tipe Pelanggan
+                        </div>
 
-        function updateStats() {
-            document.getElementById('totalCustomers').textContent = customers.length;
-            document.getElementById('newCustomers').textContent = customers.filter(c => c.isNew).length;
-            document.getElementById('vipCustomers').textContent = customers.filter(c => c.type === 'vip').length;
-        }
+                        <div class="customer-type-selector">
+                            <div class="type-option regular selected" data-type="regular">
+                                <div class="type-option-icon">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="type-option-label">Regular</div>
+                                <div class="type-option-desc">Pelanggan standar</div>
+                            </div>
+                            <div class="type-option vip" data-type="vip">
+                                <div class="type-option-icon">
+                                    <i class="fas fa-crown"></i>
+                                </div>
+                                <div class="type-option-label">VIP</div>
+                                <div class="type-option-desc">Member premium</div>
+                            </div>
+                            <div class="type-option new" data-type="new">
+                                <div class="type-option-icon">
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <div class="type-option-label">Baru</div>
+                                <div class="type-option-desc">Pelanggan baru</div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="customerType" value="regular">
+                    </div>
+                </form>
+            </div>
 
-        function openModal(id = null) {
-            currentCustomerId = id;
-            const title = document.getElementById('modalTitle');
-            
-            if (id) {
-                const customer = customers.find(c => c.id === id);
-                title.textContent = 'Edit Pelanggan';
-                document.getElementById('customerId').value = customer.id;
-                document.getElementById('customerName').value = customer.name;
-                document.getElementById('customerPhone').value = customer.phone;
-                document.getElementById('customerEmail').value = customer.email;
-                document.getElementById('customerType').value = customer.type;
-                document.getElementById('customerOrders').value = customer.orders;
-            } else {
-                title.textContent = 'Tambah Pelanggan';
-                customerForm.reset();
-                document.getElementById('customerOrders').value = '0';
-            }
-            
-            customerModal.classList.add('show');
-        }
+            <!-- Modal Footer -->
+            <div class="customer-modal-footer">
+                <button class="btn-modal btn-modal-cancel" id="cancelBtn">
+                    <i class="fas fa-times"></i>
+                    Batal
+                </button>
+                <button class="btn-modal btn-modal-save" id="saveBtn">
+                    <i class="fas fa-save"></i>
+                    Simpan
+                </button>
+            </div>
+        </div>
+    </div>
 
-        function openDeleteModal(id) {
-            const customer = customers.find(c => c.id === id);
-            customerToDeleteId = id;
-            document.getElementById('customerToDeleteName').textContent = customer.name;
-            deleteModal.classList.add('show');
-        }
-
-        function closeModals() {
-            customerModal.classList.remove('show');
-            deleteModal.classList.remove('show');
-            currentCustomerId = null;
-            customerToDeleteId = null;
-        }
-
-        async function saveCustomer(e) {
-            e.preventDefault();
-            const id = document.getElementById('customerId').value;
-            const name = document.getElementById('customerName').value.trim();
-            const phone = document.getElementById('customerPhone').value.trim();
-            const email = document.getElementById('customerEmail').value.trim();
-            const type = document.getElementById('customerType').value;
-            const orders = parseInt(document.getElementById('customerOrders').value) || 0;
-
-            try {
-                if (id) {
-                    await window.API.Customers.update(parseInt(id, 10), { name, phone, email, type, total_transactions: orders });
-                    showToast('Pelanggan berhasil diperbarui!');
-                } else {
-                    await window.API.Customers.create({ name, phone, email, type });
-                    showToast('Pelanggan berhasil ditambahkan!');
-                }
-                closeModals();
-                await renderCustomers();
-            } catch (err) {
-                showToast('Gagal menyimpan pelanggan: ' + err.message);
-            }
-        }
-
-        async function deleteCustomer() {
-            if (!customerToDeleteId) return;
-            try {
-                const toDelete = customers.find(c => c.id === customerToDeleteId);
-                await window.API.Customers.delete(customerToDeleteId);
-                showToast(`${toDelete.name} berhasil dihapus!`);
-                closeModals();
-                await renderCustomers();
-            } catch (err) {
-                showToast('Gagal menghapus pelanggan: ' + err.message);
-            }
-        }
-
-        function showToast(message) {
-            toast.textContent = message;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
-        }
-
-        // Initialize on load
-        document.addEventListener('DOMContentLoaded', init);
-    </script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/navbar.js"></script>
+    <script src="../js/api-helper.js"></script>
+    <script src="js/pelanggan.js"></script>
 </body>
 </html>
