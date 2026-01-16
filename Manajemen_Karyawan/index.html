@@ -1,96 +1,377 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#8B4513">
+    <meta name="theme-color" content="#0ea5e9">
     <title>Manajemen Karyawan - DigiCaf</title>
-    <link rel="stylesheet" href="../css/shared-ui.css">
+    
+    <!-- Design System CSS -->
+    <link rel="stylesheet" href="../css/design-tokens.css">
+    <link rel="stylesheet" href="../css/typography.css">
+    <link rel="stylesheet" href="../css/icons.css">
+    <link rel="stylesheet" href="../css/layout-system.css">
+    <link rel="stylesheet" href="../css/spacing-alignment.css">
+    
+    <!-- Component CSS -->
+    <link rel="stylesheet" href="../css/components/buttons.css">
+    <link rel="stylesheet" href="../css/components/cards.css">
+    <link rel="stylesheet" href="../css/components/forms.css">
+    <link rel="stylesheet" href="../css/components/badges-labels.css">
+    
+    <!-- Page Specific CSS -->
+    <link rel="stylesheet" href="css/employee-layout.css">
+    
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="css/karyawan.css">
 </head>
 <body>
-    <div data-digicaf-layout="auto" data-page-title="Manajemen Karyawan">
-        <div class="search-bar">
-            <input type="text" id="searchInputEmp" placeholder="Cari karyawan...">
-            <i class="fas fa-search"></i>
-        </div>
-
-        <div class="employee-stats">
-            <div class="stat-card">
-                <div class="stat-number" id="totalEmployees">0</div>
-                <div class="stat-label">Total</div>
+    <!-- Employee Wrapper -->
+    <div class="employee-wrapper">
+        <div class="employee-container">
+            <!-- Employee Header -->
+            <div class="employee-header">
+                <div class="employee-header-left">
+                    <h1 class="employee-title">
+                        <i class="fas fa-users"></i>
+                        Manajemen Karyawan
+                    </h1>
+                    <p class="employee-subtitle">Kelola data dan informasi karyawan</p>
+                </div>
+                <div class="employee-header-actions">
+                    <button class="btn-export" id="exportBtn">
+                        <i class="fas fa-download"></i>
+                        Export
+                    </button>
+                    <button class="btn-add-employee" id="addEmployeeBtn">
+                        <i class="fas fa-plus"></i>
+                        Tambah Karyawan
+                    </button>
+                </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-number" id="shiftPagiCount">0</div>
-                <div class="stat-label">Pagi</div>
+
+            <!-- Employee Stats -->
+            <div class="employee-stats">
+                <div class="stat-card total">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-label">Total Karyawan</div>
+                        <div class="stat-value" id="totalEmployees">0</div>
+                        <div class="stat-subtext">Semua karyawan</div>
+                    </div>
+                </div>
+                <div class="stat-card active">
+                    <div class="stat-icon">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-label">Aktif</div>
+                        <div class="stat-value" id="activeEmployees">0</div>
+                        <div class="stat-subtext">Karyawan aktif</div>
+                    </div>
+                </div>
+                <div class="stat-card shift-morning">
+                    <div class="stat-icon">
+                        <i class="fas fa-sun"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-label">Shift Pagi</div>
+                        <div class="stat-value" id="shiftPagiCount">0</div>
+                        <div class="stat-subtext">07:00 - 15:00</div>
+                    </div>
+                </div>
+                <div class="stat-card shift-day">
+                    <div class="stat-icon">
+                        <i class="fas fa-moon"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-label">Shift Siang</div>
+                        <div class="stat-value" id="shiftSiangCount">0</div>
+                        <div class="stat-subtext">15:00 - 23:00</div>
+                    </div>
+                </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-number" id="shiftSiangCount">0</div>
-                <div class="stat-label">Siang/Full</div>
+
+            <!-- Filter & Search Section -->
+            <div class="employee-filters">
+                <div class="filter-row">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInputEmp" placeholder="Cari nama karyawan atau posisi...">
+                    </div>
+                    <div class="filter-select">
+                        <select id="filterShift">
+                            <option value="">Semua Shift</option>
+                            <option value="Pagi">Shift Pagi</option>
+                            <option value="Siang">Shift Siang</option>
+                            <option value="Full Time">Full Time</option>
+                        </select>
+                    </div>
+                    <div class="filter-select">
+                        <select id="filterStatus">
+                            <option value="">Semua Status</option>
+                            <option value="active">Aktif</option>
+                            <option value="inactive">Tidak Aktif</option>
+                            <option value="on-leave">Cuti</option>
+                        </select>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <button type="button" class="primary-action-btn add-employee-btn">
-            <i class="fas fa-plus"></i>
-            Tambah Karyawan
-        </button>
+            <!-- Employee Tabs -->
+            <div class="employee-tabs" id="empTabs">
+                <button class="tab-item active" data-filter="all">
+                    Semua
+                    <span class="tab-badge" id="badgeAll">0</span>
+                </button>
+                <button class="tab-item" data-filter="Pagi">
+                    Shift Pagi
+                    <span class="tab-badge" id="badgePagi">0</span>
+                </button>
+                <button class="tab-item" data-filter="Siang">
+                    Shift Siang
+                    <span class="tab-badge" id="badgeSiang">0</span>
+                </button>
+                <button class="tab-item" data-filter="Full Time">
+                    Full Time
+                    <span class="tab-badge" id="badgeFullTime">0</span>
+                </button>
+            </div>
 
-        <div class="tabs" id="empTabs">
-            <div class="tab active" data-filter="all">Semua</div>
-            <div class="tab" data-filter="Pagi">Pagi</div>
-            <div class="tab" data-filter="Siang">Siang</div>
-            <div class="tab" data-filter="Full Time">Full Time</div>
-        </div>
-
-        <div class="employee-list" id="employeeList">
-            <div class="empty-state">
-                <i class="fas fa-spinner fa-spin"></i>
-                <p>Memuat data...</p>
+            <!-- Employee Content -->
+            <div class="employee-content">
+                <div class="employee-list" id="employeeList">
+                    <!-- Employee cards will be rendered here by JavaScript -->
+                    <div class="loading-container">
+                        <div class="loading-spinner"></div>
+                        <p class="loading-text">Memuat data karyawan...</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal -->
-    <div id="employeeModal" class="modal-overlay" aria-hidden="true">
-        <div class="modal-content card">
+    <!-- Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+        <a href="../Dashboard/index.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="../Transaksi/index.html" class="nav-item">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Transaksi</span>
+        </a>
+        <a href="../Manejemen_stok/index.html" class="nav-item">
+            <i class="fas fa-boxes"></i>
+            <span>Stok</span>
+        </a>
+        <a href="../Manajemen_Karyawan/index.html" class="nav-item active">
+            <i class="fas fa-users"></i>
+            <span>Karyawan</span>
+        </a>
+        <a href="../Laporan POS/index.html" class="nav-item">
+            <i class="fas fa-chart-bar"></i>
+            <span>Laporan</span>
+        </a>
+    </nav>
+
+    <!-- Add/Edit Employee Modal -->
+    <div class="employee-modal-overlay" id="employeeModal">
+        <div class="employee-modal">
             <div class="modal-header">
-                <h3 id="form-title">Tambah Karyawan</h3>
-                <button class="modal-close" aria-label="Tutup">&times;</button>
+                <div>
+                    <h2 class="modal-title" id="modalTitle">
+                        <i class="fas fa-user-plus"></i>
+                        Tambah Karyawan Baru
+                    </h2>
+                    <p class="modal-subtitle">Lengkapi informasi karyawan di bawah ini</p>
+                </div>
+                <button class="btn-close-modal" id="closeModalBtn">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-            <div class="card-content">
-                <form id="employeeForm">
+            
+            <div class="modal-body">
+                <form id="employeeForm" class="employee-form">
                     <input type="hidden" id="employeeId">
-                    <div class="form-row">
-                        <div class="form-field">
-                            <label>Nama Lengkap *</label>
-                            <input type="text" id="employee-name" placeholder="Nama lengkap" required>
+                    
+                    <!-- Personal Information Section -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-id-card"></i>
+                            Informasi Personal
+                        </h3>
+                        <p class="section-description">Data pribadi karyawan</p>
+                        
+                        <!-- Photo Upload -->
+                        <div class="photo-upload-section">
+                            <div class="photo-preview" id="photoPreview">
+                                <i class="fas fa-user photo-placeholder"></i>
+                            </div>
+                            <div class="photo-upload-info">
+                                <div class="photo-upload-title">Foto Profil</div>
+                                <p class="photo-upload-hint">Upload foto dengan format JPG, PNG maksimal 2MB</p>
+                                <div class="photo-upload-actions">
+                                    <button type="button" class="btn-upload" id="uploadPhotoBtn">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                        Upload Foto
+                                    </button>
+                                    <button type="button" class="btn-remove-photo" id="removePhotoBtn" style="display: none;">
+                                        <i class="fas fa-trash"></i>
+                                        Hapus
+                                    </button>
+                                </div>
+                                <input type="file" id="photoInput" accept="image/*" hidden>
+                            </div>
                         </div>
-                        <div class="form-field">
-                            <label>Shift *</label>
-                            <select id="employee-shift" required>
-                                <option value="">Pilih Shift</option>
-                                <option value="Pagi">Pagi (07:00 - 15:00)</option>
-                                <option value="Siang">Siang (15:00 - 23:00)</option>
-                                <option value="Full Time">Full Time</option>
-                            </select>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Nama Lengkap
+                                    <span class="required">*</span>
+                                </label>
+                                <input type="text" class="form-input" id="employeeName" placeholder="Masukkan nama lengkap" required>
+                                <p class="form-hint">
+                                    <i class="fas fa-info-circle"></i>
+                                    Nama sesuai dengan KTP
+                                </p>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Posisi/Jabatan
+                                    <span class="required">*</span>
+                                </label>
+                                <select class="form-select" id="employeePosition" required>
+                                    <option value="">Pilih posisi</option>
+                                    <option value="Barista">Barista</option>
+                                    <option value="Kasir">Kasir</option>
+                                    <option value="Supervisor">Supervisor</option>
+                                    <option value="Manager">Manager</option>
+                                    <option value="Staff Dapur">Staff Dapur</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Email</label>
+                                <div class="input-with-icon">
+                                    <i class="fas fa-envelope"></i>
+                                    <input type="email" class="form-input" id="employeeEmail" placeholder="email@example.com">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">
+                                    No. Telepon
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="input-with-icon">
+                                    <i class="fas fa-phone"></i>
+                                    <input type="tel" class="form-input" id="employeePhone" placeholder="+62 812-3456-7890" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row single">
+                            <div class="form-group">
+                                <label class="form-label">Alamat</label>
+                                <textarea class="form-textarea" id="employeeAddress" placeholder="Masukkan alamat lengkap" rows="3"></textarea>
+                            </div>
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-field">
-                            <label>No. Telepon</label>
-                            <input type="tel" id="employee-phone" placeholder="+62 xxx-xxxx-xxxx">
+
+                    <div class="section-divider"></div>
+
+                    <!-- Employment Information Section -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-briefcase"></i>
+                            Informasi Kepegawaian
+                        </h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    ID Karyawan
+                                    <i class="fas fa-question-circle info-icon" title="ID akan di-generate otomatis"></i>
+                                </label>
+                                <input type="text" class="form-input" id="employeeIdDisplay" placeholder="Auto-generated" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Tanggal Bergabung
+                                    <span class="required">*</span>
+                                </label>
+                                <input type="date" class="form-input" id="employeeJoinDate" required>
+                            </div>
                         </div>
-                        <div class="form-field">
-                            <label>Email</label>
-                            <input type="email" id="employee-email" placeholder="email@example.com">
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Shift Kerja
+                                    <span class="required">*</span>
+                                </label>
+                                <select class="form-select" id="employeeShift" required>
+                                    <option value="">Pilih shift</option>
+                                    <option value="Pagi">Shift Pagi (07:00 - 15:00)</option>
+                                    <option value="Siang">Shift Siang (15:00 - 23:00)</option>
+                                    <option value="Full Time">Full Time</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Status Karyawan
+                                    <span class="required">*</span>
+                                </label>
+                                <select class="form-select" id="employeeStatus" required>
+                                    <option value="active">Aktif</option>
+                                    <option value="inactive">Tidak Aktif</option>
+                                    <option value="on-leave">Cuti</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-secondary cancel-btn">Batal</button>
-                        <button type="submit" class="btn btn-primary save-employee-btn">Simpan</button>
+
+                    <div class="section-divider"></div>
+
+                    <!-- Additional Information Section -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-clipboard"></i>
+                            Informasi Tambahan
+                        </h3>
+                        
+                        <div class="form-row single">
+                            <div class="form-group">
+                                <label class="form-label">Catatan</label>
+                                <textarea class="form-textarea" id="employeeNotes" placeholder="Catatan tambahan tentang karyawan..." rows="4"></textarea>
+                            </div>
+                        </div>
                     </div>
                 </form>
+            </div>
+
+            <div class="modal-footer">
+                <div class="modal-footer-left">
+                    <button type="button" class="btn-modal btn-modal-draft" id="saveDraftBtn" style="display: none;">
+                        <i class="fas fa-save"></i>
+                        Simpan Draft
+                    </button>
+                </div>
+                <div class="modal-footer-right">
+                    <button type="button" class="btn-modal btn-modal-cancel" id="cancelBtn">
+                        <i class="fas fa-times"></i>
+                        Batal
+                    </button>
+                    <button type="submit" form="employeeForm" class="btn-modal btn-modal-save" id="saveBtn">
+                        <i class="fas fa-check"></i>
+                        Simpan Karyawan
+                    </button>
+                </div>
             </div>
         </div>
     </div>
