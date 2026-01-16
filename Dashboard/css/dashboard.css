@@ -1,0 +1,874 @@
+/**
+ * Dashboard Layout & Components
+ * Phase 4: Dashboard UI
+ * Coffee Shop POS System
+ */
+
+/* Import dependencies */
+@import '../../css/design-tokens.css';
+
+/* ============================================
+   4.1 DASHBOARD LAYOUT
+   ============================================ */
+
+.dashboard-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--spacing-4);
+}
+
+/* Header Section dengan Greeting & Date */
+.dashboard-header {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+  color: var(--color-white);
+  padding: var(--spacing-6) var(--spacing-5);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--spacing-5);
+  box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 300px;
+  height: 300px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.dashboard-header-content {
+  position: relative;
+  z-index: 1;
+}
+
+.welcome-text {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--spacing-2);
+  font-family: var(--font-family-heading);
+}
+
+.date-text {
+  font-size: var(--font-size-sm);
+  opacity: 0.9;
+  font-weight: var(--font-weight-medium);
+}
+
+/* Grid Layout Dashboard */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-5);
+  margin-bottom: var(--spacing-5);
+}
+
+@media (min-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+.dashboard-main-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-5);
+}
+
+.dashboard-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-5);
+}
+
+/* Stats Cards Grid (4 kolom responsive) */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-3);
+  margin-bottom: var(--spacing-5);
+}
+
+@media (min-width: 576px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-4);
+  }
+}
+
+@media (min-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ============================================
+   4.2 STAT CARDS
+   ============================================ */
+
+.stat-card {
+  background: var(--color-white);
+  padding: var(--spacing-5);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border-left: 4px solid var(--color-primary);
+  transition: all var(--transition-base);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100px;
+  height: 100px;
+  background: var(--color-primary);
+  opacity: 0.03;
+  border-radius: 50%;
+  transform: translate(30%, -30%);
+  transition: all var(--transition-base);
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.stat-card:hover::before {
+  transform: translate(30%, -30%) scale(1.2);
+  opacity: 0.05;
+}
+
+/* Icon untuk setiap stat card */
+.stat-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+  color: var(--color-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-xl);
+  margin-bottom: var(--spacing-3);
+  box-shadow: var(--shadow-sm);
+}
+
+.stat-label {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--spacing-2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  color: var(--color-primary);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-3xl);
+  font-family: var(--font-family-heading);
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+/* Trend indicator (+/- percentage) */
+.stat-trend {
+  margin-top: var(--spacing-2);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-md);
+}
+
+.stat-trend.positive {
+  color: var(--color-success-dark);
+  background: var(--color-success-bg);
+}
+
+.stat-trend.negative {
+  color: var(--color-danger-dark);
+  background: var(--color-danger-bg);
+}
+
+.stat-trend i {
+  font-size: 10px;
+}
+
+/* Loading skeleton state */
+.stat-card.loading .stat-value,
+.stat-card.loading .stat-label {
+  background: linear-gradient(90deg, var(--color-gray-200) 25%, var(--color-gray-100) 50%, var(--color-gray-200) 75%);
+  background-size: 200% 100%;
+  animation: loading-shimmer 1.5s infinite;
+  color: transparent;
+  border-radius: var(--radius-sm);
+}
+
+@keyframes loading-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Stat card color variants */
+.stat-card.revenue .stat-icon {
+  background: linear-gradient(135deg, var(--color-success), var(--color-success-dark));
+}
+
+.stat-card.revenue {
+  border-left-color: var(--color-success);
+}
+
+.stat-card.transactions .stat-icon {
+  background: linear-gradient(135deg, var(--color-info), var(--color-info-dark));
+}
+
+.stat-card.transactions {
+  border-left-color: var(--color-info);
+}
+
+.stat-card.warning .stat-icon {
+  background: linear-gradient(135deg, var(--color-warning), var(--color-warning-dark));
+}
+
+.stat-card.warning {
+  border-left-color: var(--color-warning);
+}
+
+.stat-card.alert .stat-icon {
+  background: linear-gradient(135deg, var(--color-danger), var(--color-danger-dark));
+}
+
+.stat-card.alert {
+  border-left-color: var(--color-danger);
+}
+
+/* ============================================
+   4.3 SALES CHART SECTION
+   ============================================ */
+
+.chart-section {
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-5);
+  margin-bottom: var(--spacing-5);
+}
+
+/* Chart header dengan period filters */
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-4);
+  flex-wrap: wrap;
+  gap: var(--spacing-3);
+}
+
+.chart-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-heading);
+}
+
+.chart-filters {
+  display: flex;
+  gap: var(--spacing-2);
+  background: var(--color-gray-100);
+  padding: var(--spacing-1);
+  border-radius: var(--radius-md);
+}
+
+.chart-filter-btn {
+  padding: var(--spacing-2) var(--spacing-3);
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.chart-filter-btn:hover {
+  background: var(--color-white);
+  color: var(--color-text-primary);
+}
+
+.chart-filter-btn.active {
+  background: var(--color-primary);
+  color: var(--color-white);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Canvas area untuk chart */
+.chart-canvas-wrapper {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  margin-bottom: var(--spacing-3);
+}
+
+.chart-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* Chart legend */
+.chart-legend {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-4);
+  flex-wrap: wrap;
+  padding-top: var(--spacing-3);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.chart-legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.chart-legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-sm);
+}
+
+/* Empty state jika no data */
+.chart-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: var(--color-text-tertiary);
+  text-align: center;
+}
+
+.chart-empty-state i {
+  font-size: 64px;
+  margin-bottom: var(--spacing-3);
+  opacity: 0.3;
+}
+
+.chart-empty-state p {
+  font-size: var(--font-size-base);
+  margin: 0;
+}
+
+/* Loading state */
+.chart-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+}
+
+.chart-loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid var(--color-gray-200);
+  border-top-color: var(--color-primary);
+  border-radius: var(--radius-full);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   4.4 RECENT TRANSACTIONS SECTION
+   ============================================ */
+
+.transactions-section {
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-5);
+}
+
+.transactions-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-4);
+}
+
+.transactions-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-heading);
+}
+
+/* View all link */
+.transactions-view-all {
+  color: var(--color-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  transition: all var(--transition-base);
+}
+
+.transactions-view-all:hover {
+  color: var(--color-primary-dark);
+  gap: var(--spacing-2);
+}
+
+/* Transaction list */
+.transaction-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+/* Transaction item layout */
+.transaction-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-3);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base);
+}
+
+.transaction-item:hover {
+  border-color: var(--color-primary);
+  background: var(--color-gray-50);
+  transform: translateX(4px);
+}
+
+.transaction-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--color-primary-lighter), var(--color-primary));
+  color: var(--color-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: var(--font-size-lg);
+}
+
+/* Transaction details (product, qty, total) */
+.transaction-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.transaction-product {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-1);
+  font-size: var(--font-size-base);
+}
+
+.transaction-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.transaction-qty,
+.transaction-time {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+}
+
+.transaction-amount {
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  font-size: var(--font-size-lg);
+  white-space: nowrap;
+}
+
+/* Transaction status badge */
+.transaction-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.transaction-status.success {
+  background: var(--color-success-bg);
+  color: var(--color-success-dark);
+}
+
+.transaction-status.pending {
+  background: var(--color-warning-bg);
+  color: var(--color-warning-dark);
+}
+
+.transaction-status.cancelled {
+  background: var(--color-danger-bg);
+  color: var(--color-danger-dark);
+}
+
+/* Time stamp formatting */
+.transaction-timestamp {
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-xs);
+}
+
+/* Empty state */
+.transactions-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-8) var(--spacing-4);
+  color: var(--color-text-tertiary);
+  text-align: center;
+}
+
+.transactions-empty i {
+  font-size: 64px;
+  margin-bottom: var(--spacing-3);
+  opacity: 0.3;
+}
+
+.transactions-empty-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-2);
+}
+
+.transactions-empty-text {
+  font-size: var(--font-size-sm);
+  margin: 0;
+}
+
+/* ============================================
+   4.5 QUICK ACTIONS SIDEBAR
+   ============================================ */
+
+.quick-actions-section {
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-5);
+}
+
+.quick-actions-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-heading);
+  margin-bottom: var(--spacing-4);
+}
+
+.quick-actions-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-3);
+}
+
+@media (min-width: 576px) and (max-width: 767px) {
+  .quick-actions-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Button untuk actions dengan icon */
+.quick-action-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4);
+  background: var(--color-gray-50);
+  border: 2px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  text-decoration: none;
+  color: inherit;
+}
+
+.quick-action-btn:hover {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.quick-action-btn:hover .quick-action-icon {
+  background: var(--color-white);
+  color: var(--color-primary);
+}
+
+.quick-action-btn:hover .quick-action-label {
+  color: var(--color-white);
+}
+
+.quick-action-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+  color: var(--color-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-xl);
+  flex-shrink: 0;
+  transition: all var(--transition-base);
+}
+
+.quick-action-label {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+  transition: all var(--transition-base);
+}
+
+.quick-action-description {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  margin-top: var(--spacing-1);
+}
+
+/* ============================================
+   4.6 TOP PRODUCTS WIDGET
+   ============================================ */
+
+.top-products-section {
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-5);
+}
+
+.top-products-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-4);
+}
+
+.top-products-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-heading);
+}
+
+/* Product list dengan mini bar chart */
+.top-product-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.top-product-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-3);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base);
+}
+
+.top-product-item:hover {
+  background: var(--color-gray-50);
+}
+
+/* Product image/icon */
+.top-product-image {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--color-secondary-light), var(--color-secondary));
+  color: var(--color-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-xl);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.top-product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.top-product-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.top-product-name {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-1);
+  font-size: var(--font-size-base);
+}
+
+/* Sales count */
+.top-product-sales {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-2);
+}
+
+/* Mini bar chart */
+.top-product-bar-wrapper {
+  width: 100%;
+  height: 6px;
+  background: var(--color-gray-200);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.top-product-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light));
+  border-radius: var(--radius-full);
+  transition: width var(--transition-base);
+}
+
+/* Trend indicator */
+.top-product-trend {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+}
+
+.top-product-trend.up {
+  color: var(--color-success);
+}
+
+.top-product-trend.down {
+  color: var(--color-danger);
+}
+
+.top-product-trend i {
+  font-size: var(--font-size-xs);
+}
+
+/* Empty state untuk top products */
+.top-products-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-6) var(--spacing-4);
+  color: var(--color-text-tertiary);
+  text-align: center;
+}
+
+.top-products-empty i {
+  font-size: 48px;
+  margin-bottom: var(--spacing-3);
+  opacity: 0.3;
+}
+
+.top-products-empty-text {
+  font-size: var(--font-size-sm);
+  margin: 0;
+}
+
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================ */
+
+@media (max-width: 767px) {
+  .dashboard-container {
+    padding: var(--spacing-3);
+  }
+
+  .dashboard-header {
+    padding: var(--spacing-4);
+  }
+
+  .welcome-text {
+    font-size: var(--font-size-xl);
+  }
+
+  .stat-icon {
+    width: 48px;
+    height: 48px;
+    font-size: var(--font-size-lg);
+  }
+
+  .stat-value {
+    font-size: var(--font-size-2xl);
+  }
+
+  .chart-canvas-wrapper {
+    height: 250px;
+  }
+
+  .chart-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .transaction-item {
+    flex-wrap: wrap;
+  }
+
+  .transaction-amount {
+    width: 100%;
+    text-align: right;
+    margin-top: var(--spacing-2);
+  }
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+
+@media print {
+  .dashboard-header,
+  .quick-actions-section,
+  .chart-filters {
+    display: none;
+  }
+
+  .dashboard-container {
+    max-width: 100%;
+  }
+
+  .stat-card,
+  .chart-section,
+  .transactions-section {
+    box-shadow: none;
+    border: 1px solid var(--color-border-medium);
+  }
+}

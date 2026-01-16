@@ -6,258 +6,199 @@
     <meta name="theme-color" content="#8B4513">
     <title>Dashboard - DigiCaf</title>
     <link rel="stylesheet" href="../css/shared-ui.css">
+    <link rel="stylesheet" href="./css/dashboard.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        .dashboard-header {
-            background: linear-gradient(135deg, #8B4513, #A0522D);
-            color: white;
-            padding: 24px 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
-        }
-
-        .welcome-text {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 6px;
-        }
-
-        .date-text {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            border-left: 4px solid #8B4513;
-            transition: all 0.2s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(139, 69, 19, 0.2);
-        }
-
-        .stat-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #8B4513, #A0522D);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            margin-bottom: 12px;
-        }
-
-        .stat-label {
-            color: #666;
-            font-size: 13px;
-            margin-bottom: 6px;
-        }
-
-        .stat-value {
-            color: #8B4513;
-            font-weight: bold;
-            font-size: 24px;
-        }
-
-        .section-title {
-            font-size: 18px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 12px;
-        }
-
-        .quick-actions {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .action-card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        }
-
-        .action-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(139, 69, 19, 0.2);
-        }
-
-        .action-icon {
-            width: 56px;
-            height: 56px;
-            margin: 0 auto 12px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #8B4513, #A0522D);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 26px;
-        }
-
-        .action-label {
-            font-weight: 600;
-            color: #333;
-            font-size: 15px;
-        }
-
-        .activity-section {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            margin-bottom: 20px;
-        }
-
-        .activity-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .activity-item:last-child {
-            border-bottom: none;
-        }
-
-        .activity-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #f8f8f8;
-            color: #8B4513;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .activity-info {
-            flex: 1;
-        }
-
-        .activity-title {
-            font-weight: 600;
-            font-size: 14px;
-            color: #333;
-            margin-bottom: 2px;
-        }
-
-        .activity-time {
-            font-size: 12px;
-            color: #999;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #999;
-        }
-
-        .empty-state i {
-            font-size: 48px;
-            margin-bottom: 12px;
-            opacity: 0.4;
-        }
+        /* Additional page-specific overrides if needed */
     </style>
 </head>
 <body>
     <div data-digicaf-layout="auto" data-page-title="Dashboard">
-        <!-- Welcome Header -->
-        <div class="dashboard-header">
-            <div class="welcome-text">Selamat Datang di DigiCaf!</div>
-            <div class="date-text" id="currentDate"></div>
-        </div>
+        <div class="dashboard-container">
+            <!-- 4.1 Dashboard Header Section dengan Greeting & Date -->
+            <div class="dashboard-header">
+                <div class="dashboard-header-content">
+                    <div class="welcome-text">Selamat Datang di DigiCaf! ☕</div>
+                    <div class="date-text" id="currentDate"></div>
+                </div>
+            </div>
 
-        <!-- Statistics Grid -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-money-bill-wave"></i>
+            <!-- 4.2 Stats Cards Grid (4 kolom responsive) -->
+            <div class="stats-grid">
+                <!-- Card Penjualan Hari Ini -->
+                <div class="stat-card revenue">
+                    <div class="stat-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="stat-label">Pendapatan Hari Ini</div>
+                    <div class="stat-value" id="todayRevenue">Rp 0</div>
+                    <div class="stat-trend positive" style="display: none;">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>+12%</span>
+                    </div>
                 </div>
-                <div class="stat-label">Pendapatan Hari Ini</div>
-                <div class="stat-value" id="todayRevenue">Rp 0</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-shopping-cart"></i>
-                </div>
-                <div class="stat-label">Transaksi</div>
-                <div class="stat-value" id="todayTransactions">0</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-fire"></i>
-                </div>
-                <div class="stat-label">Menu Terlaris</div>
-                <div class="stat-value" id="bestSeller">-</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-exclamation-triangle"></i>
-                </div>
-                <div class="stat-label">Stok Rendah</div>
-                <div class="stat-value" id="lowStock">0</div>
-            </div>
-        </div>
 
-        <!-- Quick Actions -->
-        <div class="section-title">Tindakan Cepat</div>
-        <div class="quick-actions">
-            <div class="action-card" onclick="location.href='../Transaksi/index.html'">
-                <div class="action-icon">
-                    <i class="fas fa-cash-register"></i>
+                <!-- Card Total Transaksi -->
+                <div class="stat-card transactions">
+                    <div class="stat-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <div class="stat-label">Total Transaksi</div>
+                    <div class="stat-value" id="todayTransactions">0</div>
+                    <div class="stat-trend positive" style="display: none;">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>+5</span>
+                    </div>
                 </div>
-                <div class="action-label">Buka POS</div>
-            </div>
-            <div class="action-card" onclick="location.href='../Manejemen_stok/index.html'">
-                <div class="action-icon">
-                    <i class="fas fa-box"></i>
-                </div>
-                <div class="action-label">Kelola Stok</div>
-            </div>
-            <div class="action-card" data-role="admin-only" onclick="location.href='../Manajemen_Karyawan/index.html'">
-                <div class="action-icon">
-                    <i class="fas fa-users"></i>
-                </div>
-                <div class="action-label">Karyawan</div>
-            </div>
-            <div class="action-card" onclick="location.href='../Manajemen_Pelanggan/index.html'">
-                <div class="action-icon">
-                    <i class="fas fa-user-friends"></i>
-                </div>
-                <div class="action-label">Pelanggan</div>
-            </div>
-        </div>
 
-        <!-- Recent Activity -->
-        <div class="section-title">Aktivitas Terbaru</div>
-        <div class="activity-section" id="activityList">
-            <div class="empty-state">
-                <i class="fas fa-clock"></i>
-                <p>Belum ada aktivitas</p>
+                <!-- Card Menu Terlaris -->
+                <div class="stat-card warning">
+                    <div class="stat-icon">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                    <div class="stat-label">Menu Terlaris</div>
+                    <div class="stat-value" id="bestSeller" style="font-size: 1.2rem;">-</div>
+                </div>
+
+                <!-- Card Stok Menipis (dengan warning indicator) -->
+                <div class="stat-card alert">
+                    <div class="stat-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-label">Stok Rendah</div>
+                    <div class="stat-value" id="lowStock">0</div>
+                </div>
+            </div>
+
+            <!-- Dashboard Grid: Main Content + Sidebar -->
+            <div class="dashboard-grid">
+                <!-- Main Content Area -->
+                <div class="dashboard-main-content">
+                    <!-- 4.3 Sales Chart Section -->
+                    <div class="chart-section">
+                        <!-- Chart header dengan period filters -->
+                        <div class="chart-header">
+                            <h2 class="chart-title">Grafik Penjualan</h2>
+                            <div class="chart-filters">
+                                <button class="chart-filter-btn active" data-period="today">Hari Ini</button>
+                                <button class="chart-filter-btn" data-period="week">Minggu</button>
+                                <button class="chart-filter-btn" data-period="month">Bulan</button>
+                            </div>
+                        </div>
+
+                        <!-- Canvas area untuk chart -->
+                        <div class="chart-canvas-wrapper" id="chartWrapper">
+                            <!-- Chart will be rendered here -->
+                            <div class="chart-empty-state">
+                                <i class="fas fa-chart-line"></i>
+                                <p>Grafik akan ditampilkan di sini</p>
+                                <small style="color: #999; font-size: 0.85rem;">Integrasi Chart.js coming soon</small>
+                            </div>
+                        </div>
+
+                        <!-- Chart legend -->
+                        <div class="chart-legend" style="display: none;">
+                            <div class="chart-legend-item">
+                                <div class="chart-legend-color" style="background: #6B4423;"></div>
+                                <span>Penjualan</span>
+                            </div>
+                            <div class="chart-legend-item">
+                                <div class="chart-legend-color" style="background: #28A745;"></div>
+                                <span>Target</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4.4 Recent Transactions Section -->
+                    <div class="transactions-section">
+                        <div class="transactions-header">
+                            <h2 class="transactions-title">Transaksi Terbaru</h2>
+                            <a href="../Transaksi/index.html" class="transactions-view-all">
+                                <span>Lihat Semua</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+
+                        <!-- Transaction list -->
+                        <div class="transaction-list" id="transactionList">
+                            <!-- Empty state -->
+                            <div class="transactions-empty">
+                                <i class="fas fa-receipt"></i>
+                                <p class="transactions-empty-title">Belum Ada Transaksi</p>
+                                <p class="transactions-empty-text">Transaksi hari ini akan muncul di sini</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar Area -->
+                <div class="dashboard-sidebar">
+                    <!-- 4.5 Quick Actions Sidebar -->
+                    <div class="quick-actions-section">
+                        <h2 class="quick-actions-title">Tindakan Cepat</h2>
+                        <div class="quick-actions-grid">
+                            <!-- Button Transaksi Baru -->
+                            <a href="../Transaksi/index.html" class="quick-action-btn">
+                                <div class="quick-action-icon">
+                                    <i class="fas fa-cash-register"></i>
+                                </div>
+                                <div>
+                                    <div class="quick-action-label">Transaksi Baru</div>
+                                    <div class="quick-action-description">Buka POS</div>
+                                </div>
+                            </a>
+
+                            <!-- Button Kelola Stok -->
+                            <a href="../Manejemen_stok/index.html" class="quick-action-btn">
+                                <div class="quick-action-icon">
+                                    <i class="fas fa-boxes"></i>
+                                </div>
+                                <div>
+                                    <div class="quick-action-label">Kelola Stok</div>
+                                    <div class="quick-action-description">Manajemen Inventori</div>
+                                </div>
+                            </a>
+
+                            <!-- Button Karyawan (Admin Only) -->
+                            <a href="../Manajemen_Karyawan/index.html" class="quick-action-btn" data-role="admin-only">
+                                <div class="quick-action-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div>
+                                    <div class="quick-action-label">Karyawan</div>
+                                    <div class="quick-action-description">Manajemen SDM</div>
+                                </div>
+                            </a>
+
+                            <!-- Button Laporan -->
+                            <a href="../Laporan POS/coffee-pos.html" class="quick-action-btn">
+                                <div class="quick-action-icon">
+                                    <i class="fas fa-chart-bar"></i>
+                                </div>
+                                <div>
+                                    <div class="quick-action-label">Laporan</div>
+                                    <div class="quick-action-description">Lihat Laporan</div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- 4.6 Top Products Widget -->
+                    <div class="top-products-section">
+                        <div class="top-products-header">
+                            <h2 class="top-products-title">🏆 Produk Terlaris</h2>
+                        </div>
+
+                        <!-- Product list dengan mini bar chart -->
+                        <div class="top-product-list" id="topProductList">
+                            <!-- Empty state -->
+                            <div class="top-products-empty">
+                                <i class="fas fa-coffee"></i>
+                                <p class="top-products-empty-text">Belum ada data produk terlaris hari ini</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -266,108 +207,250 @@
     <script src="../js/layout.js"></script>
     <script src="../js/navbar.js"></script>
     <script src="../js/api-helper.js"></script>
+    <script src="./dashboard.js"></script>
     <script>
-        // Set current date
+        // Set current date with better formatting
         function setCurrentDate() {
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
             const date = new Date().toLocaleDateString('id-ID', options);
-            document.getElementById('currentDate').textContent = date;
-        }
-
-        // Format currency
-        function formatCurrency(amount) {
-            return 'Rp ' + amount.toLocaleString('id-ID');
-        }
-
-        // Sample activities
-        const activities = [
-            { icon: 'shopping-cart', title: 'Transaksi baru - Espresso x2', time: '5 menit yang lalu' },
-            { icon: 'box', title: 'Stok Cappuccino diperbarui', time: '15 menit yang lalu' },
-            { icon: 'user-plus', title: 'Pelanggan baru terdaftar', time: '1 jam yang lalu' },
-            { icon: 'money-bill', title: 'Pembayaran diterima - Rp 150.000', time: '2 jam yang lalu' }
-        ];
-
-        // Load dashboard data (fetch from API; default empty/fresh if no data)
-        async function loadDashboard() {
-            const activityList = document.getElementById('activityList');
-            try {
-                const daily = await API.Reports.getDaily();
-                // Fetch raw stocks list directly and compute low-stock count from Stocks page data
-                const stocksList = await API.Stocks.getAll();
-
-                const revenue = (daily && daily.summary && daily.summary.total_revenue) ? daily.summary.total_revenue : 0;
-                const txCount = (daily && daily.summary && daily.summary.total_transactions) ? daily.summary.total_transactions : 0;
-                const best = (daily && daily.top_products && daily.top_products.length > 0) ? daily.top_products[0].name : '-';
-                const lowCount = Array.isArray(stocksList) ? stocksList.filter(s => Number(s.quantity) <= Number(s.min_stock)).length : 0;
-
-                document.getElementById('todayRevenue').textContent = formatRupiah(revenue);
-                document.getElementById('todayTransactions').textContent = String(txCount);
-                document.getElementById('bestSeller').textContent = best;
-                document.getElementById('lowStock').textContent = String(lowCount);
-
-                // Build activity area: prefer top products, otherwise low-stock alerts, otherwise empty state
-                let html = '';
-                if (daily && daily.top_products && daily.top_products.length > 0) {
-                    html += daily.top_products.slice(0,5).map((p,i) => `
-                        <div class="activity-item">
-                            <div class="activity-icon"><i class="fas fa-fire"></i></div>
-                            <div class="activity-info">
-                                <div class="activity-title">${i+1}. ${p.name}</div>
-                                <div class="activity-time">Terjual: ${p.qty_sold} | Revenue: ${formatRupiah(p.revenue)}</div>
-                            </div>
-                        </div>
-                    `).join('');
-                } else if (Array.isArray(stocksList) && stocksList.filter(s => Number(s.quantity) <= Number(s.min_stock)).length > 0) {
-                    const lowStocks = stocksList.filter(s => Number(s.quantity) <= Number(s.min_stock));
-                    html += lowStocks.slice(0,5).map(s => `
-                        <div class="activity-item">
-                            <div class="activity-icon"><i class="fas fa-exclamation-triangle"></i></div>
-                            <div class="activity-info">
-                                <div class="activity-title">Stok Rendah: ${s.name}</div>
-                                <div class="activity-time">Stok: ${s.quantity} / Min: ${s.min_stock}</div>
-                            </div>
-                        </div>
-                    `).join('');
-                } else if (activities && activities.length > 0) {
-                    html = activities.map(activity => `
-                        <div class="activity-item">
-                            <div class="activity-icon">
-                                <i class="fas fa-${activity.icon}"></i>
-                            </div>
-                            <div class="activity-info">
-                                <div class="activity-title">${activity.title}</div>
-                                <div class="activity-time">${activity.time}</div>
-                            </div>
-                        </div>
-                    `).join('');
-                } else {
-                    html = '<div class="empty-state"><i class="fas fa-clock"></i><p>Belum ada aktivitas</p></div>';
-                }
-
-                activityList.innerHTML = html;
-            } catch (err) {
-                activityList.innerHTML = `<div style="color:#f44336;padding:12px">⚠️ Error: ${err.message || err}</div>`;
+            const dateEl = document.getElementById('currentDate');
+            if (dateEl) {
+                dateEl.textContent = date;
             }
         }
 
-        // Initialize
+        // Initialize dashboard
         document.addEventListener('DOMContentLoaded', () => {
             try {
+                // Check role for admin-only features
                 const session = window.DigiCafAuth && typeof window.DigiCafAuth.getSession === 'function'
                     ? window.DigiCafAuth.getSession()
                     : null;
                 const role = (session && session.role ? String(session.role) : '').toLowerCase();
+                
                 if (role === 'kasir') {
-                    document.querySelectorAll('[data-role="admin-only"]').forEach(el => el.remove());
+                    document.querySelectorAll('[data-role="admin-only"]').forEach(el => {
+                        el.style.display = 'none';
+                    });
                 }
-            } catch (e) {}
+            } catch (e) {
+                console.warn('Role check failed:', e);
+            }
 
             setCurrentDate();
-            loadDashboard();
+            loadDashboardData();
+
+            // Setup chart filter buttons
+            const filterBtns = document.querySelectorAll('.chart-filter-btn');
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const period = btn.dataset.period;
+                    console.log('Chart filter changed to:', period);
+                    // TODO: Implement chart filtering
+                });
+            });
 
             // Auto refresh every 30 seconds
-            setInterval(loadDashboard, 30000);
+            setInterval(loadDashboardData, 30000);
         });
+
+        // Load all dashboard data
+        async function loadDashboardData() {
+            try {
+                // Load stats
+                await loadStats();
+                
+                // Load recent transactions
+                await loadRecentTransactions();
+                
+                // Load top products
+                await loadTopProducts();
+                
+                console.log('✅ Dashboard data loaded successfully');
+            } catch (err) {
+                console.error('❌ Error loading dashboard data:', err);
+            }
+        }
+
+        // Load statistics cards
+        async function loadStats() {
+            try {
+                const daily = await API.Reports.getDaily();
+                const stocksList = await API.Stocks.getAll();
+
+                // Update revenue
+                const revenue = (daily?.summary?.total_revenue) || 0;
+                const revenueEl = document.getElementById('todayRevenue');
+                if (revenueEl) {
+                    revenueEl.textContent = formatRupiah(revenue);
+                }
+
+                // Update transaction count
+                const txCount = (daily?.summary?.total_transactions) || 0;
+                const txEl = document.getElementById('todayTransactions');
+                if (txEl) {
+                    txEl.textContent = String(txCount);
+                }
+
+                // Update best seller
+                const bestSeller = (daily?.top_products?.[0]?.name) || '-';
+                const bestEl = document.getElementById('bestSeller');
+                if (bestEl) {
+                    bestEl.textContent = bestSeller;
+                    bestEl.title = daily?.top_products?.[0] ? 
+                        `${daily.top_products[0].qty_sold} terjual` : '';
+                }
+
+                // Update low stock count
+                const lowCount = Array.isArray(stocksList) ? 
+                    stocksList.filter(s => Number(s.quantity) <= Number(s.min_stock)).length : 0;
+                const lowStockEl = document.getElementById('lowStock');
+                if (lowStockEl) {
+                    lowStockEl.textContent = String(lowCount);
+                    lowStockEl.parentElement.style.borderLeftColor = 
+                        lowCount > 0 ? '#DC3545' : '#6B4423';
+                }
+            } catch (err) {
+                console.error('Error loading stats:', err);
+            }
+        }
+
+        // Load recent transactions
+        async function loadRecentTransactions() {
+            const listEl = document.getElementById('transactionList');
+            if (!listEl) return;
+
+            try {
+                const transactions = await API.Transactions.getRecent(5);
+                
+                if (!transactions || transactions.length === 0) {
+                    listEl.innerHTML = `
+                        <div class="transactions-empty">
+                            <i class="fas fa-receipt"></i>
+                            <p class="transactions-empty-title">Belum Ada Transaksi</p>
+                            <p class="transactions-empty-text">Transaksi hari ini akan muncul di sini</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                listEl.innerHTML = transactions.map(tx => {
+                    const timeAgo = getTimeAgo(tx.created_at);
+                    const itemCount = tx.items?.length || 0;
+                    
+                    return `
+                        <div class="transaction-item">
+                            <div class="transaction-icon">
+                                <i class="fas fa-shopping-bag"></i>
+                            </div>
+                            <div class="transaction-details">
+                                <div class="transaction-product">
+                                    Transaksi #${tx.id}
+                                </div>
+                                <div class="transaction-meta">
+                                    <span class="transaction-qty">
+                                        <i class="fas fa-box"></i>
+                                        ${itemCount} item
+                                    </span>
+                                    <span class="transaction-time">
+                                        <i class="fas fa-clock"></i>
+                                        ${timeAgo}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="transaction-amount">
+                                ${formatRupiah(tx.total_amount || 0)}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (err) {
+                console.error('Error loading transactions:', err);
+                listEl.innerHTML = `
+                    <div style="color: #DC3545; padding: 16px; text-align: center;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Error loading transactions
+                    </div>
+                `;
+            }
+        }
+
+        // Load top products
+        async function loadTopProducts() {
+            const listEl = document.getElementById('topProductList');
+            if (!listEl) return;
+
+            try {
+                const daily = await API.Reports.getDaily();
+                const topProducts = daily?.top_products || [];
+
+                if (topProducts.length === 0) {
+                    listEl.innerHTML = `
+                        <div class="top-products-empty">
+                            <i class="fas fa-coffee"></i>
+                            <p class="top-products-empty-text">Belum ada data produk terlaris hari ini</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Calculate max sales for bar chart scaling
+                const maxSales = Math.max(...topProducts.map(p => p.qty_sold || 0));
+
+                listEl.innerHTML = topProducts.slice(0, 5).map((product, index) => {
+                    const barWidth = maxSales > 0 ? (product.qty_sold / maxSales * 100) : 0;
+                    
+                    return `
+                        <div class="top-product-item">
+                            <div class="top-product-image">
+                                <i class="fas fa-coffee"></i>
+                            </div>
+                            <div class="top-product-info">
+                                <div class="top-product-name">${index + 1}. ${product.name}</div>
+                                <div class="top-product-sales">
+                                    ${product.qty_sold} terjual • ${formatRupiah(product.revenue || 0)}
+                                </div>
+                                <div class="top-product-bar-wrapper">
+                                    <div class="top-product-bar" style="width: ${barWidth}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (err) {
+                console.error('Error loading top products:', err);
+                listEl.innerHTML = `
+                    <div style="color: #DC3545; padding: 16px; text-align: center;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Error loading data
+                    </div>
+                `;
+            }
+        }
+
+        // Helper: Get time ago string
+        function getTimeAgo(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            
+            if (diffMins < 1) return 'Baru saja';
+            if (diffMins < 60) return `${diffMins} menit yang lalu`;
+            
+            const diffHours = Math.floor(diffMins / 60);
+            if (diffHours < 24) return `${diffHours} jam yang lalu`;
+            
+            const diffDays = Math.floor(diffHours / 24);
+            return `${diffDays} hari yang lalu`;
+        }
     </script>
 </body>
 </html>

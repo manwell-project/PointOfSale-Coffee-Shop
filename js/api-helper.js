@@ -72,7 +72,8 @@ const TransactionsAPI = {
   getById: (id) => apiFetch(`/transactions/${id}`),
   create: (data) => apiFetch('/transactions', { method: 'POST', body: JSON.stringify(data) }),
   getByDate: (date) => apiFetch(`/transactions/date/${date}`),
-  getDailySummary: () => apiFetch('/transactions/summary/daily')
+  getDailySummary: () => apiFetch('/transactions/summary/daily'),
+  getRecent: (limit = 5) => apiFetch(`/transactions?limit=${limit}&sort=desc`)
 };
 
 // ============ REPORTS ============
