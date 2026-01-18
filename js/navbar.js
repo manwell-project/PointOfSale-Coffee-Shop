@@ -4,6 +4,9 @@
   if (!document.getElementById('navbar-styles')) {
     const css = `
       .bottom-nav{position:fixed !important;bottom:0 !important;left:50% !important;transform:translateX(-50%) !important;width:100% !important;max-width:var(--app-max-width,980px) !important;background:rgba(255,255,255,0.96) !important;backdrop-filter:saturate(140%) blur(8px) !important;border-top:1px solid rgba(0,0,0,0.08) !important;display:flex !important;padding:8px 0 !important;box-shadow:0 -2px 10px rgba(0,0,0,0.08) !important;z-index:2147483647 !important;pointer-events:auto !important}
+      @media (min-width: 1025px) {
+        .bottom-nav { display: none !important; }
+      }
       .bottom-nav .nav-item{flex:1 !important;text-align:center !important;padding:8px 4px !important;cursor:pointer !important;border-radius:10px !important;margin:0 4px !important;color:var(--muted,#666) !important;transition:all .15s !important}
       .bottom-nav .nav-item .nav-icon{display:block !important;font-size:18px !important;margin-bottom:2px !important;line-height:1 !important}
       .bottom-nav .nav-item .nav-label{font-size:11px !important;font-weight:600 !important}

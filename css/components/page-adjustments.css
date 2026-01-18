@@ -1,0 +1,389 @@
+/**
+ * Page Container Adjustments
+ * Fixes spacing between sidebar and main content
+ * Applies consistent coffee theme
+ */
+
+/* ============================================
+   MAIN CONTENT AREA ADJUSTMENTS
+   ============================================ */
+
+/* Light brown background for all pages (like Dashboard) */
+body {
+  background-color: var(--color-bg-primary);
+}
+
+/* Page wrappers with light brown background */
+.stock-wrapper,
+.employee-wrapper,
+.customer-wrapper,
+.report-wrapper,
+.pos-wrapper {
+  background-color: var(--color-bg-primary);
+  min-height: 100vh;
+}
+
+/* Ensure proper spacing when sidebar is visible */
+body.sidebar-visible .dashboard-container,
+body.sidebar-visible .stock-wrapper,
+body.sidebar-visible .employee-wrapper,
+body.sidebar-visible .customer-wrapper,
+body.sidebar-visible .report-wrapper,
+body.sidebar-visible .pos-wrapper {
+  margin-left: 0;
+  padding-left: var(--spacing-5);
+  padding-right: var(--spacing-5);
+}
+
+/* Adjust for collapsed sidebar */
+body.sidebar-visible.sidebar-collapsed .dashboard-container,
+body.sidebar-visible.sidebar-collapsed .stock-wrapper,
+body.sidebar-visible.sidebar-collapsed .employee-wrapper,
+body.sidebar-visible.sidebar-collapsed .customer-wrapper,
+body.sidebar-visible.sidebar-collapsed .report-wrapper,
+body.sidebar-visible.sidebar-collapsed .pos-wrapper {
+  padding-left: var(--spacing-5);
+}
+
+/* Remove extra padding on mobile */
+@media (max-width: 768px) {
+  body.sidebar-visible .dashboard-container,
+  body.sidebar-visible .stock-wrapper,
+  body.sidebar-visible .employee-wrapper,
+  body.sidebar-visible .customer-wrapper,
+  body.sidebar-visible .report-wrapper,
+  body.sidebar-visible .pos-wrapper {
+    padding-left: var(--spacing-4);
+    padding-right: var(--spacing-4);
+  }
+}
+
+/* ============================================
+   COFFEE THEME CONSISTENCY
+   ============================================ */
+
+/* Apply coffee theme to page headers */
+.stock-header,
+.employee-header,
+.customer-header,
+.report-header {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+  color: var(--color-white) !important;
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-5);
+  margin-bottom: var(--spacing-5);
+  box-shadow: var(--shadow-md);
+}
+
+.stock-title,
+.employee-title,
+.customer-title,
+.report-title {
+  color: var(--color-white) !important;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+}
+
+.stock-title i,
+.employee-title i,
+.customer-title i,
+.report-title i {
+  color: var(--color-white) !important;
+}
+
+.stock-subtitle,
+.employee-subtitle,
+.customer-subtitle,
+.report-subtitle {
+  color: rgba(255, 255, 255, 0.9) !important;
+  margin-top: var(--spacing-2);
+  font-size: var(--font-size-sm);
+}
+
+/* Ensure all text in header sections is white */
+.stock-header *,
+.employee-header *,
+.customer-header *,
+.report-header * {
+  color: var(--color-white) !important;
+}
+
+/* Exception for buttons - they should have their own colors */
+.stock-header-actions button,
+.employee-header-actions button,
+.customer-header-actions button,
+.report-header-actions button {
+  color: var(--color-primary) !important;
+}
+
+.stock-header-actions button:hover,
+.employee-header-actions button:hover,
+.customer-header-actions button:hover,
+.report-header-actions button:hover {
+  color: var(--color-primary) !important;
+}
+
+/* Header action buttons with coffee theme */
+.stock-header-actions .btn-add-stock,
+.employee-header-actions .btn-add-employee,
+.customer-header-actions .btn-add-customer,
+.report-header-actions .btn-generate-report {
+  background: var(--color-white);
+  color: var(--color-primary);
+  border: none;
+  padding: var(--spacing-3) var(--spacing-5);
+  border-radius: var(--radius-md);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+/* Force icon colors in buttons to be dark/visible */
+.stock-header-actions .btn-add-stock i,
+.employee-header-actions .btn-add-employee i,
+.customer-header-actions .btn-add-customer i,
+.report-header-actions .btn-generate-report i,
+.btn-export i,
+.btn-export-group button i {
+  color: var(--color-primary) !important;
+}
+
+.stock-header-actions .btn-add-stock:hover,
+.employee-header-actions .btn-add-employee:hover,
+.customer-header-actions .btn-add-customer:hover,
+.report-header-actions .btn-generate-report:hover {
+  background: var(--color-gray-50);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Export buttons */
+.btn-export,
+.btn-export-group button {
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--color-white);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: var(--spacing-3) var(--spacing-4);
+  border-radius: var(--radius-md);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.btn-export:hover,
+.btn-export-group button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Export button icons should be white */
+.btn-export i,
+.btn-export-group button i {
+  color: var(--color-white) !important;
+}
+
+/* PDF/Excel/CSV specific buttons with white background */
+.btn-export.pdf,
+.btn-export.excel,
+.btn-export.csv,
+.btn-export-group .pdf,
+.btn-export-group .excel,
+.btn-export-group .csv {
+  background: var(--color-white);
+  color: var(--color-primary);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.btn-export.pdf:hover,
+.btn-export.excel:hover,
+.btn-export.csv:hover,
+.btn-export-group .pdf:hover,
+.btn-export-group .excel:hover,
+.btn-export-group .csv:hover {
+  background: var(--color-gray-50);
+  color: var(--color-primary-dark);
+}
+
+/* Icons in white background export buttons */
+.btn-export.pdf i,
+.btn-export.excel i,
+.btn-export.csv i,
+.btn-export-group .pdf i,
+.btn-export-group .excel i,
+.btn-export-group .csv i {
+  color: var(--color-primary) !important;
+}
+
+/* Print button styling */
+.btn-print {
+  background: var(--color-white);
+  color: var(--color-primary);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  padding: var(--spacing-3) var(--spacing-5);
+  border-radius: var(--radius-md);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.btn-print:hover {
+  background: var(--color-gray-50);
+  color: var(--color-primary-dark);
+}
+
+.btn-print i {
+  color: var(--color-primary) !important;
+}
+
+/* Cards with coffee theme accents */
+.stat-card,
+.info-card,
+.data-card {
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-4);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-base);
+  border-left: 4px solid transparent;
+}
+
+.stat-card:hover,
+.info-card:hover,
+.data-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.stat-card.primary,
+.info-card.primary,
+.data-card.primary {
+  border-left-color: var(--color-primary);
+}
+
+/* Primary action buttons with coffee theme */
+.btn-primary,
+.btn-save,
+.btn-submit {
+  background: var(--color-primary);
+  color: var(--color-white);
+  border: none;
+  padding: var(--spacing-3) var(--spacing-5);
+  border-radius: var(--radius-md);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.btn-primary:hover,
+.btn-save:hover,
+.btn-submit:hover {
+  background: var(--color-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Active states with coffee theme */
+.active,
+.is-active,
+.selected {
+  color: var(--color-primary) !important;
+  background: rgba(107, 68, 35, 0.1) !important;
+}
+
+/* Links with coffee theme */
+a {
+  color: var(--color-primary);
+  transition: color var(--transition-base);
+}
+
+a:hover {
+  color: var(--color-primary-dark);
+}
+
+/* ============================================
+   SMOOTH TRANSITIONS
+   ============================================ */
+
+/* Smooth page transitions */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-duration: 0.15s;
+  transition-timing-function: ease-in-out;
+}
+
+/* Preserve specific transitions */
+.sidebar-nav,
+.top-navbar,
+.bottom-nav,
+body.sidebar-visible {
+  /* Keep their own transition properties */
+}
+
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================ */
+
+@media (max-width: 768px) {
+  /* Adjust header padding on mobile */
+  .stock-header,
+  .employee-header,
+  .customer-header,
+  .report-header {
+    padding: var(--spacing-4);
+    margin-bottom: var(--spacing-4);
+  }
+  
+  .stock-title,
+  .employee-title,
+  .customer-title,
+  .report-title {
+    font-size: var(--font-size-xl);
+  }
+  
+  /* Stack header actions on mobile */
+  .stock-header-actions,
+  .employee-header-actions,
+  .customer-header-actions,
+  .report-header-actions {
+    flex-direction: column;
+    gap: var(--spacing-2);
+    width: 100%;
+  }
+  
+  .stock-header-actions button,
+  .employee-header-actions button,
+  .customer-header-actions button,
+  .report-header-actions button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+
+@media print {
+  body.sidebar-visible .dashboard-container,
+  body.sidebar-visible .stock-wrapper,
+  body.sidebar-visible .employee-wrapper,
+  body.sidebar-visible .customer-wrapper,
+  body.sidebar-visible .report-wrapper,
+  body.sidebar-visible .pos-wrapper {
+    padding-left: 0;
+    margin-left: 0;
+  }
+}

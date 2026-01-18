@@ -32,11 +32,8 @@
     setupEventListeners();
     
     // Initialize components
-    initializeSearch();
-    initializeNotifications();
     initializeUserMenu();
     initializeMobileMenu();
-    initializeBreadcrumbs();
     
     // Setup scroll behavior
     setupScrollBehavior();
@@ -98,45 +95,8 @@
             </a>
           </div>
 
-          <!-- Center Section - Search -->
-          <div class="top-navbar-center">
-            <div class="top-navbar-search">
-              <i class="fas fa-search top-navbar-search-icon"></i>
-              <input 
-                type="text" 
-                class="top-navbar-search-input" 
-                id="topNavbarSearch"
-                placeholder="Cari menu, transaksi, atau pelanggan..."
-                autocomplete="off"
-              />
-              <div class="top-navbar-search-results" id="searchResults"></div>
-            </div>
-          </div>
-
-          <!-- Right Section - Actions & User -->
+          <!-- Right Section - User Menu Only (Simple Mode) -->
           <div class="top-navbar-right">
-            <!-- Notifications -->
-            <div style="position: relative;">
-              <button class="top-navbar-action-btn" id="notificationBtn" aria-label="Notifications">
-                <i class="fas fa-bell"></i>
-                <span class="top-navbar-badge" id="notificationBadge" style="display: none;">0</span>
-              </button>
-              <div class="top-navbar-dropdown" id="notificationDropdown">
-                <div class="top-navbar-dropdown-header">
-                  Notifikasi
-                </div>
-                <div class="top-navbar-dropdown-body" id="notificationList">
-                  <div class="top-navbar-dropdown-empty">
-                    <i class="fas fa-bell-slash"></i>
-                    <p class="top-navbar-dropdown-empty-text">Tidak ada notifikasi baru</p>
-                  </div>
-                </div>
-                <div class="top-navbar-dropdown-footer">
-                  <a href="#" id="markAllRead">Tandai Semua Dibaca</a>
-                </div>
-              </div>
-            </div>
-
             <!-- User Menu -->
             <div style="position: relative;">
               <button class="top-navbar-user-btn" id="userMenuBtn">
@@ -155,14 +115,6 @@
                     </div>
                     <div class="top-navbar-dropdown-item-content">
                       <div class="top-navbar-dropdown-item-title">Profil Saya</div>
-                    </div>
-                  </a>
-                  <a href="#" class="top-navbar-dropdown-item">
-                    <div class="top-navbar-dropdown-item-icon">
-                      <i class="fas fa-cog"></i>
-                    </div>
-                    <div class="top-navbar-dropdown-item-content">
-                      <div class="top-navbar-dropdown-item-title">Pengaturan</div>
                     </div>
                   </a>
                   <div class="top-navbar-divider"></div>

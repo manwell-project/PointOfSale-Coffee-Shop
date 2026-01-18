@@ -200,13 +200,13 @@
           {
             icon: 'fas fa-home',
             text: 'Dashboard',
-            url: '/webtest/PointOfSale-Coffee-Shop/Dashboard/index.html',
+            url: '../Dashboard/index.html',
             key: 'dashboard'
           },
           {
             icon: 'fas fa-cash-register',
             text: 'Point of Sale',
-            url: '/webtest/PointOfSale-Coffee-Shop/Transaksi/index.html',
+            url: '../Transaksi/index.html',
             key: 'pos'
           }
         ]
@@ -217,20 +217,19 @@
           {
             icon: 'fas fa-box',
             text: 'Stok Produk',
-            url: '/webtest/PointOfSale-Coffee-Shop/Manejemen_stok/index.html',
+            url: '../Manejemen_stok/index.html',
             key: 'stock'
           },
           {
             icon: 'fas fa-users',
             text: 'Karyawan',
-            url: '/webtest/PointOfSale-Coffee-Shop/Manajemen_Karyawan/index.html',
-            key: 'employee',
-            adminOnly: true
+            url: '../Manajemen_Karyawan/index.html',
+            key: 'employee'
           },
           {
             icon: 'fas fa-user-friends',
             text: 'Pelanggan',
-            url: '/webtest/PointOfSale-Coffee-Shop/Manajemen_Pelanggan/index.html',
+            url: '../Manajemen_Pelanggan/index.html',
             key: 'customers'
           }
         ]
@@ -241,7 +240,7 @@
           {
             icon: 'fas fa-chart-line',
             text: 'Laporan Penjualan',
-            url: '/webtest/PointOfSale-Coffee-Shop/Laporan POS/coffee-pos.html',
+            url: '../Laporan POS/coffee-pos.html',
             key: 'reports'
           }
         ]
