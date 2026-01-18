@@ -283,6 +283,11 @@
   --navbar-bg: var(--color-white);
   --navbar-shadow: var(--shadow-sm);
   
+  /* Top Navigation Bar */
+  --top-nav-height: 64px;
+  --top-nav-bg: var(--color-white);
+  --top-nav-shadow: var(--shadow-sm);
+  
   /* Sidebar */
   --sidebar-width: 260px;
   --sidebar-width-collapsed: 64px;

@@ -6,6 +6,8 @@
     <meta name="theme-color" content="#8B4513">
     <title>Dashboard - DigiCaf</title>
     <link rel="stylesheet" href="../css/shared-ui.css">
+    <link rel="stylesheet" href="../css/components/top-navbar.css">
+    <link rel="stylesheet" href="../css/components/sidebar-nav.css">
     <link rel="stylesheet" href="./css/dashboard.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
@@ -13,6 +15,7 @@
     </style>
 </head>
 <body>
+    <!-- Top Navigation Bar will be injected by top-navbar.js -->
     <div data-digicaf-layout="auto" data-page-title="Dashboard">
         <div class="dashboard-container">
             <!-- 4.1 Dashboard Header Section dengan Greeting & Date -->
@@ -205,6 +208,7 @@
 
     <script src="../js/auth.js"></script>
     <script src="../js/layout.js"></script>
+    <script src="../js/top-navbar.js"></script>
     <script src="../js/navbar.js"></script>
     <script src="../js/api-helper.js"></script>
     <script src="./dashboard.js"></script>
@@ -452,5 +456,8 @@
             return `${diffDays} hari yang lalu`;
         }
     </script>
+    
+    <!-- Sidebar Navigation -->
+    <script src="../js/sidebar-nav.js"></script>
 </body>
 </html>

@@ -29,7 +29,6 @@ body {
 .customer-wrapper {
   min-height: 100vh;
   background: #f8fafc;
-  padding-bottom: 64px; /* Space for bottom navigation */
 }
 
 /* Customer Container - Main content area */
@@ -37,7 +36,8 @@ body {
   max-width: 1440px;
   margin: 0 auto;
   padding: var(--spacing-xl) var(--spacing-lg);
-  height: calc(100vh - 64px);
+  padding-top: calc(var(--spacing-2xl) + var(--spacing-xl));
+  min-height: calc(100vh - var(--top-nav-height, 64px) - var(--bottom-nav-height, 64px));
   overflow-y: auto;
 }
 
@@ -425,6 +425,7 @@ body {
 @media (max-width: 768px) {
   .customer-container {
     padding: var(--spacing-lg) var(--spacing-md);
+    padding-top: var(--spacing-2xl);
   }
 
   .customer-header {

@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0ea5e9">
+    <title>Alert & Toast Demo - DigiCaf</title>
+    <link rel="stylesheet" href="../css/design-tokens.css">
+    <link rel="stylesheet" href="../css/components/alerts.css">
+    <link rel="stylesheet" href="../css/components/buttons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            background: #f8fafc;
+            margin: 0;
+            padding: 20px;
+            padding-bottom: 100px;
+        }
+
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .demo-header {
+            background: white;
+            padding: 32px;
+            border-radius: 12px;
+            margin-bottom: 32px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .demo-header h1 {
+            font-size: 32px;
+            color: #1e293b;
+            margin: 0 0 8px 0;
+        }
+
+        .demo-header p {
+            color: #64748b;
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .demo-section {
+            background: white;
+            padding: 32px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .demo-section h2 {
+            font-size: 24px;
+            color: #1e293b;
+            margin: 0 0 24px 0;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .demo-section h3 {
+            font-size: 18px;
+            color: #475569;
+            margin: 32px 0 16px 0;
+        }
+
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0ea5e9, #0284c7);
+            color: white;
+        }
+
+        .btn-success {
+            background: #059669;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-info {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #64748b;
+            border: 1px solid #e5e7eb;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin-top: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <!-- Header -->
+        <div class="demo-header">
+            <h1><i class="fas fa-bell"></i> Alert & Toast Components Demo</h1>
+            <p>Demonstrasi komponen alert dan toast notification untuk Coffee Shop POS System</p>
+        </div>
+
+        <!-- Inline Alerts -->
+        <div class="demo-section">
+            <h2>Inline Alerts</h2>
+            
+            <h3>Basic Alerts</h3>
+            <div id="alertContainer">
+                <!-- Alerts will be inserted here by JavaScript -->
+            </div>
+
+            <h3>Alerts with Border Left</h3>
+            <div class="alert alert-success alert-border-left">
+                <div class="alert-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="alert-content">
+                    <div class="alert-title">Success!</div>
+                    <div class="alert-message">Your changes have been saved successfully.</div>
+                </div>
+            </div>
+
+            <div class="alert alert-error alert-border-left">
+                <div class="alert-icon"><i class="fas fa-times-circle"></i></div>
+                <div class="alert-content">
+                    <div class="alert-title">Error</div>
+                    <div class="alert-message">Failed to process your request. Please try again.</div>
+                </div>
+            </div>
+
+            <div class="alert alert-warning alert-border-left">
+                <div class="alert-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                <div class="alert-content">
+                    <div class="alert-title">Warning</div>
+                    <div class="alert-message">Your session will expire in 5 minutes.</div>
+                </div>
+            </div>
+
+            <div class="alert alert-info alert-border-left">
+                <div class="alert-icon"><i class="fas fa-info-circle"></i></div>
+                <div class="alert-content">
+                    <div class="alert-title">Information</div>
+                    <div class="alert-message">System maintenance scheduled for tonight at 2 AM.</div>
+                </div>
+            </div>
+
+            <h3>Solid Alerts</h3>
+            <div class="alert alert-success alert-solid">
+                <div class="alert-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="alert-content">
+                    <div class="alert-title">Success!</div>
+                    <div class="alert-message">Transaction completed successfully.</div>
+                </div>
+            </div>
+
+            <div class="alert alert-error alert-solid">
+                <div class="alert-icon"><i class="fas fa-times-circle"></i></div>
+                <div class="alert-content">
+                    <div class="alert-title">Error</div>
+                    <div class="alert-message">Connection to server failed.</div>
+                </div>
+            </div>
+
+            <h3>Alert Actions</h3>
+            <div class="demo-grid">
+                <button class="btn btn-success" onclick="testAlert('success')">
+                    <i class="fas fa-check"></i> Show Success Alert
+                </button>
+                <button class="btn btn-danger" onclick="testAlert('error')">
+                    <i class="fas fa-times"></i> Show Error Alert
+                </button>
+                <button class="btn btn-warning" onclick="testAlert('warning')">
+                    <i class="fas fa-exclamation-triangle"></i> Show Warning Alert
+                </button>
+                <button class="btn btn-info" onclick="testAlert('info')">
+                    <i class="fas fa-info-circle"></i> Show Info Alert
+                </button>
+            </div>
+        </div>
+
+        <!-- Toast Notifications -->
+        <div class="demo-section">
+            <h2>Toast Notifications</h2>
+            
+            <h3>Basic Toasts</h3>
+            <div class="demo-grid">
+                <button class="btn btn-success" onclick="showSuccessToast('Operation completed successfully!')">
+                    <i class="fas fa-check"></i> Success Toast
+                </button>
+                <button class="btn btn-danger" onclick="showErrorToast('Failed to save data!')">
+                    <i class="fas fa-times"></i> Error Toast
+                </button>
+                <button class="btn btn-warning" onclick="showWarningToast('Please review your input')">
+                    <i class="fas fa-exclamation-triangle"></i> Warning Toast
+                </button>
+                <button class="btn btn-info" onclick="showInfoToast('You have new notifications')">
+                    <i class="fas fa-info-circle"></i> Info Toast
+                </button>
+            </div>
+
+            <h3>Toast with Title</h3>
+            <div class="demo-grid">
+                <button class="btn btn-success" onclick="testToastWithTitle('success')">
+                    <i class="fas fa-check"></i> Success with Title
+                </button>
+                <button class="btn btn-danger" onclick="testToastWithTitle('error')">
+                    <i class="fas fa-times"></i> Error with Title
+                </button>
+                <button class="btn btn-warning" onclick="testToastWithTitle('warning')">
+                    <i class="fas fa-exclamation"></i> Warning with Title
+                </button>
+                <button class="btn btn-info" onclick="testToastWithTitle('info')">
+                    <i class="fas fa-info"></i> Info with Title
+                </button>
+            </div>
+
+            <h3>Toast Positions</h3>
+            <div class="demo-grid">
+                <button class="btn btn-primary" onclick="testPosition('top-right')">
+                    Top Right
+                </button>
+                <button class="btn btn-primary" onclick="testPosition('top-left')">
+                    Top Left
+                </button>
+                <button class="btn btn-primary" onclick="testPosition('top-center')">
+                    Top Center
+                </button>
+                <button class="btn btn-primary" onclick="testPosition('bottom-right')">
+                    Bottom Right
+                </button>
+                <button class="btn btn-primary" onclick="testPosition('bottom-left')">
+                    Bottom Left
+                </button>
+                <button class="btn btn-primary" onclick="testPosition('bottom-center')">
+                    Bottom Center
+                </button>
+            </div>
+
+            <h3>Special Toasts</h3>
+            <div class="demo-grid">
+                <button class="btn btn-primary" onclick="testLoadingToast()">
+                    <i class="fas fa-spinner"></i> Loading Toast
+                </button>
+                <button class="btn btn-success" onclick="testToastWithActions()">
+                    <i class="fas fa-cog"></i> Toast with Actions
+                </button>
+                <button class="btn btn-info" onclick="testLongToast()">
+                    <i class="fas fa-clock"></i> Long Duration (10s)
+                </button>
+                <button class="btn btn-secondary" onclick="dismissAllToasts()">
+                    <i class="fas fa-times-circle"></i> Dismiss All
+                </button>
+            </div>
+
+            <h3>Usage Examples</h3>
+            <div class="code-block">
+// Simple toast<br>
+showToast('Product added to cart');<br>
+<br>
+// Toast with type<br>
+showSuccessToast('Stock updated successfully');<br>
+showErrorToast('Failed to save data');<br>
+showWarningToast('Please review your input');<br>
+showInfoToast('You have new notifications');<br>
+<br>
+// Toast with options<br>
+showToast('Order completed', 'success', {<br>
+&nbsp;&nbsp;title: 'Success!',<br>
+&nbsp;&nbsp;duration: 5000,<br>
+&nbsp;&nbsp;position: 'bottom-right',<br>
+&nbsp;&nbsp;actions: [<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{ text: 'View Receipt', onClick: () => openReceipt() },<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{ text: 'New Order', onClick: () => newOrder() }<br>
+&nbsp;&nbsp;]<br>
+});<br>
+<br>
+// Loading toast<br>
+const loadingId = showLoadingToast('Processing payment...');<br>
+// Later: dismissToast(loadingId);<br>
+<br>
+// Inline alert<br>
+showAlert('Please fill all required fields', 'warning', 'formContainer');
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/toast.js"></script>
+    <script>
+        // Initialize demo alerts
+        window.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('alertContainer');
+            
+            // Success alert
+            const successAlert = document.createElement('div');
+            successAlert.className = 'alert alert-success alert-dismissible';
+            successAlert.innerHTML = `
+                <div class="alert-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="alert-content">
+                    <div class="alert-title">Success!</div>
+                    <div class="alert-message">Your changes have been saved successfully.</div>
+                </div>
+                <button class="alert-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+            `;
+            container.appendChild(successAlert);
+
+            // Error alert
+            const errorAlert = document.createElement('div');
+            errorAlert.className = 'alert alert-error alert-dismissible';
+            errorAlert.innerHTML = `
+                <div class="alert-icon"><i class="fas fa-times-circle"></i></div>
+                <div class="alert-content">
+                    <div class="alert-title">Error</div>
+                    <div class="alert-message">Failed to process your request. Please try again.</div>
+                </div>
+                <button class="alert-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+            `;
+            container.appendChild(errorAlert);
+
+            // Warning alert
+            const warningAlert = document.createElement('div');
+            warningAlert.className = 'alert alert-warning alert-dismissible';
+            warningAlert.innerHTML = `
+                <div class="alert-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                <div class="alert-content">
+                    <div class="alert-title">Warning</div>
+                    <div class="alert-message">Your session will expire in 5 minutes.</div>
+                </div>
+                <button class="alert-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+            `;
+            container.appendChild(warningAlert);
+
+            // Info alert
+            const infoAlert = document.createElement('div');
+            infoAlert.className = 'alert alert-info alert-dismissible';
+            infoAlert.innerHTML = `
+                <div class="alert-icon"><i class="fas fa-info-circle"></i></div>
+                <div class="alert-content">
+                    <div class="alert-title">Information</div>
+                    <div class="alert-message">System maintenance scheduled for tonight at 2 AM.</div>
+                </div>
+                <button class="alert-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+            `;
+            container.appendChild(infoAlert);
+        });
+
+        // Test functions
+        function testAlert(type) {
+            const messages = {
+                success: { title: 'Success!', message: 'Your operation completed successfully.' },
+                error: { title: 'Error', message: 'An error occurred while processing your request.' },
+                warning: { title: 'Warning', message: 'Please review your input before continuing.' },
+                info: { title: 'Information', message: 'This is an informational message.' }
+            };
+
+            showAlert(messages[type].message, type, 'alertContainer', {
+                title: messages[type].title,
+                borderLeft: true
+            });
+        }
+
+        function testToastWithTitle(type) {
+            const titles = {
+                success: 'Success!',
+                error: 'Error Occurred',
+                warning: 'Warning!',
+                info: 'Information'
+            };
+
+            const messages = {
+                success: 'Your operation completed successfully.',
+                error: 'Failed to process your request.',
+                warning: 'Please review your input.',
+                info: 'You have new notifications.'
+            };
+
+            showToast(messages[type], type, {
+                title: titles[type],
+                duration: 5000
+            });
+        }
+
+        function testPosition(position) {
+            showToast(`Toast at ${position}`, 'info', {
+                title: 'Position Test',
+                position: position,
+                duration: 4000
+            });
+        }
+
+        function testLoadingToast() {
+            const loadingId = showLoadingToast('Processing payment...');
+            
+            setTimeout(() => {
+                dismissToast(loadingId);
+                showSuccessToast('Payment completed!', {
+                    title: 'Success!'
+                });
+            }, 3000);
+        }
+
+        function testToastWithActions() {
+            showSuccessToast('Order #1234 has been completed', {
+                title: 'Order Complete',
+                actions: [
+                    { 
+                        text: 'View Receipt', 
+                        primary: true,
+                        onClick: () => alert('Opening receipt...') 
+                    },
+                    { 
+                        text: 'New Order', 
+                        onClick: () => alert('Starting new order...') 
+                    }
+                ]
+            });
+        }
+
+        function testLongToast() {
+            showInfoToast('This toast will stay for 10 seconds', {
+                title: 'Long Duration',
+                duration: 10000
+            });
+        }
+    </script>
+</body>
+</html>
