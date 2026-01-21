@@ -68,7 +68,7 @@ body {
 }
 
 .customer-title i {
-  color: #0ea5e9;
+  color: var(--color-customer-primary);
 }
 
 .customer-subtitle {
@@ -85,8 +85,8 @@ body {
 }
 
 .btn-add-customer {
-  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
-  color: #ffffff;
+  background: var(--stat-card-bg);
+  color: var(--color-white);
   border: none;
   padding: var(--spacing-sm) var(--spacing-lg);
   border-radius: var(--radius-md);
@@ -97,13 +97,13 @@ body {
   align-items: center;
   gap: var(--spacing-xs);
   transition: all var(--transition-base);
-  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.25);
+  box-shadow: var(--shadow-coffee);
 }
 
 .btn-add-customer:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.35);
-  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  box-shadow: var(--shadow-lg);
+  background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary-darker) 100%);
 }
 
 .btn-export {
@@ -165,8 +165,8 @@ body {
 }
 
 .customer-stats .stat-card.total .stat-icon {
-  background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
-  color: #0284c7;
+  background: linear-gradient(135deg, var(--color-primary-lighter) 0%, var(--color-secondary-light) 100%);
+  color: var(--color-primary-dark);
 }
 
 .customer-stats .stat-card.regular .stat-icon {
@@ -175,13 +175,13 @@ body {
 }
 
 .customer-stats .stat-card.vip .stat-icon {
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  color: #d97706;
+  background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-accent-light) 100%);
+  color: var(--color-primary-darker);
 }
 
 .customer-stats .stat-card.new .stat-icon {
-  background: linear-gradient(135deg, #ddd6fe 0%, #c4b5fd 100%);
-  color: #7c3aed;
+  background: linear-gradient(135deg, var(--color-accent-light) 0%, var(--color-secondary-light) 100%);
+  color: var(--color-accent-dark);
 }
 
 .customer-stats .stat-content {

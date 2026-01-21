@@ -91,6 +91,69 @@
   --color-link-visited: #8B5A3C;
   
   /* ============================================
+     MODULE-SPECIFIC COLORS (Consistent Theme)
+     ============================================ */
+  
+  /* Dashboard Module */
+  --color-dashboard-primary: var(--color-primary);
+  --color-dashboard-bg: var(--color-bg-primary);
+  --color-dashboard-card: var(--color-bg-secondary);
+  
+  /* Employee/Karyawan Module */
+  --color-employee-primary: var(--color-primary);
+  --color-employee-secondary: var(--color-primary-light);
+  --color-employee-accent: var(--color-accent);
+  --color-employee-card-border: var(--color-primary);
+  
+  /* Customer/Pelanggan Module */
+  --color-customer-primary: var(--color-primary);
+  --color-customer-secondary: var(--color-secondary);
+  --color-customer-accent: var(--color-accent);
+  --color-customer-highlight: var(--color-primary-light);
+  
+  /* Stock/Product Module */
+  --color-stock-primary: var(--color-primary);
+  --color-stock-low: var(--color-warning);
+  --color-stock-out: var(--color-danger);
+  --color-stock-sufficient: var(--color-success);
+  
+  /* Transaction/POS Module */
+  --color-transaction-primary: var(--color-primary);
+  --color-transaction-success: var(--color-success);
+  --color-transaction-pending: var(--color-warning);
+  --color-transaction-cancelled: var(--color-danger);
+  
+  /* ============================================
+     SEMANTIC UI ELEMENTS
+     ============================================ */
+  
+  /* Search Bar */
+  --searchbar-border-color: var(--color-primary);
+  --searchbar-bg: var(--color-white);
+  --searchbar-text: var(--color-text-primary);
+  --searchbar-icon-color: var(--color-primary);
+  --searchbar-focus-shadow: 0 0 0 3px rgba(107, 68, 35, 0.15);
+  
+  /* Stat Cards */
+  --stat-card-bg: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+  --stat-card-text: var(--color-white);
+  --stat-card-shadow: 0 4px 12px rgba(107, 68, 35, 0.25);
+  
+  /* Tabs */
+  --tab-bg: var(--color-white);
+  --tab-text: var(--color-primary);
+  --tab-active-bg: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+  --tab-active-text: var(--color-white);
+  --tab-hover-bg: rgba(107, 68, 35, 0.08);
+  
+  /* Cards */
+  --card-bg: var(--color-white);
+  --card-border: var(--color-border-light);
+  --card-shadow: var(--shadow-sm);
+  --card-hover-shadow: var(--shadow-md);
+  --card-accent-border: var(--color-primary);
+  
+  /* ============================================
      TYPOGRAPHY
      ============================================ */
   

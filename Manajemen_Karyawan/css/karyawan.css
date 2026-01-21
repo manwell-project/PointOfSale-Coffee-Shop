@@ -1,120 +1,149 @@
+/**
+ * Manajemen Karyawan - Employee Management
+ * Coffee Shop POS System
+ * Using design tokens for consistency
+ */
+
+/* Import design tokens */
+@import '../../css/design-tokens.css';
+
 /* Search bar */
 .search-bar {
     position: relative;
-    margin: 16px 0;
+    margin: var(--spacing-4) 0;
 }
 
 .search-bar input {
     width: 100%;
-    padding: 14px 50px 14px 20px;
-    border-radius: 25px;
-    border: 2px solid #8B4513;
-    background-color: white;
-    font-size: 16px;
+    padding: var(--spacing-3) var(--spacing-12) var(--spacing-3) var(--spacing-5);
+    border-radius: var(--radius-full);
+    border: 2px solid var(--searchbar-border-color);
+    background-color: var(--searchbar-bg);
+    font-size: var(--font-size-md);
+    transition: var(--transition-base);
+}
+
+.search-bar input:focus {
+    outline: none;
+    box-shadow: var(--searchbar-focus-shadow);
+    border-color: var(--color-primary-dark);
 }
 
 .search-bar i {
     position: absolute;
-    right: 20px;
+    right: var(--spacing-5);
     top: 50%;
     transform: translateY(-50%);
-    color: #8B4513;
-    font-size: 18px;
+    color: var(--searchbar-icon-color);
+    font-size: var(--font-size-lg);
 }
 
 /* Stat cards */
 .employee-stats {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin: 18px 0;
+    gap: var(--spacing-3);
+    margin: var(--spacing-4) 0;
 }
 
 .stat-card {
-    background: linear-gradient(135deg, #8B4513, #A0522D);
-    color: white;
-    border-radius: 12px;
-    padding: 20px 16px;
+    background: var(--stat-card-bg);
+    color: var(--stat-card-text);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-5) var(--spacing-4);
     text-align: center;
-    box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
+    box-shadow: var(--stat-card-shadow);
+    transition: var(--transition-base);
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
 }
 
 .stat-number {
-    font-size: 32px;
-    font-weight: bold;
-    margin-bottom: 6px;
+    font-size: var(--font-size-4xl);
+    font-weight: var(--font-weight-bold);
+    margin-bottom: var(--spacing-2);
 }
 
 .stat-label {
-    font-size: 13px;
+    font-size: var(--font-size-sm);
     opacity: 0.9;
+    font-weight: var(--font-weight-medium);
 }
 
 /* Tabs */
 .tabs {
     display: flex;
-    gap: 8px;
-    margin: 16px 0;
+    gap: var(--spacing-2);
+    margin: var(--spacing-4) 0;
     overflow-x: auto;
 }
 
 .tab {
-    padding: 10px 20px;
+    padding: var(--spacing-2) var(--spacing-5);
     cursor: pointer;
-    font-weight: 500;
-    background: white;
-    border-radius: 20px;
+    font-weight: var(--font-weight-medium);
+    background: var(--tab-bg);
+    border-radius: var(--radius-full);
     white-space: nowrap;
-    transition: all 0.2s ease;
-    color: #8B4513;
+    transition: var(--transition-base);
+    color: var(--tab-text);
     border: 2px solid transparent;
 }
 
 .tab:hover {
-    background-color: rgba(139, 69, 19, 0.1);
+    background-color: var(--tab-hover-bg);
 }
 
 .tab.active {
-    background: linear-gradient(135deg, #8B4513, #A0522D);
-    color: white;
-    font-weight: bold;
+    background: var(--tab-active-bg);
+    color: var(--tab-active-text);
+    font-weight: var(--font-weight-bold);
+    box-shadow: var(--shadow-coffee);
 }
 
 /* Employee list */
 .employee-list {
     display: grid;
-    gap: 12px;
-    margin-bottom: 20px;
+    gap: var(--spacing-3);
+    margin-bottom: var(--spacing-5);
 }
 
 .employee-card {
-    background: white;
-    border-radius: 12px;
-    padding: 16px;
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-4);
     display: flex;
     align-items: center;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    border-left: 4px solid #8B4513;
+    transition: var(--transition-base);
+    box-shadow: var(--card-shadow);
+    border-left: 4px solid var(--card-accent-border);
 }
 
 .employee-card:hover {
+    box-shadow: var(--card-hover-shadow);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(139, 69, 19, 0.2);
+}
+
+.employee-card:hover {
+    box-shadow: var(--card-hover-shadow);
+    transform: translateY(-2px);
 }
 
 .employee-avatar {
     width: 55px;
     height: 55px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #8B4513, #A0522D);
+    border-radius: var(--radius-circle);
+    background: var(--stat-card-bg);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
-    font-weight: bold;
-    margin-right: 16px;
-    font-size: 20px;
+    color: var(--color-white);
+    font-weight: var(--font-weight-bold);
+    margin-right: var(--spacing-4);
+    font-size: var(--font-size-xl);
     flex-shrink: 0;
 }
 
@@ -123,55 +152,60 @@
 }
 
 .employee-name {
-    font-weight: 600;
-    font-size: 17px;
-    margin-bottom: 4px;
-    color: #333;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--spacing-1);
+    color: var(--color-text-primary);
 }
 
 .employee-details {
-    font-size: 14px;
-    color: #666;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
 }
 
 .employee-actions {
     display: flex;
-    gap: 8px;
+    gap: var(--spacing-2);
 }
 
 .action-btn {
     width: 40px;
     height: 40px;
-    border-radius: 50%;
-    background: #8B4513;
-    color: white;
+    border-radius: var(--radius-circle);
+    background: var(--color-employee-primary);
+    color: var(--color-white);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: var(--transition-base);
     border: none;
 }
 
 .action-btn:hover {
     transform: scale(1.1);
-    box-shadow: 0 4px 8px rgba(139, 69, 19, 0.3);
+    box-shadow: var(--shadow-coffee);
 }
 
 .action-btn.delete {
-    background: #dc3545;
+    background: var(--color-danger);
+}
+
+.action-btn.delete:hover {
+    background: var(--color-danger-dark);
+    box-shadow: var(--shadow-danger);
 }
 
 /* Modal */
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--modal-backdrop);
     display: none;
     align-items: center;
     justify-content: center;
-    padding: 20px;
-    z-index: 1000;
+    padding: var(--spacing-5);
+    z-index: var(--z-index-modal);
 }
 
 .modal-overlay[aria-hidden="false"] {
@@ -181,16 +215,17 @@
 .modal-content {
     max-width: 600px;
     width: 100%;
-    background: white;
-    border-radius: 16px;
-    padding: 24px;
-    animation: modalAppear 0.3s ease;
+    background: var(--color-bg-secondary);
+    border-radius: var(--modal-border-radius);
+    padding: var(--modal-padding);
+    animation: modalAppear var(--duration-slow) var(--ease-out);
+    box-shadow: var(--modal-shadow);
 }
 
 @keyframes modalAppear {
     from {
         opacity: 0;
-        transform: scale(0.9);
+        transform: scale(0.95);
     }
     to {
         opacity: 1;
@@ -202,42 +237,42 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 16px;
-    border-bottom: 2px solid #f0f0f0;
+    margin-bottom: var(--spacing-5);
+    padding-bottom: var(--spacing-4);
+    border-bottom: 2px solid var(--color-border-light);
 }
 
 .modal-header h3 {
-    font-size: 22px;
-    font-weight: bold;
-    color: #8B4513;
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-employee-primary);
 }
 
 .modal-close {
     background: transparent;
     border: none;
-    font-size: 28px;
+    font-size: var(--font-size-3xl);
     cursor: pointer;
-    color: #666;
+    color: var(--color-text-secondary);
     width: 32px;
     height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
-    transition: all 0.2s;
+    border-radius: var(--radius-circle);
+    transition: var(--transition-base);
 }
 
 .modal-close:hover {
-    background: #f0f0f0;
-    color: #8B4513;
+    background: var(--color-bg-tertiary);
+    color: var(--color-employee-primary);
 }
 
 /* Form */
 .form-row {
     display: flex;
-    gap: 12px;
-    margin-bottom: 16px;
+    gap: var(--spacing-3);
+    margin-bottom: var(--spacing-4);
 }
 
 .form-field {
@@ -247,96 +282,100 @@
 
 .form-field label {
     display: block;
-    margin-bottom: 6px;
-    font-weight: 500;
-    font-size: 14px;
-    color: #333;
+    margin-bottom: var(--spacing-2);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-primary);
 }
 
 .form-field input,
 .form-field select {
     width: 100%;
-    padding: 12px 16px;
-    border-radius: 8px;
-    border: 2px solid #ddd;
-    font-size: 15px;
-    transition: border-color 0.2s ease;
+    padding: var(--input-padding-y) var(--input-padding-x);
+    border-radius: var(--input-border-radius);
+    border: var(--input-border-width) solid var(--input-border-color);
+    font-size: var(--font-size-md);
+    transition: var(--transition-base);
+    background: var(--color-white);
 }
 
 .form-field input:focus,
 .form-field select:focus {
     outline: none;
-    border-color: #8B4513;
+    border-color: var(--input-focus-border-color);
+    box-shadow: var(--input-focus-shadow);
 }
 
 .form-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 12px;
-    margin-top: 24px;
+    gap: var(--spacing-3);
+    margin-top: var(--spacing-6);
 }
 
 .btn {
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-weight: 600;
+    padding: var(--button-padding-y) var(--button-padding-x);
+    border-radius: var(--button-border-radius);
+    font-weight: var(--button-font-weight);
     cursor: pointer;
     border: none;
-    font-size: 15px;
-    transition: all 0.2s ease;
+    font-size: var(--font-size-md);
+    transition: var(--transition-base);
+    min-height: var(--button-height);
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #8B4513, #A0522D);
-    color: white;
+    background: var(--stat-card-bg);
+    color: var(--color-white);
 }
 
 .btn-primary:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
+    box-shadow: var(--shadow-coffee);
 }
 
 .btn-secondary {
-    background: #f5f5f5;
-    color: #666;
-    border: 2px solid #ddd;
+    background: var(--color-bg-tertiary);
+    color: var(--color-text-secondary);
+    border: 2px solid var(--color-border-light);
 }
 
 .btn-secondary:hover {
-    background: #e0e0e0;
+    background: var(--color-gray-300);
+    border-color: var(--color-border-medium);
 }
 
 /* Empty state */
 .empty-state {
     text-align: center;
-    padding: 60px 20px;
-    color: #999;
+    padding: var(--spacing-16) var(--spacing-5);
+    color: var(--color-text-tertiary);
 }
 
 .empty-state i {
-    font-size: 64px;
-    margin-bottom: 16px;
+    font-size: var(--font-size-5xl);
+    margin-bottom: var(--spacing-4);
     opacity: 0.4;
 }
 
 .empty-state p {
-    font-size: 16px;
+    font-size: var(--font-size-md);
 }
 
 /* Toast */
 .toast {
     position: fixed;
-    top: 20px;
+    top: var(--spacing-5);
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(0,0,0,0.85);
-    color: white;
-    padding: 12px 24px;
-    border-radius: 25px;
-    font-size: 14px;
-    z-index: 2000;
+    background: rgba(0, 0, 0, 0.85);
+    color: var(--color-white);
+    padding: var(--spacing-3) var(--spacing-6);
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-sm);
+    z-index: var(--z-index-notification);
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity var(--duration-slow) var(--ease-in-out);
     pointer-events: none;
 }
 

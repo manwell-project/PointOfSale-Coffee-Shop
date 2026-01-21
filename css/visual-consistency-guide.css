@@ -1,0 +1,663 @@
+/**
+ * VISUAL CONSISTENCY GUIDE
+ * Coffee Shop POS System - Framework7
+ * 
+ * Panduan lengkap untuk konsistensi visual di seluruh aplikasi
+ * 
+ * ATURAN PENTING:
+ * 1. SELALU import design-tokens.css di awal setiap CSS file
+ * 2. GUNAKAN CSS variables, JANGAN hard-code values
+ * 3. IKUTI naming convention yang sudah ditetapkan
+ * 4. TEST di berbagai screen sizes (mobile, tablet, desktop)
+ */
+
+/* ============================================
+   IMPORT ORDER - WAJIB DIIKUTI
+   ============================================ */
+
+/*
+  Urutan import CSS yang benar untuk konsistensi:
+  
+  @import '../../css/design-tokens.css';      [WAJIB - Selalu pertama]
+  @import '../../css/utilities.css';          [Opsional - Untuk utility classes]
+  @import '../../css/components/buttons.css'; [Opsional - Sesuai kebutuhan]
+  @import '../../css/components/cards.css';   [Opsional - Sesuai kebutuhan]
+*/
+
+/* ============================================
+   COLOR PALETTE - COFFEE THEME
+   ============================================ */
+
+/*
+  PRIMARY COLORS (Coffee Brown):
+  --------------------------------
+  --color-primary: #6B4423           → Main brand color
+  --color-primary-light: #8B5A3C     → Lighter shade
+  --color-primary-dark: #4A2E18      → Darker shade
+  
+  SECONDARY COLORS (Beige/Cream):
+  --------------------------------
+  --color-secondary: #D4A574         → Complementary color
+  --color-secondary-light: #E8C9A0   → Lighter shade
+  
+  ACCENT COLORS (Terracotta):
+  --------------------------------
+  --color-accent: #C17B5C            → For highlights
+  
+  SEMANTIC COLORS:
+  --------------------------------
+  --color-success: #28A745           → Success states
+  --color-warning: #FFC107           → Warning states
+  --color-danger: #DC3545            → Error states
+  --color-info: #17A2B8              → Info states
+  
+  ❌ JANGAN GUNAKAN:
+  - #0ea5e9, #0284c7 (Blue - tidak sesuai coffee theme)
+  - #8B4513, #A0522D (Old colors - gunakan design tokens)
+*/
+
+/* ============================================
+   TYPOGRAPHY SYSTEM
+   ============================================ */
+
+/*
+  FONT SIZES:
+  --------------------------------
+  --font-size-xs: 0.75rem     (12px)
+  --font-size-sm: 0.875rem    (14px)
+  --font-size-md: 1rem        (16px) ← Base size
+  --font-size-lg: 1.125rem    (18px)
+  --font-size-xl: 1.25rem     (20px)
+  --font-size-2xl: 1.5rem     (24px)
+  --font-size-3xl: 1.875rem   (30px)
+  --font-size-4xl: 2.25rem    (36px)
+  
+  FONT WEIGHTS:
+  --------------------------------
+  --font-weight-normal: 400
+  --font-weight-medium: 500
+  --font-weight-semibold: 600
+  --font-weight-bold: 700
+  
+  CONTOH PENGGUNAAN:
+  .page-title {
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-bold);
+  }
+*/
+
+/* ============================================
+   SPACING SYSTEM (4px base unit)
+   ============================================ */
+
+/*
+  SPACING VALUES:
+  --------------------------------
+  --spacing-1: 0.25rem    (4px)
+  --spacing-2: 0.5rem     (8px)
+  --spacing-3: 0.75rem    (12px)
+  --spacing-4: 1rem       (16px)
+  --spacing-5: 1.25rem    (20px)
+  --spacing-6: 1.5rem     (24px)
+  --spacing-8: 2rem       (32px)
+  --spacing-10: 2.5rem    (40px)
+  
+  SEMANTIC SPACING:
+  --------------------------------
+  --spacing-xs: var(--spacing-1)   (4px)
+  --spacing-sm: var(--spacing-2)   (8px)
+  --spacing-md: var(--spacing-4)   (16px)
+  --spacing-lg: var(--spacing-6)   (24px)
+  --spacing-xl: var(--spacing-8)   (32px)
+  
+  CONTOH PENGGUNAAN:
+  .card {
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
+  }
+*/
+
+/* ============================================
+   COMPONENT PATTERNS - SEARCH BAR
+   ============================================ */
+
+/*
+  SEARCH BAR - Standard Pattern:
+  -------------------------------- */
+  
+.search-bar {
+  position: relative;
+  margin: var(--spacing-4) 0;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: var(--spacing-3) var(--spacing-12) var(--spacing-3) var(--spacing-5);
+  border-radius: var(--radius-full);
+  border: 2px solid var(--searchbar-border-color);
+  background-color: var(--searchbar-bg);
+  font-size: var(--font-size-md);
+  transition: var(--transition-base);
+}
+
+.search-bar input:focus {
+  outline: none;
+  box-shadow: var(--searchbar-focus-shadow);
+  border-color: var(--color-primary-dark);
+}
+
+.search-bar i {
+  position: absolute;
+  right: var(--spacing-5);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--searchbar-icon-color);
+  font-size: var(--font-size-lg);
+}
+
+/* ============================================
+   COMPONENT PATTERNS - STAT CARDS
+   ============================================ */
+
+/*
+  STAT CARDS - Standard Pattern:
+  -------------------------------- */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-3);
+  margin: var(--spacing-4) 0;
+}
+
+.stat-card {
+  background: var(--stat-card-bg);
+  color: var(--stat-card-text);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-5) var(--spacing-4);
+  text-align: center;
+  box-shadow: var(--stat-card-shadow);
+  transition: var(--transition-base);
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.stat-number {
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--spacing-2);
+}
+
+.stat-label {
+  font-size: var(--font-size-sm);
+  opacity: 0.9;
+  font-weight: var(--font-weight-medium);
+}
+
+/* ============================================
+   COMPONENT PATTERNS - TABS
+   ============================================ */
+
+/*
+  TABS - Standard Pattern:
+  -------------------------------- */
+
+.tabs {
+  display: flex;
+  gap: var(--spacing-2);
+  margin: var(--spacing-4) 0;
+  overflow-x: auto;
+}
+
+.tab {
+  padding: var(--spacing-2) var(--spacing-5);
+  cursor: pointer;
+  font-weight: var(--font-weight-medium);
+  background: var(--tab-bg);
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  transition: var(--transition-base);
+  color: var(--tab-text);
+  border: 2px solid transparent;
+}
+
+.tab:hover {
+  background-color: var(--tab-hover-bg);
+}
+
+.tab.active {
+  background: var(--tab-active-bg);
+  color: var(--tab-active-text);
+  font-weight: var(--font-weight-bold);
+  box-shadow: var(--shadow-coffee);
+}
+
+/* ============================================
+   COMPONENT PATTERNS - CARDS
+   ============================================ */
+
+/*
+  CARDS - Standard Pattern:
+  -------------------------------- */
+
+.card {
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-4);
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--card-border);
+  transition: var(--transition-base);
+}
+
+.card:hover {
+  box-shadow: var(--card-hover-shadow);
+  transform: translateY(-2px);
+}
+
+/* Card dengan accent border kiri */
+.card-accent {
+  border-left: 4px solid var(--card-accent-border);
+}
+
+/* ============================================
+   COMPONENT PATTERNS - BUTTONS
+   ============================================ */
+
+/*
+  BUTTONS - Standard Pattern:
+  -------------------------------- */
+
+.btn {
+  padding: var(--button-padding-y) var(--button-padding-x);
+  border-radius: var(--button-border-radius);
+  font-weight: var(--button-font-weight);
+  cursor: pointer;
+  border: none;
+  font-size: var(--font-size-md);
+  transition: var(--transition-base);
+  min-height: var(--button-height);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+}
+
+/* Primary Button - Coffee Theme */
+.btn-primary {
+  background: var(--stat-card-bg);
+  color: var(--color-white);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-coffee);
+}
+
+/* Secondary Button */
+.btn-secondary {
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-secondary);
+  border: 2px solid var(--color-border-light);
+}
+
+.btn-secondary:hover {
+  background: var(--color-gray-300);
+  border-color: var(--color-border-medium);
+}
+
+/* Success Button */
+.btn-success {
+  background: var(--color-success);
+  color: var(--color-white);
+}
+
+/* Danger Button */
+.btn-danger {
+  background: var(--color-danger);
+  color: var(--color-white);
+}
+
+.btn-danger:hover {
+  background: var(--color-danger-dark);
+  box-shadow: var(--shadow-danger);
+}
+
+/* ============================================
+   COMPONENT PATTERNS - MODALS
+   ============================================ */
+
+/*
+  MODALS - Standard Pattern:
+  -------------------------------- */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--modal-backdrop);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-5);
+  z-index: var(--z-index-modal);
+}
+
+.modal-overlay[aria-hidden="false"] {
+  display: flex;
+}
+
+.modal-content {
+  max-width: 600px;
+  width: 100%;
+  background: var(--color-bg-secondary);
+  border-radius: var(--modal-border-radius);
+  padding: var(--modal-padding);
+  animation: modalAppear var(--duration-slow) var(--ease-out);
+  box-shadow: var(--modal-shadow);
+}
+
+@keyframes modalAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-5);
+  padding-bottom: var(--spacing-4);
+  border-bottom: 2px solid var(--color-border-light);
+}
+
+.modal-header h3 {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+}
+
+/* ============================================
+   COMPONENT PATTERNS - FORMS
+   ============================================ */
+
+/*
+  FORMS - Standard Pattern:
+  -------------------------------- */
+
+.form-field {
+  margin-bottom: var(--spacing-4);
+}
+
+.form-field label {
+  display: block;
+  margin-bottom: var(--spacing-2);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  padding: var(--input-padding-y) var(--input-padding-x);
+  border-radius: var(--input-border-radius);
+  border: var(--input-border-width) solid var(--input-border-color);
+  font-size: var(--font-size-md);
+  transition: var(--transition-base);
+  background: var(--color-white);
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  outline: none;
+  border-color: var(--input-focus-border-color);
+  box-shadow: var(--input-focus-shadow);
+}
+
+/* ============================================
+   SHADOWS & ELEVATION
+   ============================================ */
+
+/*
+  SHADOW LEVELS:
+  --------------------------------
+  --shadow-xs      → Minimal elevation
+  --shadow-sm      → Cards at rest
+  --shadow-md      → Cards on hover
+  --shadow-lg      → Dropdowns, modals
+  --shadow-xl      → Elevated modals
+  --shadow-2xl     → Maximum elevation
+  
+  THEMED SHADOWS:
+  --------------------------------
+  --shadow-coffee   → For primary elements
+  --shadow-success  → For success states
+  --shadow-warning  → For warning states
+  --shadow-danger   → For danger states
+*/
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+/*
+  BREAKPOINTS:
+  --------------------------------
+  Mobile First Approach
+  
+  Base styles         → 0px - 575px (Mobile)
+  @media (min-width: 576px)  → Small tablets
+  @media (min-width: 768px)  → Tablets
+  @media (min-width: 1024px) → Desktop
+  @media (min-width: 1280px) → Large desktop
+  
+  CONTOH:
+  
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  
+  @media (min-width: 768px) {
+    .grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+*/
+
+/* ============================================
+   ACCESSIBILITY GUIDELINES
+   ============================================ */
+
+/*
+  1. FOCUS INDICATORS - Selalu berikan visual feedback
+  -------------------------------- */
+  
+.interactive-element:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/*
+  2. COLOR CONTRAST - Minimum 4.5:1 untuk teks normal
+  --------------------------------
+  ✅ Good: Dark text on light background
+  ✅ Good: White text on coffee brown
+  ❌ Bad: Light text on light background
+  
+  3. TOUCH TARGETS - Minimum 44x44px untuk mobile
+  -------------------------------- */
+  
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/*
+  4. ARIA LABELS - Untuk screen readers
+  -------------------------------- */
+  
+/* <button aria-label="Close modal"> */
+
+/* ============================================
+   ANIMATION GUIDELINES
+   ============================================ */
+
+/*
+  TIMING:
+  --------------------------------
+  --duration-fast: 150ms      → Micro-interactions
+  --duration-normal: 250ms    → Standard transitions
+  --duration-slow: 350ms      → Complex animations
+  
+  EASING:
+  --------------------------------
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1)
+  --ease-out: cubic-bezier(0, 0, 0.2, 1)
+  
+  BEST PRACTICES:
+  --------------------------------
+  1. Gunakan transform untuk smooth animations
+  2. Hindari animasi pada width/height (gunakan scale)
+  3. Prefer opacity over visibility
+  
+  CONTOH:
+  
+  .animated-card {
+    transition: transform var(--duration-normal) var(--ease-out),
+                box-shadow var(--duration-normal) var(--ease-out);
+  }
+  
+  .animated-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+*/
+
+/* ============================================
+   MODULE-SPECIFIC COLORS
+   ============================================ */
+
+/*
+  Setiap modul menggunakan coffee theme yang sama:
+  
+  DASHBOARD:
+  --color-dashboard-primary: var(--color-primary)
+  
+  KARYAWAN/EMPLOYEE:
+  --color-employee-primary: var(--color-primary)
+  --color-employee-accent: var(--color-accent)
+  
+  PELANGGAN/CUSTOMER:
+  --color-customer-primary: var(--color-primary)
+  --color-customer-accent: var(--color-accent)
+  
+  STOCK/PRODUCT:
+  --color-stock-primary: var(--color-primary)
+  --color-stock-low: var(--color-warning)
+  --color-stock-out: var(--color-danger)
+  
+  TRANSACTION/POS:
+  --color-transaction-primary: var(--color-primary)
+  --color-transaction-success: var(--color-success)
+*/
+
+/* ============================================
+   COMMON MISTAKES TO AVOID
+   ============================================ */
+
+/*
+  ❌ JANGAN LAKUKAN:
+  --------------------------------
+  1. Hard-code colors:
+     background: #8B4513;  ← Wrong!
+  
+  2. Hard-code spacing:
+     padding: 16px;        ← Wrong!
+  
+  3. Inline styles:
+     <div style="color: red">  ← Wrong!
+  
+  4. Inconsistent naming:
+     .searchBox            ← Wrong! (camelCase)
+  
+  5. !important overuse:
+     color: red !important; ← Only for utilities!
+  
+  
+  ✅ LAKUKAN:
+  --------------------------------
+  1. Use CSS variables:
+     background: var(--color-primary);
+  
+  2. Use spacing tokens:
+     padding: var(--spacing-4);
+  
+  3. Use CSS classes:
+     <div class="text-danger">
+  
+  4. Use kebab-case:
+     .search-box
+  
+  5. Avoid !important:
+     color: var(--color-danger);
+*/
+
+/* ============================================
+   UTILITY CLASSES (Quick Reference)
+   ============================================ */
+
+/*
+  COLORS:
+  .text-primary, .text-coffee-primary, .bg-white, .bg-coffee-gradient
+  
+  SPACING:
+  .m-4, .mt-2, .mb-4, .p-4, .px-3, .py-2, .gap-3
+  
+  SHADOWS:
+  .shadow-sm, .shadow-md, .shadow-coffee
+  
+  BORDERS:
+  .rounded, .rounded-lg, .rounded-full, .border-coffee
+  
+  TYPOGRAPHY:
+  .text-sm, .text-lg, .font-bold, .text-center
+  
+  FLEXBOX:
+  .d-flex, .justify-center, .items-center, .gap-2
+  
+  GRID:
+  .d-grid, .grid-cols-2, .grid-cols-3
+*/
+
+/* ============================================
+   CHECKLIST SEBELUM COMMIT
+   ============================================ */
+
+/*
+  ✅ Design tokens diimport?
+  ✅ Tidak ada hard-coded colors?
+  ✅ Tidak ada hard-coded spacing values?
+  ✅ Responsive di mobile, tablet, desktop?
+  ✅ Hover states didefinisikan?
+  ✅ Focus states untuk accessibility?
+  ✅ Transitions smooth?
+  ✅ Coffee theme consistency?
+  ✅ Naming convention konsisten?
+  ✅ Comments untuk section yang kompleks?
+*/
