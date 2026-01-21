@@ -1,0 +1,711 @@
+/**
+ * Tablet Optimizations
+ * Coffee Shop POS System
+ * iPad & Android tablet specific enhancements (768px - 1023px)
+ */
+
+/* ============================================
+   TABLET LAYOUT ADJUSTMENTS
+   ============================================ */
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  /* Tablet container */
+  .page-content {
+    padding: var(--spacing-6);
+  }
+  
+  /* Two-column layout */
+  .tablet-two-column {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-5);
+  }
+  
+  /* Three-column layout */
+  .tablet-three-column {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-4);
+  }
+  
+  /* Sidebar + Main content */
+  .tablet-sidebar-layout {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: var(--spacing-6);
+  }
+}
+
+/* ============================================
+   TABLET DASHBOARD
+   ============================================ */
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  /* Stat cards: 2 columns */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-4);
+  }
+  
+  .stat-card {
+    padding: var(--spacing-5);
+  }
+  
+  .stat-card-value {
+    font-size: 2rem;
+  }
+  
+  /* Charts: Side by side */
+  .charts-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-5);
+  }
+  
+  .chart-card {
+    padding: var(--spacing-5);
+  }
+  
+  /* Quick actions: 3 columns */
+  .quick-actions {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-4);
+  }
+}
+
+/* ============================================
+   TABLET PRODUCT GRID
+   ============================================ */
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .products-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-4);
+  }
+  
+  .product-card {
+    padding: var(--spacing-4);
+  }
+  
+  .product-image {
+    height: 160px;
+  }
+  
+  .product-name {
+    font-size: var(--font-size-md);
+  }
+  
+  .product-price {
+    font-size: var(--font-size-lg);
+  }
+  
+  /* Horizontal product card */
+  .product-card-horizontal {
+    display: flex;
+    gap: var(--spacing-4);
+    padding: var(--spacing-4);
+  }
+  
+  .product-card-horizontal .product-image {
+    width: 120px;
+    height: 120px;
+    flex-shrink: 0;
+  }
+  
+  .product-card-horizontal .product-info {
+    flex: 1;
+  }
+}
+
+/* ============================================
+   TABLET TABLES
+   ============================================ */
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .data-table {
+    font-size: var(--font-size-sm);
+  }
+  
+  .data-table th,
+  .data-table td {
+    padding: var(--spacing-3) var(--spacing-4);
+  }
+  
+  .data-table th {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+  }
+  
+  /* Compact action buttons */
+  .action-btn {
+    width: 36px;
+    height: 36px;
+    font-size: var(--font-size-sm);
+  }
+  
+  /* Scrollable table */
+  .table-responsive-tablet {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .table-responsive-tablet table {
+    min-width: 600px;
+  }
+}
+
+/* ============================================
+   TABLET FORMS
+   ============================================ */
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  /* Two-column form layout */
+  .form-row-tablet {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-4);
+  }
+  
+  .form-group-full {
+    grid-column: 1 / -1;
+  }
+  
+  .form-input,
+  .form-select {
+    height: 42px;
+    font-size: var(--font-size-md);
+  }
+  
+  .form-label {
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--spacing-2);
+  }
+  
+  /* Form actions: Side by side */
+  .form-actions-tablet {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-3);
+  }
+  
+  .form-actions-tablet .btn {
+    min-width: 120px;
+    height: 44px;
+  }
+}
+
+/* ============================================
+   TABLET MODALS
+   ============================================ */
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .modal-tablet {
+    padding: var(--spacing-6);
+  }
+  
+  .modal-content {
+    max-width: 600px;
+    margin: var(--spacing-10) auto;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-2xl);
+  }
+  
+  .modal-header {
+    padding: var(--spacing-5);
+  }
+  
+  .modal-body {
+    padding: var(--spacing-5);
+  }
+  
+  .modal-footer {
+    padding: var(--spacing-5);
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-3);
+  }
+}
+
+/* ============================================
+   TABLET NAVIGATION
+   ============================================ */
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  /* Horizontal tabs */
+  .tabs-tablet {
+    display: flex;
+    gap: var(--spacing-2);
+    border-bottom: 2px solid var(--color-border-light);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .tab-tablet {
+    padding: var(--spacing-3) var(--spacing-5);
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-secondary);
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  
+  .tab-tablet.active {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
+  }
+  
+  /* Sidebar navigation */
+  .sidebar-tablet {
+    width: 240px;
+    background: var(--color-white);
+    border-right: 1px solid var(--color-border-light);
+    padding: var(--spacing-5) 0;
+  }
+  
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    padding: var(--spacing-3) var(--spacing-5);
+    color: var(--color-text-primary);
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  
+  .sidebar-item:hover,
+  .sidebar-item.active {
+    background: var(--color-surface);
+  }
+  
+  .sidebar-icon {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* ============================================
+   TABLET SEARCH & FILTERS
+   ============================================ */
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .search-filter-tablet {
+    display: flex;
+    gap: var(--spacing-4);
+    align-items: center;
+  }
+  
+  .searchbar-tablet {
+    flex: 1;
+    max-width: 400px;
+  }
+  
+  .searchbar-tablet input {
+    height: 42px;
+    padding: var(--spacing-2) var(--spacing-10);
+  }
+  
+  .filter-group-tablet {
+    display: flex;
+    gap: var(--spacing-2);
+    flex-wrap: wrap;
+  }
+  
+  .filter-btn-tablet {
+    padding: var(--spacing-2) var(--spacing-4);
+    font-size: var(--font-size-sm);
+  }
+  
+  /* Advanced filters sidebar */
+  .filters-sidebar-tablet {
+    width: 280px;
+    padding: var(--spacing-5);
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+  }
+  
+  .filter-section {
+    margin-bottom: var(--spacing-5);
+  }
+  
+  .filter-section-title {
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--spacing-3);
+  }
+}
+
+/* ============================================
+   TABLET TRANSACTION / POS
+   ============================================ */
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  /* Split view: Products | Cart */
+  .pos-layout-tablet {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: var(--spacing-5);
+    height: calc(100vh - 120px);
+  }
+  
+  .pos-products-section {
+    overflow-y: auto;
+  }
+  
+  .pos-cart-section {
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-5);
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .cart-items-list {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: var(--spacing-4);
+  }
+  
+  .cart-item-tablet {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    padding: var(--spacing-3);
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-2);
+  }
+  
+  .cart-item-image {
+    width: 60px;
+    height: 60px;
+    border-radius: var(--radius-md);
+  }
+  
+  .cart-summary-tablet {
+    padding-top: var(--spacing-4);
+    border-top: 2px solid var(--color-border-light);
+  }
+  
+  .cart-total-tablet {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-4);
+  }
+  
+  .cart-total-label {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+  }
+  
+  .cart-total-value {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-primary);
+  }
+  
+  .checkout-btn-tablet {
+    width: 100%;
+    height: 50px;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+  }
+}
+
+/* ============================================
+   TABLET CARDS & LISTS
+   ============================================ */
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .card-tablet {
+    padding: var(--spacing-5);
+    border-radius: var(--radius-lg);
+  }
+  
+  .card-header-tablet {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-4);
+  }
+  
+  .card-title-tablet {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+  }
+  
+  /* List items */
+  .list-item-tablet {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-4);
+    padding: var(--spacing-4);
+    border-bottom: 1px solid var(--color-border-light);
+  }
+  
+  .list-item-tablet:last-child {
+    border-bottom: none;
+  }
+  
+  .list-item-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    flex-shrink: 0;
+  }
+  
+  .list-item-content {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .list-item-title {
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--spacing-1);
+  }
+  
+  .list-item-subtitle {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+  }
+  
+  .list-item-action {
+    flex-shrink: 0;
+  }
+}
+
+/* ============================================
+   TABLET EMPLOYEE MANAGEMENT
+   ============================================ */
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .employee-grid-tablet {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-4);
+  }
+  
+  .employee-card-tablet {
+    display: flex;
+    gap: var(--spacing-4);
+    padding: var(--spacing-4);
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .employee-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+  
+  .employee-info {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .employee-name {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--spacing-1);
+  }
+  
+  .employee-role {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--spacing-2);
+  }
+  
+  .employee-actions {
+    display: flex;
+    gap: var(--spacing-2);
+    margin-top: var(--spacing-3);
+  }
+}
+
+/* ============================================
+   TABLET STOCK MANAGEMENT
+   ============================================ */
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .stock-layout-tablet {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: var(--spacing-5);
+  }
+  
+  .stock-filters-tablet {
+    background: var(--color-white);
+    padding: var(--spacing-5);
+    border-radius: var(--radius-lg);
+    height: fit-content;
+    position: sticky;
+    top: var(--spacing-4);
+  }
+  
+  .stock-grid-tablet {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-4);
+  }
+  
+  .stock-card-tablet {
+    padding: var(--spacing-4);
+  }
+  
+  .stock-status-badge {
+    display: inline-block;
+    padding: var(--spacing-1) var(--spacing-3);
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+  }
+  
+  .stock-status-low {
+    background: var(--color-warning-alpha-20);
+    color: var(--color-warning);
+  }
+  
+  .stock-status-out {
+    background: var(--color-danger-alpha-20);
+    color: var(--color-danger);
+  }
+  
+  .stock-status-ok {
+    background: var(--color-success-alpha-20);
+    color: var(--color-success);
+  }
+}
+
+/* ============================================
+   TABLET REPORTS
+   ============================================ */
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .report-header-tablet {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-6);
+  }
+  
+  .report-filters-tablet {
+    display: flex;
+    gap: var(--spacing-3);
+    flex-wrap: wrap;
+  }
+  
+  .report-metrics-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-4);
+    margin-bottom: var(--spacing-6);
+  }
+  
+  .metric-card-tablet {
+    padding: var(--spacing-5);
+    text-align: center;
+  }
+  
+  .metric-value {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-primary);
+  }
+  
+  .metric-label {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    margin-top: var(--spacing-2);
+  }
+}
+
+/* ============================================
+   TABLET TOOLBAR
+   ============================================ */
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .toolbar-tablet {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-4) var(--spacing-6);
+    background: var(--color-white);
+    border-bottom: 1px solid var(--color-border-light);
+    position: sticky;
+    top: 0;
+    z-index: var(--z-index-sticky);
+  }
+  
+  .toolbar-title {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+  }
+  
+  .toolbar-actions {
+    display: flex;
+    gap: var(--spacing-3);
+  }
+  
+  .toolbar-btn {
+    height: 40px;
+    padding: var(--spacing-2) var(--spacing-4);
+    font-size: var(--font-size-md);
+  }
+}
+
+/* ============================================
+   TABLET LANDSCAPE SPECIFIC
+   ============================================ */
+
+@media (min-width: 768px) and (max-width: 1023px) and (orientation: landscape) {
+  /* Optimize for landscape orientation */
+  .landscape-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  .landscape-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-6);
+  }
+  
+  /* Reduce vertical padding */
+  .landscape-compact {
+    padding-top: var(--spacing-4);
+    padding-bottom: var(--spacing-4);
+  }
+}
+
+/* ============================================
+   TABLET TOUCH OPTIMIZATIONS
+   ============================================ */
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  /* Ensure touch targets are adequate */
+  .touch-target-tablet {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Increase spacing for easier tapping */
+  .touchable-list .list-item {
+    padding: var(--spacing-4);
+  }
+  
+  /* Hover effects for tablets with precision pointing */
+  @media (hover: hover) {
+    .hoverable-tablet:hover {
+      background: var(--color-surface);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+  }
+}

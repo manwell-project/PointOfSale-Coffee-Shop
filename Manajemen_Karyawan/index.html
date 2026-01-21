@@ -28,6 +28,11 @@
     <link rel="stylesheet" href="../css/components/toast-notifications.css">
     <link rel="stylesheet" href="../css/components/micro-interactions.css">
     
+    <!-- Responsive Design CSS -->
+    <link rel="stylesheet" href="../css/responsive.css">
+    <link rel="stylesheet" href="../css/mobile-optimizations.css">
+    <link rel="stylesheet" href="../css/tablet.css">
+    
     <!-- Page Specific CSS -->
     <link rel="stylesheet" href="css/employee-layout.css">
     <link rel="stylesheet" href="../css/shared-ui.css">
@@ -39,20 +44,20 @@
     <!-- Top Navigation Bar will be injected by top-navbar.js -->
     <!-- Employee Wrapper -->
     <div class="employee-wrapper">
-        <div class="employee-container">
+        <div class="employee-container container-responsive">
             <!-- Employee Header -->
-            <div class="employee-header">
+            <div class="employee-header spacing-responsive">
                 <div class="employee-header-left">
-                    <h1 class="employee-title">
+                    <h1 class="employee-title heading-responsive">
                         <i class="fas fa-users"></i>
                         Manajemen Karyawan
                     </h1>
-                    <p class="employee-subtitle">Kelola data dan informasi karyawan</p>
+                    <p class="employee-subtitle text-responsive-md">Kelola data dan informasi karyawan</p>
                 </div>
-                <div class="employee-header-actions">
-                    <button class="btn-export" id="exportBtn">
+                <div class="employee-header-actions btn-group-responsive">
+                    <button class="btn-export btn-responsive" id="exportBtn">
                         <i class="fas fa-download"></i>
-                        Export
+                        <span class="hide-mobile">Export</span>
                     </button>
                     <button class="btn-add-employee" id="addEmployeeBtn">
                         <i class="fas fa-plus"></i>
@@ -393,6 +398,7 @@
     <script src="../js/ux-utilities.js"></script>
     <script src="../js/loading-helpers.js"></script>
     <script src="../js/toast.js"></script>
+    <script src="../js/responsive-utilities.js"></script>
     <script src="../js/top-navbar.js"></script>
     <script src="../js/sidebar-nav.js"></script>
     <script src="../js/navbar.js"></script>

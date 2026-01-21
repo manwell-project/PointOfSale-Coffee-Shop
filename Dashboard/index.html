@@ -10,6 +10,10 @@
     <link rel="stylesheet" href="../css/components/sidebar-nav.css">
     <link rel="stylesheet" href="../css/components/page-adjustments.css">
     <link rel="stylesheet" href="./css/dashboard.css">
+    <!-- Responsive Design CSS -->
+    <link rel="stylesheet" href="../css/responsive.css">
+    <link rel="stylesheet" href="../css/mobile-optimizations.css">
+    <link rel="stylesheet" href="../css/tablet.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         /* Additional page-specific overrides if needed */
@@ -18,19 +22,19 @@
 <body>
     <!-- Top Navigation Bar will be injected by top-navbar.js -->
     <div data-digicaf-layout="auto" data-page-title="Dashboard">
-        <div class="dashboard-container">
+        <div class="dashboard-container container-responsive">
             <!-- 4.1 Dashboard Header Section dengan Greeting & Date -->
-            <div class="dashboard-header">
+            <div class="dashboard-header spacing-responsive">
                 <div class="dashboard-header-content">
-                    <div class="welcome-text">Selamat Datang di DigiCaf! ☕</div>
-                    <div class="date-text" id="currentDate"></div>
+                    <div class="welcome-text heading-responsive">Selamat Datang di DigiCaf! ☕</div>
+                    <div class="date-text text-responsive-md" id="currentDate"></div>
                 </div>
             </div>
 
             <!-- 4.2 Stats Cards Grid (4 kolom responsive) -->
-            <div class="stats-grid">
+            <div class="stats-grid stats-responsive">
                 <!-- Card Penjualan Hari Ini -->
-                <div class="stat-card revenue">
+                <div class="stat-card card-responsive revenue card-hover-lift">
                     <div class="stat-icon">
                         <i class="fas fa-money-bill-wave"></i>
                     </div>
@@ -43,7 +47,7 @@
                 </div>
 
                 <!-- Card Total Transaksi -->
-                <div class="stat-card transactions">
+                <div class="stat-card card-responsive transactions card-hover-lift">
                     <div class="stat-icon">
                         <i class="fas fa-shopping-cart"></i>
                     </div>
@@ -56,7 +60,7 @@
                 </div>
 
                 <!-- Card Menu Terlaris -->
-                <div class="stat-card warning">
+                <div class="stat-card card-responsive warning card-hover-lift">
                     <div class="stat-icon">
                         <i class="fas fa-fire"></i>
                     </div>
@@ -65,7 +69,7 @@
                 </div>
 
                 <!-- Card Stok Menipis (dengan warning indicator) -->
-                <div class="stat-card alert">
+                <div class="stat-card card-responsive alert card-hover-lift">
                     <div class="stat-icon">
                         <i class="fas fa-exclamation-triangle"></i>
                     </div>
@@ -75,18 +79,18 @@
             </div>
 
             <!-- Dashboard Grid: Main Content + Sidebar -->
-            <div class="dashboard-grid">
+            <div class="dashboard-grid layout-with-sidebar">
                 <!-- Main Content Area -->
-                <div class="dashboard-main-content">
+                <div class="dashboard-main-content layout-main">
                     <!-- 4.3 Sales Chart Section -->
-                    <div class="chart-section">
+                    <div class="chart-section card-responsive">
                         <!-- Chart header dengan period filters -->
                         <div class="chart-header">
-                            <h2 class="chart-title">Grafik Penjualan</h2>
-                            <div class="chart-filters">
-                                <button class="chart-filter-btn active" data-period="today">Hari Ini</button>
-                                <button class="chart-filter-btn" data-period="week">Minggu</button>
-                                <button class="chart-filter-btn" data-period="month">Bulan</button>
+                            <h2 class="chart-title text-responsive-lg">Grafik Penjualan</h2>
+                            <div class="chart-filters btn-group-responsive">
+                                <button class="chart-filter-btn btn-responsive active" data-period="today">Hari Ini</button>
+                                <button class="chart-filter-btn btn-responsive" data-period="week">Minggu</button>
+                                <button class="chart-filter-btn btn-responsive" data-period="month">Bulan</button>
                             </div>
                         </div>
 
@@ -458,7 +462,10 @@
         }
     </script>
     
+    <!-- Responsive Utilities -->
+    <script src="../js/responsive-utilities.js"></script>
+    
     <!-- Sidebar Navigation -->
-    <script src="../js/sidebar-nav.js"></script>
+    <script src="../js/components/sidebar-nav.js"></script>
 </body>
 </html>

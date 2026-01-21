@@ -1,0 +1,762 @@
+/**
+ * Responsive Design System
+ * Coffee Shop POS System
+ * Mobile-first responsive utilities & patterns
+ */
+
+/* ============================================
+   BREAKPOINTS REFERENCE
+   ============================================
+   
+   xs:  0px    - 575px   (Mobile portrait)
+   sm:  576px  - 767px   (Mobile landscape / Small tablets)
+   md:  768px  - 1023px  (Tablets)
+   lg:  1024px - 1279px  (Desktop)
+   xl:  1280px - 1535px  (Large desktop)
+   2xl: 1536px+          (Extra large)
+   
+   ============================================ */
+
+/* ============================================
+   RESPONSIVE CONTAINERS
+   ============================================ */
+
+.container-responsive {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--spacing-4);
+  padding-right: var(--spacing-4);
+}
+
+@media (min-width: 576px) {
+  .container-responsive {
+    max-width: 540px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container-responsive {
+    max-width: 720px;
+    padding-left: var(--spacing-6);
+    padding-right: var(--spacing-6);
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-responsive {
+    max-width: 960px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container-responsive {
+    max-width: 1140px;
+  }
+}
+
+@media (min-width: 1536px) {
+  .container-responsive {
+    max-width: 1320px;
+  }
+}
+
+/* Fluid Container */
+.container-fluid {
+  width: 100%;
+  padding-left: var(--spacing-4);
+  padding-right: var(--spacing-4);
+}
+
+@media (min-width: 768px) {
+  .container-fluid {
+    padding-left: var(--spacing-6);
+    padding-right: var(--spacing-6);
+  }
+}
+
+/* ============================================
+   RESPONSIVE GRID SYSTEM
+   ============================================ */
+
+.grid-responsive {
+  display: grid;
+  gap: var(--spacing-4);
+  width: 100%;
+}
+
+/* Mobile: 1 column */
+.grid-responsive {
+  grid-template-columns: 1fr;
+}
+
+/* Tablet: 2 columns */
+@media (min-width: 768px) {
+  .grid-responsive {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-5);
+  }
+}
+
+/* Desktop: 3-4 columns */
+@media (min-width: 1024px) {
+  .grid-responsive {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-6);
+  }
+  
+  .grid-responsive.grid-4-cols {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Auto-fit grid */
+.grid-auto-fit {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-4);
+}
+
+@media (min-width: 768px) {
+  .grid-auto-fit {
+    gap: var(--spacing-5);
+  }
+}
+
+/* ============================================
+   RESPONSIVE FLEXBOX UTILITIES
+   ============================================ */
+
+.flex-responsive {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+@media (min-width: 768px) {
+  .flex-responsive {
+    flex-direction: row;
+    gap: var(--spacing-5);
+  }
+}
+
+.flex-responsive-reverse {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--spacing-4);
+}
+
+@media (min-width: 768px) {
+  .flex-responsive-reverse {
+    flex-direction: row;
+  }
+}
+
+/* ============================================
+   RESPONSIVE SPACING
+   ============================================ */
+
+/* Mobile: Reduced spacing */
+.spacing-responsive {
+  padding: var(--spacing-4);
+}
+
+@media (min-width: 768px) {
+  .spacing-responsive {
+    padding: var(--spacing-6);
+  }
+}
+
+@media (min-width: 1024px) {
+  .spacing-responsive {
+    padding: var(--spacing-8);
+  }
+}
+
+/* Section spacing */
+.section-spacing {
+  padding-top: var(--spacing-8);
+  padding-bottom: var(--spacing-8);
+}
+
+@media (min-width: 768px) {
+  .section-spacing {
+    padding-top: var(--spacing-12);
+    padding-bottom: var(--spacing-12);
+  }
+}
+
+@media (min-width: 1024px) {
+  .section-spacing {
+    padding-top: var(--spacing-16);
+    padding-bottom: var(--spacing-16);
+  }
+}
+
+/* ============================================
+   RESPONSIVE TYPOGRAPHY
+   ============================================ */
+
+.text-responsive-sm {
+  font-size: var(--font-size-sm);
+}
+
+@media (min-width: 768px) {
+  .text-responsive-sm {
+    font-size: var(--font-size-md);
+  }
+}
+
+.text-responsive-md {
+  font-size: var(--font-size-md);
+}
+
+@media (min-width: 768px) {
+  .text-responsive-md {
+    font-size: var(--font-size-lg);
+  }
+}
+
+.text-responsive-lg {
+  font-size: var(--font-size-lg);
+}
+
+@media (min-width: 768px) {
+  .text-responsive-lg {
+    font-size: var(--font-size-xl);
+  }
+}
+
+@media (min-width: 1024px) {
+  .text-responsive-lg {
+    font-size: var(--font-size-2xl);
+  }
+}
+
+.heading-responsive {
+  font-size: var(--font-size-xl);
+  line-height: var(--line-height-tight);
+}
+
+@media (min-width: 768px) {
+  .heading-responsive {
+    font-size: var(--font-size-2xl);
+  }
+}
+
+@media (min-width: 1024px) {
+  .heading-responsive {
+    font-size: var(--font-size-3xl);
+  }
+}
+
+/* ============================================
+   RESPONSIVE CARDS
+   ============================================ */
+
+.card-responsive {
+  padding: var(--spacing-4);
+  border-radius: var(--radius-md);
+}
+
+@media (min-width: 768px) {
+  .card-responsive {
+    padding: var(--spacing-6);
+    border-radius: var(--radius-lg);
+  }
+}
+
+/* ============================================
+   RESPONSIVE BUTTONS
+   ============================================ */
+
+.btn-responsive {
+  width: 100%;
+  padding: var(--spacing-3) var(--spacing-4);
+  font-size: var(--font-size-md);
+}
+
+@media (min-width: 768px) {
+  .btn-responsive {
+    width: auto;
+    min-width: 120px;
+    padding: var(--spacing-3) var(--spacing-6);
+  }
+}
+
+.btn-group-responsive {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .btn-group-responsive {
+    flex-direction: row;
+    width: auto;
+  }
+}
+
+/* ============================================
+   RESPONSIVE TABLES
+   ============================================ */
+
+/* Mobile: Card view */
+.table-responsive-mobile {
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 767px) {
+  .table-responsive-mobile table {
+    display: block;
+  }
+  
+  .table-responsive-mobile thead {
+    display: none;
+  }
+  
+  .table-responsive-mobile tbody,
+  .table-responsive-mobile tr {
+    display: block;
+  }
+  
+  .table-responsive-mobile tr {
+    margin-bottom: var(--spacing-4);
+    padding: var(--spacing-4);
+    background: var(--color-white);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .table-responsive-mobile td {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--spacing-2) 0;
+    border-bottom: 1px solid var(--color-border-light);
+  }
+  
+  .table-responsive-mobile td:last-child {
+    border-bottom: none;
+  }
+  
+  .table-responsive-mobile td::before {
+    content: attr(data-label);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+  }
+}
+
+/* Horizontal scroll for desktop */
+@media (min-width: 768px) {
+  .table-responsive-mobile {
+    overflow-x: visible;
+  }
+}
+
+/* ============================================
+   RESPONSIVE MODALS
+   ============================================ */
+
+.modal-responsive .modal-content {
+  width: 95%;
+  max-width: 500px;
+  margin: var(--spacing-4);
+}
+
+@media (min-width: 768px) {
+  .modal-responsive .modal-content {
+    width: 90%;
+    max-width: 600px;
+    margin: var(--spacing-8);
+  }
+}
+
+@media (min-width: 1024px) {
+  .modal-responsive .modal-content {
+    max-width: 800px;
+  }
+}
+
+/* Full screen modal on mobile */
+.modal-fullscreen-mobile .modal-content {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  margin: 0;
+  border-radius: 0;
+}
+
+@media (min-width: 768px) {
+  .modal-fullscreen-mobile .modal-content {
+    width: 90%;
+    height: auto;
+    max-width: 600px;
+    margin: var(--spacing-8) auto;
+    border-radius: var(--radius-xl);
+  }
+}
+
+/* ============================================
+   RESPONSIVE FORMS
+   ============================================ */
+
+.form-responsive {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.form-row-responsive {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+@media (min-width: 768px) {
+  .form-row-responsive {
+    flex-direction: row;
+  }
+  
+  .form-row-responsive > * {
+    flex: 1;
+  }
+}
+
+/* ============================================
+   RESPONSIVE NAVIGATION
+   ============================================ */
+
+.nav-responsive {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+@media (min-width: 768px) {
+  .nav-responsive {
+    flex-direction: row;
+    gap: var(--spacing-4);
+  }
+}
+
+/* Mobile hamburger menu */
+.nav-mobile-toggle {
+  display: block;
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+@media (min-width: 768px) {
+  .nav-mobile-toggle {
+    display: none;
+  }
+}
+
+.nav-mobile-menu {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--color-white);
+  z-index: var(--z-index-modal);
+  padding: var(--spacing-6);
+  overflow-y: auto;
+}
+
+.nav-mobile-menu.active {
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .nav-mobile-menu {
+    display: block !important;
+    position: static;
+    width: auto;
+    height: auto;
+    background: transparent;
+    padding: 0;
+    overflow-y: visible;
+  }
+}
+
+/* ============================================
+   RESPONSIVE SIDEBARS
+   ============================================ */
+
+.layout-with-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+@media (min-width: 1024px) {
+  .layout-with-sidebar {
+    flex-direction: row;
+    gap: var(--spacing-6);
+  }
+  
+  .layout-sidebar {
+    width: 280px;
+    flex-shrink: 0;
+  }
+  
+  .layout-main {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+/* ============================================
+   RESPONSIVE STATS/METRICS
+   ============================================ */
+
+.stats-responsive {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-3);
+}
+
+@media (min-width: 576px) {
+  .stats-responsive {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-4);
+  }
+}
+
+@media (min-width: 1024px) {
+  .stats-responsive {
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-5);
+  }
+}
+
+/* ============================================
+   RESPONSIVE IMAGES
+   ============================================ */
+
+.img-responsive {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.img-cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.img-contain {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* ============================================
+   HIDE/SHOW UTILITIES
+   ============================================ */
+
+/* Hide on mobile */
+.hide-mobile {
+  display: none !important;
+}
+
+@media (min-width: 768px) {
+  .hide-mobile {
+    display: block !important;
+  }
+}
+
+.hide-mobile-flex {
+  display: none !important;
+}
+
+@media (min-width: 768px) {
+  .hide-mobile-flex {
+    display: flex !important;
+  }
+}
+
+/* Show only on mobile */
+.show-mobile {
+  display: block !important;
+}
+
+@media (min-width: 768px) {
+  .show-mobile {
+    display: none !important;
+  }
+}
+
+.show-mobile-flex {
+  display: flex !important;
+}
+
+@media (min-width: 768px) {
+  .show-mobile-flex {
+    display: none !important;
+  }
+}
+
+/* Hide on tablet */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .hide-tablet {
+    display: none !important;
+  }
+}
+
+/* Show only on tablet */
+.show-tablet {
+  display: none !important;
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .show-tablet {
+    display: block !important;
+  }
+}
+
+/* Hide on desktop */
+@media (min-width: 1024px) {
+  .hide-desktop {
+    display: none !important;
+  }
+}
+
+/* Show only on desktop */
+.show-desktop {
+  display: none !important;
+}
+
+@media (min-width: 1024px) {
+  .show-desktop {
+    display: block !important;
+  }
+}
+
+/* ============================================
+   RESPONSIVE TEXT ALIGNMENT
+   ============================================ */
+
+.text-center-mobile {
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .text-center-mobile {
+    text-align: left;
+  }
+}
+
+.text-left-mobile {
+  text-align: left;
+}
+
+@media (min-width: 768px) {
+  .text-left-mobile {
+    text-align: center;
+  }
+}
+
+/* ============================================
+   RESPONSIVE ORDERING
+   ============================================ */
+
+.order-mobile-first {
+  order: -1;
+}
+
+@media (min-width: 768px) {
+  .order-mobile-first {
+    order: 0;
+  }
+}
+
+.order-mobile-last {
+  order: 999;
+}
+
+@media (min-width: 768px) {
+  .order-mobile-last {
+    order: 0;
+  }
+}
+
+/* ============================================
+   TOUCH-FRIENDLY TARGETS
+   ============================================ */
+
+@media (max-width: 767px) {
+  /* Minimum touch target: 44x44px */
+  .touch-target,
+  button,
+  .btn,
+  a.btn,
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Increase tap area */
+  .touch-target {
+    padding: var(--spacing-3);
+  }
+}
+
+/* ============================================
+   RESPONSIVE OVERFLOW
+   ============================================ */
+
+.overflow-scroll-mobile {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (min-width: 768px) {
+  .overflow-scroll-mobile {
+    overflow-x: visible;
+  }
+}
+
+/* ============================================
+   LANDSCAPE ORIENTATION
+   ============================================ */
+
+@media (max-width: 767px) and (orientation: landscape) {
+  .landscape-adjust {
+    padding-top: var(--spacing-2);
+    padding-bottom: var(--spacing-2);
+  }
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .page-break-before {
+    page-break-before: always;
+  }
+  
+  .page-break-after {
+    page-break-after: always;
+  }
+  
+  .page-break-inside-avoid {
+    page-break-inside: avoid;
+  }
+}
