@@ -12,7 +12,7 @@
     activeClass: 'active',
     collapsedClass: 'collapsed',
     openClass: 'open',
-    mobileBreakpoint: 768,
+    mobileBreakpoint: 1024, // Sidebar ONLY shows on desktop (>1024px)
   };
 
   // State

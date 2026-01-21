@@ -33,7 +33,6 @@
     
     // Initialize components
     initializeUserMenu();
-    initializeMobileMenu();
     
     // Setup scroll behavior
     setupScrollBehavior();
@@ -83,20 +82,51 @@
     const navbarHTML = `
       <nav class="top-navbar">
         <div class="top-navbar-inner">
-          <!-- Left Section -->
+          <!-- Left Section - Logo -->
           <div class="top-navbar-left">
-            <button class="top-navbar-menu-toggle" id="mobileMenuToggle" aria-label="Toggle Menu">
-              <i class="fas fa-bars"></i>
-            </button>
-            
-            <a href="/webtest/PointOfSale-Coffee-Shop/Dashboard/index.html" class="top-navbar-logo">
+            <a href="../Dashboard/index.html" class="top-navbar-logo">
               <span class="top-navbar-logo-icon">☕</span>
               <span class="top-navbar-brand">DigiCaf</span>
             </a>
           </div>
 
-          <!-- Right Section - User Menu Only (Simple Mode) -->
+          <!-- Center Section - Search Bar -->
+          <div class="top-navbar-center">
+            <div class="top-navbar-search">
+              <i class="fas fa-search top-navbar-search-icon"></i>
+              <input 
+                type="text" 
+                class="top-navbar-search-input" 
+                id="topNavbarSearch"
+                placeholder="Cari produk, pelanggan, transaksi..."
+                autocomplete="off"
+              />
+              <div class="top-navbar-search-results" id="searchResults"></div>
+            </div>
+          </div>
+
+          <!-- Right Section - Notifications + User Menu -->
           <div class="top-navbar-right">
+            <!-- Notifications -->
+            <div style="position: relative;">
+              <button class="top-navbar-notification-btn" id="notificationBtn" aria-label="Notifications">
+                <i class="fas fa-bell"></i>
+                <span class="top-navbar-notification-badge" id="notificationBadge" style="display: none;">0</span>
+              </button>
+              <div class="top-navbar-dropdown top-navbar-notification-dropdown" id="notificationDropdown">
+                <div class="top-navbar-dropdown-header">
+                  <h4>Notifikasi</h4>
+                  <button class="top-navbar-dropdown-header-action" id="markAllReadBtn">Tandai Semua Dibaca</button>
+                </div>
+                <div class="top-navbar-dropdown-body" id="notificationList">
+                  <div class="top-navbar-notification-empty">
+                    <i class="fas fa-bell-slash"></i>
+                    <p>Tidak ada notifikasi</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- User Menu -->
             <div style="position: relative;">
               <button class="top-navbar-user-btn" id="userMenuBtn">
@@ -132,37 +162,6 @@
           </div>
         </div>
       </nav>
-
-      <!-- Mobile Menu -->
-      <div class="top-navbar-mobile-overlay" id="mobileOverlay"></div>
-      <div class="top-navbar-mobile-menu" id="mobileMenu">
-        <a href="/webtest/PointOfSale-Coffee-Shop/Dashboard/index.html" class="top-navbar-mobile-nav-item">
-          <i class="fas fa-home"></i>
-          <span>Dashboard</span>
-        </a>
-        <a href="/webtest/PointOfSale-Coffee-Shop/Transaksi/index.html" class="top-navbar-mobile-nav-item">
-          <i class="fas fa-cash-register"></i>
-          <span>Point of Sale</span>
-        </a>
-        <a href="/webtest/PointOfSale-Coffee-Shop/Manejemen_stok/index.html" class="top-navbar-mobile-nav-item">
-          <i class="fas fa-box"></i>
-          <span>Manajemen Stok</span>
-        </a>
-        ${userRole === 'admin' ? `
-        <a href="/webtest/PointOfSale-Coffee-Shop/Manajemen_Karyawan/index.html" class="top-navbar-mobile-nav-item">
-          <i class="fas fa-users"></i>
-          <span>Manajemen Karyawan</span>
-        </a>
-        ` : ''}
-        <a href="/webtest/PointOfSale-Coffee-Shop/Manajemen_Pelanggan/index.html" class="top-navbar-mobile-nav-item">
-          <i class="fas fa-user-friends"></i>
-          <span>Manajemen Pelanggan</span>
-        </a>
-        <a href="/webtest/PointOfSale-Coffee-Shop/Laporan POS/coffee-pos.html" class="top-navbar-mobile-nav-item">
-          <i class="fas fa-chart-line"></i>
-          <span>Laporan</span>
-        </a>
-      </div>
     `;
 
     document.body.insertAdjacentHTML('afterbegin', navbarHTML);
@@ -193,10 +192,16 @@
     }
     
     // Mark all read button
-    const markAllReadBtn = document.getElementById('markAllRead');
+    const markAllReadBtn = document.getElementById('markAllReadBtn');
     if (markAllReadBtn) {
       markAllReadBtn.addEventListener('click', handleMarkAllRead);
     }
+
+    // Initialize search
+    initializeSearch();
+
+    // Initialize notifications
+    initializeNotifications();
   }
 
   /**
@@ -492,88 +497,63 @@
       
       // Close notification dropdown if open
       const notificationDropdown = document.getElementById('notificationDropdown');
+      const notificationBtn = document.getElementById('notificationBtn');
       if (notificationDropdown) {
         notificationDropdown.classList.remove('active');
       }
+      if (notificationBtn) {
+        notificationBtn.classList.remove('active');
+      }
+
+      // Close search results if open
+      const searchResults = document.getElementById('searchResults');
+      if (searchResults) {
+        searchResults.classList.remove('active');
+      }
     });
   }
 
   /**
-   * Initialize mobile menu
+   * Initialize notifications
    */
-  function initializeMobileMenu() {
-    const menuToggle = document.getElementById('mobileMenuToggle');
-    const mobileMenu = document.getElementById('mobileMenu');
-    const mobileOverlay = document.getElementById('mobileOverlay');
+  function initializeNotifications() {
+    const notificationBtn = document.getElementById('notificationBtn');
+    const notificationDropdown = document.getElementById('notificationDropdown');
     
-    if (!menuToggle || !mobileMenu || !mobileOverlay) return;
+    if (!notificationBtn || !notificationDropdown) return;
 
-    menuToggle.addEventListener('click', (e) => {
+    notificationBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      toggleMobileMenu();
-    });
-
-    mobileOverlay.addEventListener('click', () => {
-      closeMobileMenu();
-    });
-
-    // Set active menu item based on current page
-    setActiveMobileMenuItem();
-  }
-
-  /**
-   * Toggle mobile menu
-   */
-  function toggleMobileMenu() {
-    const mobileMenu = document.getElementById('mobileMenu');
-    const mobileOverlay = document.getElementById('mobileOverlay');
-    
-    if (mobileMenu && mobileOverlay) {
-      const isActive = mobileMenu.classList.contains('active');
+      notificationDropdown.classList.toggle('active');
+      notificationBtn.classList.toggle('active');
       
-      if (isActive) {
-        closeMobileMenu();
-      } else {
-        mobileMenu.classList.add('active');
-        mobileOverlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
+      // Close user dropdown if open
+      const userDropdown = document.getElementById('userDropdown');
+      const userMenuBtn = document.getElementById('userMenuBtn');
+      if (userDropdown) {
+        userDropdown.classList.remove('active');
       }
-    }
-  }
+      if (userMenuBtn) {
+        userMenuBtn.classList.remove('active');
+      }
 
-  /**
-   * Close mobile menu
-   */
-  function closeMobileMenu() {
-    const mobileMenu = document.getElementById('mobileMenu');
-    const mobileOverlay = document.getElementById('mobileOverlay');
-    
-    if (mobileMenu) mobileMenu.classList.remove('active');
-    if (mobileOverlay) mobileOverlay.classList.remove('active');
-    document.body.style.overflow = '';
-  }
+      // Close search results if open
+      const searchResults = document.getElementById('searchResults');
+      if (searchResults) {
+        searchResults.classList.remove('active');
+      }
 
-  /**
-   * Set active mobile menu item
-   */
-  function setActiveMobileMenuItem() {
-    const currentPath = window.location.pathname;
-    const menuItems = document.querySelectorAll('.top-navbar-mobile-nav-item');
-    
-    menuItems.forEach(item => {
-      const itemPath = new URL(item.href).pathname;
-      if (currentPath.includes(itemPath)) {
-        item.classList.add('active');
+      // Load notifications when opened
+      if (notificationDropdown.classList.contains('active')) {
+        loadNotifications();
       }
     });
-  }
 
-  /**
-   * Initialize breadcrumbs
-   */
-  function initializeBreadcrumbs() {
-    // Breadcrumbs will be set dynamically by each page
-    // This is a placeholder for future implementation
+    // Load initial notifications
+    loadNotifications();
+
+    // Set interval to check for new notifications
+    setInterval(loadNotifications, CONFIG.notificationCheckInterval);
   }
 
   /**
@@ -637,6 +617,7 @@
     const searchResults = document.getElementById('searchResults');
     const searchInput = document.getElementById('topNavbarSearch');
     const notificationDropdown = document.getElementById('notificationDropdown');
+    const notificationBtn = document.getElementById('notificationBtn');
     const userDropdown = document.getElementById('userDropdown');
     const userMenuBtn = document.getElementById('userMenuBtn');
 
@@ -646,17 +627,15 @@
     }
 
     // Close notification dropdown
-    if (notificationDropdown && !notificationDropdown.contains(e.target)) {
-      const notificationBtn = document.getElementById('notificationBtn');
-      if (!notificationBtn?.contains(e.target)) {
-        notificationDropdown.classList.remove('active');
-      }
+    if (notificationDropdown && !notificationDropdown.contains(e.target) && !notificationBtn?.contains(e.target)) {
+      notificationDropdown.classList.remove('active');
+      if (notificationBtn) notificationBtn.classList.remove('active');
     }
 
     // Close user dropdown
     if (userDropdown && !userDropdown.contains(e.target) && !userMenuBtn?.contains(e.target)) {
       userDropdown.classList.remove('active');
-      userMenuBtn?.classList.remove('active');
+      if (userMenuBtn) userMenuBtn.classList.remove('active');
     }
   }
 

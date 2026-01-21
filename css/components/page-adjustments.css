@@ -135,25 +135,27 @@ body.sidebar-visible.sidebar-collapsed .pos-wrapper {
 }
 
 /* Ensure all text in header sections is white */
-.stock-header *,
-.employee-header *,
-.customer-header *,
-.report-header * {
+/* EXCEPT buttons which have their own styling */
+.stock-header *:not(button):not(button *),
+.employee-header *:not(button):not(button *),
+.customer-header *:not(button):not(button *),
+.report-header *:not(button):not(button *) {
   color: var(--color-white) !important;
 }
 
 /* Exception for buttons - they should have their own colors */
-.stock-header-actions button,
-.employee-header-actions button,
-.customer-header-actions button,
-.report-header-actions button {
+/* Exclude .btn-export to allow white background with coffee text */
+.stock-header-actions button:not(.btn-export),
+.employee-header-actions button:not(.btn-export),
+.customer-header-actions button:not(.btn-export),
+.report-header-actions button:not(.btn-export) {
   color: var(--color-primary) !important;
 }
 
-.stock-header-actions button:hover,
-.employee-header-actions button:hover,
-.customer-header-actions button:hover,
-.report-header-actions button:hover {
+.stock-header-actions button:not(.btn-export):hover,
+.employee-header-actions button:not(.btn-export):hover,
+.customer-header-actions button:not(.btn-export):hover,
+.report-header-actions button:not(.btn-export):hover {
   color: var(--color-primary) !important;
 }
 
@@ -194,32 +196,36 @@ body.sidebar-visible.sidebar-collapsed .pos-wrapper {
   box-shadow: var(--shadow-md);
 }
 
-/* Export buttons */
+/* Export buttons - Solid white with coffee brown text for better readability */
 .btn-export,
 .btn-export-group button {
-  background: rgba(255, 255, 255, 0.2);
-  color: var(--color-white);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: var(--color-white) !important;
+  color: var(--color-primary) !important;
+  border: 1px solid rgba(255, 255, 255, 0.9);
   padding: var(--spacing-3) var(--spacing-4);
   border-radius: var(--radius-md);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
   transition: all var(--transition-base);
   display: inline-flex;
   align-items: center;
   gap: var(--spacing-2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .btn-export:hover,
 .btn-export-group button:hover {
-  background: rgba(255, 255, 255, 0.3);
-  border-color: rgba(255, 255, 255, 0.5);
+  background: var(--color-gray-50) !important;
+  color: var(--color-primary) !important;
+  border-color: var(--color-white);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* Export button icons should be white */
+/* Export button icons should match text color (coffee brown) */
 .btn-export i,
 .btn-export-group button i {
-  color: var(--color-white) !important;
+  color: var(--color-primary) !important;
 }
 
 /* PDF/Excel/CSV specific buttons with white background */
