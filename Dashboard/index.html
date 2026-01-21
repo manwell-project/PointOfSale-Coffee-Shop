@@ -462,10 +462,26 @@
         }
     </script>
     
+    <!-- Performance Optimizations -->
+    <script src="../js/performance.js" defer></script>
+    <script src="../js/performance-utilities.js" defer></script>
+    <script src="../js/cache.js" defer></script>
+    
     <!-- Responsive Utilities -->
-    <script src="../js/responsive-utilities.js"></script>
+    <script src="../js/responsive-utilities.js" defer></script>
     
     <!-- Sidebar Navigation -->
-    <script src="../js/components/sidebar-nav.js"></script>
+    <script src="../js/components/sidebar-nav.js" defer></script>
+    
+    <!-- Register Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('✅ SW registered:', reg))
+                    .catch(err => console.log('❌ SW registration failed:', err));
+            });
+        }
+    </script>
 </body>
 </html>
