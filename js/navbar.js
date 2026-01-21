@@ -3,7 +3,7 @@
   // Inject minimal styles for the bottom navigation if not already present
   if (!document.getElementById('navbar-styles')) {
     const css = `
-      .bottom-nav{position:fixed !important;bottom:0 !important;left:50% !important;transform:translateX(-50%) !important;width:100% !important;max-width:var(--app-max-width,980px) !important;background:rgba(255,255,255,0.96) !important;backdrop-filter:saturate(140%) blur(8px) !important;border-top:1px solid rgba(0,0,0,0.08) !important;display:flex !important;padding:8px 0 !important;box-shadow:0 -2px 10px rgba(0,0,0,0.08) !important;z-index:2147483647 !important;pointer-events:auto !important}
+      .bottom-nav{position:fixed !important;bottom:0 !important;left:0 !important;width:100% !important;background:rgba(255,255,255,0.96) !important;backdrop-filter:saturate(140%) blur(8px) !important;border-top:1px solid rgba(0,0,0,0.08) !important;display:flex !important;padding:8px 0 !important;box-shadow:0 -2px 10px rgba(0,0,0,0.08) !important;z-index:999 !important;pointer-events:auto !important;transition:left 0.3s ease, width 0.3s ease !important;}
       @media (min-width: 1025px) {
         .bottom-nav { display: none !important; }
       }
@@ -35,10 +35,10 @@
   const mapping = {
     dashboard: 'Dashboard/index.html',
     pos: 'Transaksi/index.html',
-    stock: 'Manejemen_stok/index.html',
+    stock: 'Manajemen_Stok/index.html',
     employee: 'Manajemen_Karyawan/index.html',
     customers: 'Manajemen_Pelanggan/index.html',
-    reports: 'Laporan POS/coffee-pos.html'
+    reports: 'Manajemen_Laporan/coffee-pos.html'
   };
 
   function getNavItems() {
@@ -120,14 +120,22 @@
   }
 
   // Set active based on current location
-  const currPath = location.pathname.replace(/\\/g, '/');
+  const currPath = location.pathname.replace(/\\/g, '/').toLowerCase();
   items.forEach(({ key: page }) => {
-    const targetUrl = resolveUrl(mapping[page]);
-    const targetPath = targetUrl ? targetUrl.pathname : mapping[page];
+    const targetPath = mapping[page];
     const item = nav.querySelector(`[data-page="${page}"]`);
     if (!item) return;
-    // If the resolved target path appears at end of current pathname, mark active
-    if (currPath.endsWith(targetPath) || currPath.indexOf(targetPath) !== -1) {
+    
+    // Check if current path contains the target path
+    // More robust matching for renamed folders
+    if (currPath.includes(targetPath.toLowerCase()) || 
+        currPath.includes(page.toLowerCase()) ||
+        (page === 'dashboard' && currPath.includes('/dashboard/')) ||
+        (page === 'pos' && currPath.includes('/transaksi/')) ||
+        (page === 'stock' && currPath.includes('/manajemen_stok/')) ||
+        (page === 'employee' && currPath.includes('/manajemen_karyawan/')) ||
+        (page === 'customers' && currPath.includes('/manajemen_pelanggan/')) ||
+        (page === 'reports' && currPath.includes('/manajemen_laporan/'))) {
       item.classList.add('active');
     }
   });
@@ -135,9 +143,21 @@
   // Click handlers
   nav.querySelectorAll('.nav-item').forEach(it => {
     it.addEventListener('click', function(e){
+      e.preventDefault(); // Prevent default to handle navigation properly
       const page = it.getAttribute('data-page');
-      const targetUrl = resolveUrl(mapping[page] || 'index.html');
-      window.location.href = (targetUrl ? targetUrl.href : (mapping[page] || 'index.html'));
+      const relPath = mapping[page];
+      
+      if (!relPath) {
+        console.error(`No mapping found for page: ${page}`);
+        return;
+      }
+      
+      // Try to resolve URL, fallback to relative path
+      const targetUrl = resolveUrl(relPath);
+      const finalUrl = targetUrl ? targetUrl.href : relPath;
+      
+      console.log(`Navigating to ${page}: ${finalUrl}`);
+      window.location.href = finalUrl;
     });
   });
 

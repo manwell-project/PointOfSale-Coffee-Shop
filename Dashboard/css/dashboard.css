@@ -12,10 +12,12 @@
    ============================================ */
 
 .dashboard-container {
-  max-width: 1400px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
   padding: var(--spacing-4);
-  padding-top: calc(var(--spacing-2xl) + var(--spacing-lg));
+  padding-top: calc(var(--top-nav-height, 64px) + var(--spacing-4));
+  padding-bottom: calc(var(--bottom-nav-height, 64px) + var(--spacing-4));
 }
 
 /* Header Section dengan Greeting & Date */

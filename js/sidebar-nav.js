@@ -217,7 +217,7 @@
           {
             icon: 'fas fa-box',
             text: 'Stok Produk',
-            url: '../Manejemen_stok/index.html',
+            url: '../Manajemen_Stok/index.html',
             key: 'stock'
           },
           {
@@ -240,7 +240,7 @@
           {
             icon: 'fas fa-chart-line',
             text: 'Laporan Penjualan',
-            url: '../Laporan POS/coffee-pos.html',
+            url: '../Manajemen_Laporan/coffee-pos.html',
             key: 'reports'
           }
         ]

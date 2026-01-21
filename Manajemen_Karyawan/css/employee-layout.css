@@ -38,7 +38,6 @@ body {
   padding: var(--spacing-xl) var(--spacing-lg);
   padding-top: calc(var(--spacing-2xl) + var(--spacing-xl));
   min-height: calc(100vh - var(--top-nav-height, 64px) - var(--bottom-nav-height, 64px));
-  overflow-y: auto;
 }
 
 /* Employee Header */

@@ -23,16 +23,40 @@ body {
   min-height: 100vh;
 }
 
-/* Ensure proper spacing when sidebar is visible */
+/* Adjust top navbar when sidebar is visible - navbar shifts right */
+body.sidebar-visible .top-navbar {
+  left: var(--sidebar-width, 260px);
+  width: calc(100% - var(--sidebar-width, 260px));
+  transition: left 0.3s ease, width 0.3s ease;
+}
+
+/* Adjust bottom navbar when sidebar is visible */
+body.sidebar-visible .bottom-nav {
+  left: var(--sidebar-width, 260px);
+  width: calc(100% - var(--sidebar-width, 260px));
+  transition: left 0.3s ease, width 0.3s ease;
+}
+
+/* Adjust navbars for collapsed sidebar */
+body.sidebar-visible.sidebar-collapsed .top-navbar {
+  left: var(--sidebar-width-collapsed, 64px);
+  width: calc(100% - var(--sidebar-width-collapsed, 64px));
+}
+
+body.sidebar-visible.sidebar-collapsed .bottom-nav {
+  left: var(--sidebar-width-collapsed, 64px);
+  width: calc(100% - var(--sidebar-width-collapsed, 64px));
+}
+
+/* Push content wrappers to make space for sidebar */
 body.sidebar-visible .dashboard-container,
 body.sidebar-visible .stock-wrapper,
 body.sidebar-visible .employee-wrapper,
 body.sidebar-visible .customer-wrapper,
 body.sidebar-visible .report-wrapper,
 body.sidebar-visible .pos-wrapper {
-  margin-left: 0;
-  padding-left: var(--spacing-5);
-  padding-right: var(--spacing-5);
+  margin-left: var(--sidebar-width, 260px);
+  transition: margin-left 0.3s ease;
 }
 
 /* Adjust for collapsed sidebar */
@@ -42,19 +66,25 @@ body.sidebar-visible.sidebar-collapsed .employee-wrapper,
 body.sidebar-visible.sidebar-collapsed .customer-wrapper,
 body.sidebar-visible.sidebar-collapsed .report-wrapper,
 body.sidebar-visible.sidebar-collapsed .pos-wrapper {
-  padding-left: var(--spacing-5);
+  margin-left: var(--sidebar-width-collapsed, 64px);
 }
 
-/* Remove extra padding on mobile */
-@media (max-width: 768px) {
+/* Reset margins and navbar positions on mobile (sidebar hidden) */
+@media (max-width: 1024px) {
   body.sidebar-visible .dashboard-container,
   body.sidebar-visible .stock-wrapper,
   body.sidebar-visible .employee-wrapper,
   body.sidebar-visible .customer-wrapper,
   body.sidebar-visible .report-wrapper,
   body.sidebar-visible .pos-wrapper {
-    padding-left: var(--spacing-4);
-    padding-right: var(--spacing-4);
+    margin-left: 0;
+  }
+  
+  /* Reset navbar positions on mobile */
+  body.sidebar-visible .top-navbar,
+  body.sidebar-visible .bottom-nav {
+    left: 0;
+    width: 100%;
   }
 }
 
@@ -322,14 +352,6 @@ a:hover {
   transition-property: background-color, border-color, color, fill, stroke;
   transition-duration: 0.15s;
   transition-timing-function: ease-in-out;
-}
-
-/* Preserve specific transitions */
-.sidebar-nav,
-.top-navbar,
-.bottom-nav,
-body.sidebar-visible {
-  /* Keep their own transition properties */
 }
 
 /* ============================================
