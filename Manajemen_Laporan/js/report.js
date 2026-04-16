@@ -1,6 +1,6 @@
 /**
  * Report Management JavaScript
- * Handles report page initialization and basic interactions
+ * Handles report page initialization and report core features
  */
 
 // ============================================
@@ -14,10 +14,66 @@ const reportPeriodEl = document.getElementById('reportPeriod');
 const reportTable = document.getElementById('reportTable');
 const reportTableBody = document.getElementById('reportTableBody');
 const tableTotalEl = document.getElementById('tableTotal');
+const tableTitleEl = document.querySelector('.table-title');
+const tableLoadingEl = document.getElementById('tableLoading');
+const tableEmptyEl = document.getElementById('tableEmpty');
+const tablePaginationEl = document.getElementById('tablePagination');
+const paginationInfoEl = document.getElementById('paginationInfo');
+const paginationButtonsEl = document.getElementById('paginationButtons');
+const btnPrevPage = document.getElementById('btnPrevPage');
+const btnNextPage = document.getElementById('btnNextPage');
+const tableSearchInput = document.getElementById('tableSearch');
+const categoryFilterGroup = document.getElementById('categoryFilterGroup');
+const filterCategory = document.getElementById('filterCategory');
+const filterStatus = document.getElementById('filterStatus');
+const filterPayment = document.getElementById('filterPayment');
+const resetFilterBtn = document.getElementById('resetFilterBtn');
+const cancelFilterBtn = document.getElementById('cancelFilterBtn');
+const applyFilterBtn = document.getElementById('applyFilterBtn');
+const presetButtons = document.querySelectorAll('.preset-btn');
+const reportTabs = document.querySelectorAll('.report-tab');
+const tableHeaderCells = document.querySelectorAll('#reportTable thead th');
+const sortableHeaderCells = document.querySelectorAll('#reportTable thead th.sortable');
+const viewToggleButtons = document.querySelectorAll('.view-toggle-btn');
+
+const badgeSalesEl = document.getElementById('badgeSales');
+const badgeProductsEl = document.getElementById('badgeProducts');
+const badgeEmployeesEl = document.getElementById('badgeEmployees');
+
+const totalRevenueEl = document.getElementById('totalRevenue');
+const totalTransactionsEl = document.getElementById('totalTransactions');
+const totalProductsSoldEl = document.getElementById('totalProductsSold');
+const avgTransactionEl = document.getElementById('avgTransaction');
+const summaryLabels = document.querySelectorAll('.summary-card .summary-label');
+
 const exportPdfBtn = document.getElementById('exportPdfBtn');
 const exportExcelBtn = document.getElementById('exportExcelBtn');
 const exportCsvBtn = document.getElementById('exportCsvBtn');
 const printReportBtn = document.getElementById('printReportBtn');
+
+// ============================================
+// STATE MANAGEMENT
+// ============================================
+
+let transactions = [];
+let filteredTransactions = [];
+let currentRows = [];
+let currentReport = 'sales';
+let currentPage = 1;
+const pageSize = 10;
+let sortColumn = 'date';
+let sortDirection = 'desc';
+
+let appliedFilters = {
+    dateFrom: '',
+    dateTo: '',
+    category: 'all',
+    status: 'all',
+    payment: 'all',
+    search: ''
+};
+
+let draftFilters = { ...appliedFilters };
 
 // ============================================
 // INITIALIZATION
@@ -32,10 +88,89 @@ if (document.readyState === 'loading') {
 function initializeReportPage() {
     setDefaultDateRange();
     initializeEventListeners();
+    syncDraftFiltersFromControls();
+    applyFiltersFromDraft(true);
+    updateFilterVisibility();
+    configureTableHeaders();
+    loadReportData();
     console.log('Report Page Loaded');
 }
 
 function initializeEventListeners() {
+    if (applyFilterBtn) {
+        applyFilterBtn.addEventListener('click', () => {
+            syncDraftFiltersFromControls();
+            applyFiltersFromDraft();
+        });
+    }
+
+    if (cancelFilterBtn) {
+        cancelFilterBtn.addEventListener('click', handleCancelFilter);
+    }
+
+    if (resetFilterBtn) {
+        resetFilterBtn.addEventListener('click', handleResetFilter);
+    }
+
+    presetButtons.forEach((button) => {
+        button.addEventListener('click', () => handleDatePreset(button));
+    });
+
+    reportTabs.forEach((tab) => {
+        tab.addEventListener('click', () => handleReportTabChange(tab));
+    });
+
+    sortableHeaderCells.forEach((header) => {
+        header.addEventListener('click', () => handleSort(header));
+    });
+
+    if (tableSearchInput) {
+        tableSearchInput.addEventListener('input', handleSearchInput);
+    }
+
+    if (btnPrevPage) {
+        btnPrevPage.addEventListener('click', () => changePage(currentPage - 1));
+    }
+
+    if (btnNextPage) {
+        btnNextPage.addEventListener('click', () => changePage(currentPage + 1));
+    }
+
+    if (paginationButtonsEl) {
+        paginationButtonsEl.addEventListener('click', (event) => {
+            const target = event.target.closest('.pagination-btn[data-page]');
+            if (!target) return;
+
+            const page = Number(target.getAttribute('data-page'));
+            if (Number.isFinite(page)) {
+                changePage(page);
+            }
+        });
+    }
+
+    if (reportTableBody) {
+        reportTableBody.addEventListener('click', (event) => {
+            const actionButton = event.target.closest('.table-action-btn');
+            if (!actionButton) return;
+
+            const rowId = actionButton.getAttribute('data-id') || '-';
+            const rowLabel = actionButton.getAttribute('data-label') || 'Data';
+            showReportMessage(`${rowLabel} #${rowId}`, 'info');
+        });
+    }
+
+    viewToggleButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+            viewToggleButtons.forEach((btn) => btn.classList.remove('active'));
+            button.classList.add('active');
+
+            const viewMode = button.getAttribute('data-view');
+            if (viewMode === 'grid') {
+                showReportMessage('Mode grid akan menyusul. Saat ini data tetap tampil dalam tabel.', 'info');
+            }
+        });
+    });
+
     if (exportPdfBtn) {
         exportPdfBtn.addEventListener('click', handleExportPdf);
     }
@@ -54,7 +189,57 @@ function initializeEventListeners() {
 }
 
 // ============================================
-// PAGE HELPERS
+// DATA LOADING
+// ============================================
+
+async function loadReportData() {
+    showLoading(true);
+
+    try {
+        const rawTransactions = await window.API.Transactions.getAll();
+        transactions = await enrichTransactionsWithItems(rawTransactions || []);
+        renderReport();
+    } catch (error) {
+        console.error('Error loading report data:', error);
+        transactions = [];
+        filteredTransactions = [];
+        currentRows = [];
+        renderReport();
+        showReportMessage('Gagal memuat data laporan dari server.', 'error');
+    } finally {
+        showLoading(false);
+    }
+}
+
+async function enrichTransactionsWithItems(rawTransactions) {
+    const detailPromises = rawTransactions.map((transaction) =>
+        window.API.Transactions.getById(transaction.id)
+            .then((detail) => mergeTransactionDetail(transaction, detail))
+            .catch(() => mergeTransactionDetail(transaction, null))
+    );
+
+    return Promise.all(detailPromises);
+}
+
+function mergeTransactionDetail(transaction, detail) {
+    const txItems = Array.isArray(detail?.items) ? detail.items : [];
+    const itemCount = txItems.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
+
+    return {
+        id: Number(transaction.id),
+        createdAt: parseDateSafe(transaction.created_at),
+        customerName: transaction.customer_name || 'Walk-in',
+        employeeName: transaction.employee_name || 'Tanpa Karyawan',
+        totalAmount: Number(transaction.total_amount) || 0,
+        paymentMethod: normalizePayment(transaction.payment_method),
+        status: normalizeStatus(transaction.status),
+        items: txItems,
+        itemCount
+    };
+}
+
+// ============================================
+// FILTERS, TABS, SORTING
 // ============================================
 
 function setDefaultDateRange() {
@@ -67,6 +252,630 @@ function setDefaultDateRange() {
     dateFromInput.valueAsDate = lastMonth;
     dateToInput.valueAsDate = today;
 }
+
+function handleDatePreset(button) {
+    const preset = button.getAttribute('data-preset');
+    const now = new Date();
+    const start = new Date(now);
+    const end = new Date(now);
+
+    switch (preset) {
+        case 'today':
+            break;
+        case 'yesterday':
+            start.setDate(start.getDate() - 1);
+            end.setDate(end.getDate() - 1);
+            break;
+        case 'week': {
+            const day = now.getDay();
+            const diff = day === 0 ? 6 : day - 1;
+            start.setDate(now.getDate() - diff);
+            break;
+        }
+        case 'month':
+            start.setDate(1);
+            break;
+        case 'year':
+            start.setMonth(0, 1);
+            break;
+        default:
+            return;
+    }
+
+    if (dateFromInput) dateFromInput.valueAsDate = start;
+    if (dateToInput) dateToInput.valueAsDate = end;
+
+    setActivePresetButton(button);
+    syncDraftFiltersFromControls();
+    applyFiltersFromDraft();
+}
+
+function setActivePresetButton(activeButton) {
+    presetButtons.forEach((button) => {
+        button.classList.toggle('active', button === activeButton);
+    });
+}
+
+function handleReportTabChange(tab) {
+    reportTabs.forEach((item) => item.classList.remove('active'));
+    tab.classList.add('active');
+
+    currentReport = tab.getAttribute('data-report') || 'sales';
+    currentPage = 1;
+
+    configureTableHeaders();
+    updateFilterVisibility();
+    renderReport();
+}
+
+function handleSort(header) {
+    const column = header.getAttribute('data-sort');
+    if (!column) return;
+
+    if (sortColumn === column) {
+        sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+        sortColumn = column;
+        sortDirection = 'asc';
+    }
+
+    currentPage = 1;
+    renderReport();
+}
+
+function handleSearchInput(event) {
+    appliedFilters.search = (event.target.value || '').trim().toLowerCase();
+    draftFilters.search = appliedFilters.search;
+    currentPage = 1;
+    renderReport();
+}
+
+function handleCancelFilter() {
+    draftFilters = { ...appliedFilters };
+    setControlsFromFilters(draftFilters);
+    showReportMessage('Filter dikembalikan ke kondisi terakhir diterapkan.', 'info');
+}
+
+function handleResetFilter() {
+    setDefaultDateRange();
+
+    if (filterCategory) filterCategory.value = 'all';
+    if (filterStatus) filterStatus.value = 'all';
+    if (filterPayment) filterPayment.value = 'all';
+    if (tableSearchInput) tableSearchInput.value = '';
+
+    presetButtons.forEach((button) => button.classList.remove('active'));
+
+    syncDraftFiltersFromControls();
+    applyFiltersFromDraft();
+}
+
+function syncDraftFiltersFromControls() {
+    draftFilters = {
+        dateFrom: dateFromInput?.value || '',
+        dateTo: dateToInput?.value || '',
+        category: filterCategory?.value || 'all',
+        status: filterStatus?.value || 'all',
+        payment: filterPayment?.value || 'all',
+        search: (tableSearchInput?.value || '').trim().toLowerCase()
+    };
+}
+
+function setControlsFromFilters(filters) {
+    if (dateFromInput) dateFromInput.value = filters.dateFrom || '';
+    if (dateToInput) dateToInput.value = filters.dateTo || '';
+    if (filterCategory) filterCategory.value = filters.category || 'all';
+    if (filterStatus) filterStatus.value = filters.status || 'all';
+    if (filterPayment) filterPayment.value = filters.payment || 'all';
+    if (tableSearchInput) tableSearchInput.value = filters.search || '';
+}
+
+function applyFiltersFromDraft(skipMessage = false) {
+    appliedFilters = { ...draftFilters };
+    currentPage = 1;
+    renderReport();
+
+    if (!skipMessage) {
+        showReportMessage('Filter laporan diterapkan.', 'success');
+    }
+}
+
+function updateFilterVisibility() {
+    if (!categoryFilterGroup) return;
+    categoryFilterGroup.style.display = currentReport === 'products' ? '' : 'none';
+}
+
+function configureTableHeaders() {
+    if (tableHeaderCells.length !== 8) return;
+
+    const headerConfigByReport = {
+        sales: [
+            { label: 'ID', sort: 'id', sortable: true, number: false },
+            { label: 'Tanggal', sort: 'date', sortable: true, number: false },
+            { label: 'Pelanggan', sort: 'customer', sortable: true, number: false },
+            { label: 'Item', sort: 'items', sortable: true, number: false },
+            { label: 'Total', sort: 'amount', sortable: true, number: true },
+            { label: 'Pembayaran', sort: 'payment', sortable: true, number: false },
+            { label: 'Status', sort: '', sortable: false, number: false },
+            { label: 'Aksi', sort: '', sortable: false, number: false }
+        ],
+        products: [
+            { label: 'ID', sort: 'id', sortable: true, number: false },
+            { label: 'Produk', sort: 'name', sortable: true, number: false },
+            { label: 'Kategori', sort: 'category', sortable: true, number: false },
+            { label: 'Terjual', sort: 'quantity', sortable: true, number: true },
+            { label: 'Pendapatan', sort: 'amount', sortable: true, number: true },
+            { label: 'Kontribusi', sort: 'share', sortable: true, number: false },
+            { label: 'Status', sort: '', sortable: false, number: false },
+            { label: 'Aksi', sort: '', sortable: false, number: false }
+        ],
+        employees: [
+            { label: 'ID', sort: 'id', sortable: true, number: false },
+            { label: 'Karyawan', sort: 'name', sortable: true, number: false },
+            { label: 'Shift', sort: 'shift', sortable: true, number: false },
+            { label: 'Transaksi', sort: 'transactions', sortable: true, number: true },
+            { label: 'Total', sort: 'amount', sortable: true, number: true },
+            { label: 'Rata-rata', sort: 'average', sortable: true, number: false },
+            { label: 'Status', sort: '', sortable: false, number: false },
+            { label: 'Aksi', sort: '', sortable: false, number: false }
+        ]
+    };
+
+    const headerConfig = headerConfigByReport[currentReport] || headerConfigByReport.sales;
+
+    tableHeaderCells.forEach((cell, index) => {
+        const config = headerConfig[index];
+        if (!config) return;
+
+        cell.textContent = config.label;
+        cell.setAttribute('data-sort', config.sort);
+
+        if (config.sortable) {
+            cell.classList.add('sortable');
+        } else {
+            cell.classList.remove('sortable', 'sorted-asc', 'sorted-desc');
+        }
+
+        if (config.number) {
+            cell.classList.add('number');
+        } else {
+            cell.classList.remove('number');
+        }
+    });
+}
+
+// ============================================
+// REPORT RENDERING
+// ============================================
+
+function renderReport() {
+    configureTableHeaders();
+    updateFilterVisibility();
+
+    filteredTransactions = getFilteredTransactions();
+
+    const salesRows = buildSalesRows(filteredTransactions);
+    const productRows = buildProductRows(filteredTransactions);
+    const employeeRows = buildEmployeeRows(filteredTransactions);
+
+    updateTabBadges(salesRows.length, productRows.length, employeeRows.length);
+
+    if (currentReport === 'products') {
+        currentRows = productRows;
+    } else if (currentReport === 'employees') {
+        currentRows = employeeRows;
+    } else {
+        currentRows = salesRows;
+    }
+
+    currentRows = sortRows(currentRows);
+    updateSummaryCards(filteredTransactions, productRows, employeeRows);
+    updateReportMeta();
+    renderTable();
+}
+
+function getFilteredTransactions() {
+    const dateFrom = appliedFilters.dateFrom ? new Date(`${appliedFilters.dateFrom}T00:00:00`) : null;
+    const dateTo = appliedFilters.dateTo ? new Date(`${appliedFilters.dateTo}T23:59:59`) : null;
+    const searchKeyword = (appliedFilters.search || '').toLowerCase();
+
+    return transactions.filter((transaction) => {
+        if (dateFrom && transaction.createdAt < dateFrom) return false;
+        if (dateTo && transaction.createdAt > dateTo) return false;
+
+        if (appliedFilters.status !== 'all' && transaction.status !== appliedFilters.status) {
+            return false;
+        }
+
+        if (appliedFilters.payment !== 'all' && transaction.paymentMethod !== appliedFilters.payment) {
+            return false;
+        }
+
+        if (appliedFilters.category !== 'all') {
+            const hasCategory = transaction.items.some((item) => normalizeCategory(item.category) === appliedFilters.category);
+            if (!hasCategory) return false;
+        }
+
+        if (searchKeyword) {
+            const itemNames = transaction.items.map((item) => item.product_name || '').join(' ').toLowerCase();
+            const searchBlob = [
+                transaction.id,
+                transaction.customerName,
+                transaction.employeeName,
+                transaction.paymentMethod,
+                transaction.status,
+                itemNames
+            ].join(' ').toLowerCase();
+
+            if (!searchBlob.includes(searchKeyword)) {
+                return false;
+            }
+        }
+
+        return true;
+    });
+}
+
+function buildSalesRows(data) {
+    return data.map((transaction) => {
+        const itemLabel = transaction.itemCount > 0 ? `${transaction.itemCount} item` : '0 item';
+
+        return {
+            id: transaction.id,
+            sortValues: {
+                id: transaction.id,
+                date: transaction.createdAt.getTime(),
+                customer: transaction.customerName,
+                items: transaction.itemCount,
+                amount: transaction.totalAmount,
+                payment: transaction.paymentMethod
+            },
+            cells: [
+                `<strong>#${transaction.id}</strong>`,
+                `${formatDateTime(transaction.createdAt)}`,
+                `${escapeHtml(transaction.customerName)}`,
+                `${escapeHtml(itemLabel)}`,
+                `${formatCurrency(transaction.totalAmount)}`,
+                `${paymentLabel(transaction.paymentMethod)}`,
+                `<span class="table-badge ${statusBadgeClass(transaction.status)}">${statusLabel(transaction.status)}</span>`,
+                `<div class="table-actions"><button class="table-action-btn view" data-id="${transaction.id}" data-label="Transaksi" title="Lihat"><i class="fas fa-eye"></i></button></div>`
+            ]
+        };
+    });
+}
+
+function buildProductRows(data) {
+    const productMap = new Map();
+
+    data.forEach((transaction) => {
+        transaction.items.forEach((item) => {
+            const category = normalizeCategory(item.category);
+            if (appliedFilters.category !== 'all' && category !== appliedFilters.category) {
+                return;
+            }
+
+            const productId = Number(item.product_id) || 0;
+            const key = productId || `${item.product_name}-${category}`;
+
+            if (!productMap.has(key)) {
+                productMap.set(key, {
+                    id: productId || '-',
+                    name: item.product_name || 'Produk Tidak Dikenal',
+                    category,
+                    quantity: 0,
+                    amount: 0,
+                    transactions: new Set()
+                });
+            }
+
+            const bucket = productMap.get(key);
+            bucket.quantity += Number(item.quantity) || 0;
+            bucket.amount += Number(item.subtotal) || 0;
+            bucket.transactions.add(transaction.id);
+        });
+    });
+
+    const totalRevenue = Array.from(productMap.values()).reduce((sum, item) => sum + item.amount, 0);
+
+    return Array.from(productMap.values()).map((product) => {
+        const share = totalRevenue > 0 ? (product.amount / totalRevenue) * 100 : 0;
+        const statusText = product.quantity >= 20 ? 'Laris' : product.quantity >= 8 ? 'Normal' : 'Rendah';
+        const statusClass = product.quantity >= 20 ? 'success' : product.quantity >= 8 ? 'info' : 'warning';
+
+        return {
+            id: product.id,
+            sortValues: {
+                id: String(product.id),
+                name: product.name,
+                category: product.category,
+                quantity: product.quantity,
+                amount: product.amount,
+                share
+            },
+            cells: [
+                `<strong>${escapeHtml(String(product.id))}</strong>`,
+                `${escapeHtml(product.name)}`,
+                `${categoryLabel(product.category)}`,
+                `${product.quantity}`,
+                `${formatCurrency(product.amount)}`,
+                `${share.toFixed(1)}%`,
+                `<span class="table-badge ${statusClass}">${statusText}</span>`,
+                `<div class="table-actions"><button class="table-action-btn view" data-id="${escapeHtml(String(product.id))}" data-label="Produk" title="Lihat"><i class="fas fa-eye"></i></button></div>`
+            ]
+        };
+    });
+}
+
+function buildEmployeeRows(data) {
+    const employeeMap = new Map();
+
+    data.forEach((transaction) => {
+        const employeeKey = transaction.employeeName || 'Tanpa Karyawan';
+        if (!employeeMap.has(employeeKey)) {
+            employeeMap.set(employeeKey, {
+                id: '-',
+                name: employeeKey,
+                shift: 'N/A',
+                transactions: 0,
+                amount: 0
+            });
+        }
+
+        const bucket = employeeMap.get(employeeKey);
+        bucket.transactions += 1;
+        bucket.amount += transaction.totalAmount;
+    });
+
+    return Array.from(employeeMap.values()).map((employee) => {
+        const average = employee.transactions > 0 ? employee.amount / employee.transactions : 0;
+        const statusText = employee.transactions >= 10 ? 'Aktif' : employee.transactions >= 4 ? 'Normal' : 'Rendah';
+        const statusClass = employee.transactions >= 10 ? 'success' : employee.transactions >= 4 ? 'info' : 'warning';
+
+        return {
+            id: employee.id,
+            sortValues: {
+                id: String(employee.id),
+                name: employee.name,
+                shift: employee.shift,
+                transactions: employee.transactions,
+                amount: employee.amount,
+                average
+            },
+            cells: [
+                `<strong>${escapeHtml(String(employee.id))}</strong>`,
+                `${escapeHtml(employee.name)}`,
+                `${escapeHtml(employee.shift)}`,
+                `${employee.transactions}`,
+                `${formatCurrency(employee.amount)}`,
+                `${formatCurrency(average)}`,
+                `<span class="table-badge ${statusClass}">${statusText}</span>`,
+                `<div class="table-actions"><button class="table-action-btn view" data-id="${escapeHtml(String(employee.id))}" data-label="Karyawan" title="Lihat"><i class="fas fa-eye"></i></button></div>`
+            ]
+        };
+    });
+}
+
+function sortRows(rows) {
+    const sortedRows = [...rows];
+    const directionFactor = sortDirection === 'asc' ? 1 : -1;
+
+    sortedRows.sort((a, b) => {
+        const aVal = a.sortValues?.[sortColumn];
+        const bVal = b.sortValues?.[sortColumn];
+
+        if (aVal === undefined && bVal === undefined) return 0;
+        if (aVal === undefined) return 1;
+        if (bVal === undefined) return -1;
+
+        if (typeof aVal === 'number' && typeof bVal === 'number') {
+            return (aVal - bVal) * directionFactor;
+        }
+
+        return String(aVal).localeCompare(String(bVal), 'id', { sensitivity: 'base' }) * directionFactor;
+    });
+
+    return sortedRows;
+}
+
+function updateSummaryCards(salesData, productRows, employeeRows) {
+    const salesRevenue = salesData.reduce((sum, tx) => sum + tx.totalAmount, 0);
+    const salesCount = salesData.length;
+    const totalQty = salesData.reduce((sum, tx) => sum + tx.itemCount, 0);
+    const salesAvg = salesCount > 0 ? salesRevenue / salesCount : 0;
+
+    if (currentReport === 'products') {
+        const totalProductRevenue = productRows.reduce((sum, row) => sum + (Number(row.sortValues.amount) || 0), 0);
+        const totalProductQty = productRows.reduce((sum, row) => sum + (Number(row.sortValues.quantity) || 0), 0);
+        const productAvg = productRows.length > 0 ? totalProductRevenue / productRows.length : 0;
+
+        setSummaryLabel(0, 'Total Pendapatan Produk');
+        setSummaryLabel(1, 'Jumlah Produk');
+        setSummaryLabel(2, 'Qty Terjual');
+        setSummaryLabel(3, 'Rata-rata per Produk');
+
+        setElementText(totalRevenueEl, formatCurrency(totalProductRevenue));
+        setElementText(totalTransactionsEl, formatNumber(productRows.length));
+        setElementText(totalProductsSoldEl, formatNumber(totalProductQty));
+        setElementText(avgTransactionEl, formatCurrency(productAvg));
+        return;
+    }
+
+    if (currentReport === 'employees') {
+        const totalEmployeeRevenue = employeeRows.reduce((sum, row) => sum + (Number(row.sortValues.amount) || 0), 0);
+        const totalEmployeeTransactions = employeeRows.reduce((sum, row) => sum + (Number(row.sortValues.transactions) || 0), 0);
+        const employeeAvg = employeeRows.length > 0 ? totalEmployeeRevenue / employeeRows.length : 0;
+
+        setSummaryLabel(0, 'Total Penjualan Tim');
+        setSummaryLabel(1, 'Jumlah Karyawan');
+        setSummaryLabel(2, 'Total Transaksi');
+        setSummaryLabel(3, 'Rata-rata per Karyawan');
+
+        setElementText(totalRevenueEl, formatCurrency(totalEmployeeRevenue));
+        setElementText(totalTransactionsEl, formatNumber(employeeRows.length));
+        setElementText(totalProductsSoldEl, formatNumber(totalEmployeeTransactions));
+        setElementText(avgTransactionEl, formatCurrency(employeeAvg));
+        return;
+    }
+
+    setSummaryLabel(0, 'Total Pendapatan');
+    setSummaryLabel(1, 'Total Transaksi');
+    setSummaryLabel(2, 'Produk Terjual');
+    setSummaryLabel(3, 'Rata-rata Transaksi');
+
+    setElementText(totalRevenueEl, formatCurrency(salesRevenue));
+    setElementText(totalTransactionsEl, formatNumber(salesCount));
+    setElementText(totalProductsSoldEl, formatNumber(totalQty));
+    setElementText(avgTransactionEl, formatCurrency(salesAvg));
+}
+
+function updateReportMeta() {
+    const reportMeta = {
+        sales: {
+            title: '<i class="fas fa-chart-bar"></i> Laporan Penjualan',
+            table: '<i class="fas fa-table"></i> Detail Transaksi'
+        },
+        products: {
+            title: '<i class="fas fa-box"></i> Laporan Produk',
+            table: '<i class="fas fa-table"></i> Ringkasan Produk'
+        },
+        employees: {
+            title: '<i class="fas fa-user-tie"></i> Laporan Karyawan',
+            table: '<i class="fas fa-table"></i> Performa Karyawan'
+        }
+    };
+
+    const selected = reportMeta[currentReport] || reportMeta.sales;
+
+    if (reportTitleEl) {
+        reportTitleEl.innerHTML = selected.title;
+    }
+
+    if (tableTitleEl) {
+        tableTitleEl.innerHTML = selected.table;
+    }
+
+    if (reportPeriodEl) {
+        const fromLabel = appliedFilters.dateFrom ? formatDateOnly(appliedFilters.dateFrom) : '-';
+        const toLabel = appliedFilters.dateTo ? formatDateOnly(appliedFilters.dateTo) : '-';
+        reportPeriodEl.innerHTML = `<i class="fas fa-calendar"></i><span>${fromLabel} - ${toLabel}</span>`;
+    }
+}
+
+function updateTabBadges(salesCount, productCount, employeeCount) {
+    if (badgeSalesEl) badgeSalesEl.textContent = formatNumber(salesCount);
+    if (badgeProductsEl) badgeProductsEl.textContent = formatNumber(productCount);
+    if (badgeEmployeesEl) badgeEmployeesEl.textContent = formatNumber(employeeCount);
+}
+
+function renderTable() {
+    const totalRows = currentRows.length;
+    const totalPages = Math.max(1, Math.ceil(totalRows / pageSize));
+    if (currentPage > totalPages) currentPage = totalPages;
+
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const pageRows = currentRows.slice(startIndex, endIndex);
+
+    if (reportTableBody) {
+        reportTableBody.innerHTML = pageRows.map((row) => `
+            <tr>
+                <td>${row.cells[0]}</td>
+                <td>${row.cells[1]}</td>
+                <td>${row.cells[2]}</td>
+                <td>${row.cells[3]}</td>
+                <td class="currency">${row.cells[4]}</td>
+                <td>${row.cells[5]}</td>
+                <td class="status">${row.cells[6]}</td>
+                <td>${row.cells[7]}</td>
+            </tr>
+        `).join('');
+    }
+
+    const tableTotal = currentRows.reduce((sum, row) => sum + (Number(row.sortValues?.amount) || 0), 0);
+    if (tableTotalEl) {
+        tableTotalEl.textContent = formatCurrency(tableTotal);
+    }
+
+    if (tableEmptyEl) {
+        tableEmptyEl.style.display = totalRows === 0 ? 'flex' : 'none';
+    }
+
+    if (reportTable) {
+        reportTable.style.display = totalRows === 0 ? 'none' : 'table';
+    }
+
+    if (tablePaginationEl) {
+        tablePaginationEl.style.display = totalRows === 0 ? 'none' : 'flex';
+    }
+
+    updatePagination(totalRows, totalPages, startIndex, endIndex);
+    updateSortableHeaderState();
+}
+
+function updatePagination(totalRows, totalPages, startIndex, endIndex) {
+    if (paginationInfoEl) {
+        if (totalRows === 0) {
+            paginationInfoEl.textContent = 'Menampilkan 0 dari 0 data';
+        } else {
+            paginationInfoEl.textContent = `Menampilkan ${startIndex + 1}-${Math.min(endIndex, totalRows)} dari ${totalRows} data`;
+        }
+    }
+
+    if (btnPrevPage) {
+        btnPrevPage.disabled = currentPage <= 1;
+    }
+
+    if (btnNextPage) {
+        btnNextPage.disabled = currentPage >= totalPages || totalRows === 0;
+    }
+
+    if (!paginationButtonsEl) return;
+
+    if (totalRows === 0) {
+        paginationButtonsEl.innerHTML = '';
+        return;
+    }
+
+    const pageButtons = [];
+    for (let page = 1; page <= totalPages; page += 1) {
+        pageButtons.push(`<button class="pagination-btn ${page === currentPage ? 'active' : ''}" data-page="${page}">${page}</button>`);
+    }
+
+    paginationButtonsEl.innerHTML = pageButtons.join('');
+}
+
+function updateSortableHeaderState() {
+    tableHeaderCells.forEach((header) => {
+        header.classList.remove('sorted-asc', 'sorted-desc');
+
+        const column = header.getAttribute('data-sort');
+        if (!column || column !== sortColumn) return;
+
+        header.classList.add(sortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc');
+    });
+}
+
+function changePage(nextPage) {
+    const totalPages = Math.max(1, Math.ceil(currentRows.length / pageSize));
+    if (nextPage < 1 || nextPage > totalPages) return;
+
+    currentPage = nextPage;
+    renderTable();
+}
+
+function showLoading(isLoading) {
+    if (tableLoadingEl) {
+        tableLoadingEl.style.display = isLoading ? 'flex' : 'none';
+    }
+
+    if (reportTable) {
+        reportTable.style.opacity = isLoading ? '0.5' : '1';
+    }
+}
+
+// ============================================
+// EXPORT & PRINT
+// ============================================
 
 function handlePrintReport() {
     openPrintWindow('print');
@@ -384,6 +1193,130 @@ function ensureJsPdfLoaded() {
         script.onerror = () => reject(new Error('Failed to load jsPDF script'));
         document.head.appendChild(script);
     });
+}
+
+// ============================================
+// COMMON HELPERS
+// ============================================
+
+function parseDateSafe(value) {
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.getTime()) ? new Date() : parsed;
+}
+
+function normalizeStatus(value) {
+    const normalized = String(value || 'completed').toLowerCase();
+
+    if (normalized === 'selesai') return 'completed';
+    if (normalized === 'dibatalkan') return 'cancelled';
+    if (normalized === 'menunggu') return 'pending';
+
+    if (['completed', 'pending', 'cancelled'].includes(normalized)) {
+        return normalized;
+    }
+
+    return 'completed';
+}
+
+function normalizePayment(value) {
+    const normalized = String(value || 'cash').toLowerCase();
+
+    if (normalized.includes('debit')) return 'debit';
+    if (normalized.includes('credit') || normalized.includes('kredit')) return 'credit';
+    if (normalized.includes('wallet') || normalized.includes('qris')) return 'ewallet';
+    return 'cash';
+}
+
+function normalizeCategory(value) {
+    const normalized = String(value || '').trim().toLowerCase();
+
+    if (!normalized) return 'other';
+    if ((normalized.includes('non') && normalized.includes('kopi')) || normalized.includes('non-coffee')) return 'non-coffee';
+    if (normalized.includes('coffee') || normalized.includes('kopi')) return 'coffee';
+    if (normalized.includes('food') || normalized.includes('makanan')) return 'food';
+    if (normalized.includes('snack')) return 'snack';
+
+    return normalized;
+}
+
+function categoryLabel(category) {
+    const labels = {
+        coffee: 'Kopi',
+        'non-coffee': 'Non-Kopi',
+        food: 'Makanan',
+        snack: 'Snack'
+    };
+
+    return labels[category] || category;
+}
+
+function paymentLabel(payment) {
+    const labels = {
+        cash: 'Tunai',
+        debit: 'Kartu Debit',
+        credit: 'Kartu Kredit',
+        ewallet: 'E-Wallet'
+    };
+
+    return labels[payment] || payment;
+}
+
+function statusLabel(status) {
+    const labels = {
+        completed: 'Selesai',
+        pending: 'Pending',
+        cancelled: 'Dibatalkan'
+    };
+
+    return labels[status] || status;
+}
+
+function statusBadgeClass(status) {
+    if (status === 'completed') return 'success';
+    if (status === 'pending') return 'warning';
+    if (status === 'cancelled') return 'danger';
+    return 'info';
+}
+
+function formatCurrency(value) {
+    return new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        minimumFractionDigits: 0
+    }).format(Number(value) || 0);
+}
+
+function formatNumber(value) {
+    return new Intl.NumberFormat('id-ID').format(Number(value) || 0);
+}
+
+function formatDateTime(date) {
+    return date.toLocaleString('id-ID', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+function formatDateOnly(dateStr) {
+    const date = new Date(`${dateStr}T00:00:00`);
+    return date.toLocaleDateString('id-ID', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+    });
+}
+
+function setSummaryLabel(index, text) {
+    if (!summaryLabels[index]) return;
+    summaryLabels[index].textContent = text;
+}
+
+function setElementText(element, text) {
+    if (!element) return;
+    element.textContent = text;
 }
 
 function generateFileDate() {
