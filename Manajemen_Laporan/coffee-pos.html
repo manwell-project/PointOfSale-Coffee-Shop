@@ -12,9 +12,6 @@
     <link rel="stylesheet" href="css/report-layout.css">
     <link rel="stylesheet" href="../css/shared-ui.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <style>
-        /* Additional page-specific styles if needed */
-    </style>
 </head>
 <body>
     <!-- Top Navigation Bar will be injected by top-navbar.js -->
@@ -33,20 +30,20 @@
                 </div>
                 <div class="report-header-actions">
                     <div class="btn-export-group">
-                        <button class="btn-export pdf">
+                        <button class="btn-export pdf" id="exportPdfBtn" type="button">
                             <i class="fas fa-file-pdf"></i>
                             PDF
                         </button>
-                        <button class="btn-export excel">
+                        <button class="btn-export excel" id="exportExcelBtn" type="button">
                             <i class="fas fa-file-excel"></i>
                             Excel
                         </button>
-                        <button class="btn-export csv">
+                        <button class="btn-export csv" id="exportCsvBtn" type="button">
                             <i class="fas fa-file-csv"></i>
                             CSV
                         </button>
                     </div>
-                    <button class="btn-print" onclick="window.print()">
+                    <button class="btn-print" id="printReportBtn" type="button">
                         <i class="fas fa-print"></i>
                         Print
                     </button>
@@ -412,17 +409,6 @@
     <script src="../js/top-navbar.js"></script>
     <script src="../js/sidebar-nav.js"></script>
     <script src="../js/navbar.js"></script>
-    <script>
-        // Report Management JavaScript will be added
-        console.log('Report Page Loaded');
-        
-        // Set default dates (last 30 days)
-        const today = new Date();
-        const lastMonth = new Date(today);
-        lastMonth.setDate(today.getDate() - 30);
-        
-        document.getElementById('dateFrom').valueAsDate = lastMonth;
-        document.getElementById('dateTo').valueAsDate = today;
-    </script>
+    <script src="js/report.js"></script>
 </body>
 </html>
