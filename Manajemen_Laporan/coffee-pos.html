@@ -69,6 +69,77 @@
                 </button>
             </div>
 
+            <!-- Report Content Header -->
+            <div class="report-content-header">
+                <h2 class="report-content-title" id="reportContentTitle">
+                    <i class="fas fa-chart-bar"></i>
+                    Laporan Penjualan
+                </h2>
+                <div class="report-period" id="reportPeriod">
+                    <i class="fas fa-calendar"></i>
+                    <span>-</span>
+                </div>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="report-summary">
+                <div class="summary-card revenue">
+                    <div class="summary-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="summary-content">
+                        <div class="summary-label">Total Pendapatan</div>
+                        <div class="summary-value" id="totalRevenue">Rp 0</div>
+                        <div class="summary-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="summary-card transactions">
+                    <div class="summary-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <div class="summary-content">
+                        <div class="summary-label">Total Transaksi</div>
+                        <div class="summary-value" id="totalTransactions">0</div>
+                        <div class="summary-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="summary-card products">
+                    <div class="summary-icon">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <div class="summary-content">
+                        <div class="summary-label">Produk Terjual</div>
+                        <div class="summary-value" id="totalProductsSold">0</div>
+                        <div class="summary-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="summary-card average">
+                    <div class="summary-icon">
+                        <i class="fas fa-calculator"></i>
+                    </div>
+                    <div class="summary-content">
+                        <div class="summary-label">Rata-rata Transaksi</div>
+                        <div class="summary-value" id="avgTransaction">Rp 0</div>
+                        <div class="summary-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Filter Section -->
             <div class="report-filters">
                 <div class="filter-header">
@@ -164,77 +235,6 @@
 
             <!-- Report Content -->
             <div class="report-content">
-                <!-- Report Content Header -->
-                <div class="report-content-header">
-                    <h2 class="report-content-title" id="reportContentTitle">
-                        <i class="fas fa-chart-bar"></i>
-                        Laporan Penjualan
-                    </h2>
-                    <div class="report-period" id="reportPeriod">
-                        <i class="fas fa-calendar"></i>
-                        <span>-</span>
-                    </div>
-                </div>
-
-                <!-- Summary Cards -->
-                <div class="report-summary">
-                    <div class="summary-card revenue">
-                        <div class="summary-icon">
-                            <i class="fas fa-money-bill-wave"></i>
-                        </div>
-                        <div class="summary-content">
-                            <div class="summary-label">Total Pendapatan</div>
-                            <div class="summary-value" id="totalRevenue">Rp 0</div>
-                            <div class="summary-change positive">
-                                <i class="fas fa-arrow-up"></i>
-                                <span>+0%</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="summary-card transactions">
-                        <div class="summary-icon">
-                            <i class="fas fa-shopping-cart"></i>
-                        </div>
-                        <div class="summary-content">
-                            <div class="summary-label">Total Transaksi</div>
-                            <div class="summary-value" id="totalTransactions">0</div>
-                            <div class="summary-change positive">
-                                <i class="fas fa-arrow-up"></i>
-                                <span>+0%</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="summary-card products">
-                        <div class="summary-icon">
-                            <i class="fas fa-box"></i>
-                        </div>
-                        <div class="summary-content">
-                            <div class="summary-label">Produk Terjual</div>
-                            <div class="summary-value" id="totalProductsSold">0</div>
-                            <div class="summary-change positive">
-                                <i class="fas fa-arrow-up"></i>
-                                <span>+0%</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="summary-card average">
-                        <div class="summary-icon">
-                            <i class="fas fa-calculator"></i>
-                        </div>
-                        <div class="summary-content">
-                            <div class="summary-label">Rata-rata Transaksi</div>
-                            <div class="summary-value" id="avgTransaction">Rp 0</div>
-                            <div class="summary-change positive">
-                                <i class="fas fa-arrow-up"></i>
-                                <span>+0%</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Charts Section -->
                 <div class="charts-section">
                     <div class="charts-grid">
