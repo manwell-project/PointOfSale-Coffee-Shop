@@ -27,6 +27,7 @@
     
     <!-- Page Specific CSS - Phase 5.1 -->
     <link rel="stylesheet" href="./css/pos-layout.css">
+    <link rel="stylesheet" href="./css/receipt.css">
     <link rel="stylesheet" href="../css/shared-ui.css">
     
     <!-- Page Adjustments - MUST BE LAST to override local CSS -->
@@ -394,6 +395,7 @@
     
     <!-- Custom Scripts -->
     <script src="../js/api-helper.js"></script>
+    <script src="./js/receipt.js"></script>
     <script>
         // ==========================================
         // CART STATE MANAGEMENT
@@ -744,6 +746,11 @@
         function processPayment() {
             if (cartItems.length === 0 || paymentAmount < cartTotal) return;
             
+            // Disable confirm button
+            const confirmBtn = document.getElementById('confirmPaymentBtn');
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = 'Memproses...';
+            
             // Prepare transaction data
             const customerName = document.getElementById('customerName').value || null;
             const customerPhone = document.getElementById('customerPhone').value || null;
@@ -765,36 +772,50 @@
             
             console.log('Processing payment:', transactionData);
             
-            // TODO: Send to backend API
-            // API.Transactions.create(transactionData)
-            //   .then(response => {
-            //     showSuccessReceipt(response.data);
-            //   })
-            //   .catch(error => {
-            //     showToast('Gagal memproses pembayaran', 'error');
-            //   });
-            
-            // For now, simulate success
-            showSuccessMessage();
-            
-            // Clear cart
-            cartItems = [];
-            renderCart();
-            updateCartSummary();
-            
-            // Close modal
-            closePaymentModal();
+            // Send to backend API
+            API.Transactions.create({
+              items: cartItems.map((it) => ({
+                product_id: it.id,
+                quantity: it.quantity,
+                unit_price: it.price,
+                subtotal: it.subtotal
+              })),
+              customer_id: null,
+              employee_id: null,
+              payment_method: selectedPaymentMethod,
+              total_amount: cartTotal
+            })
+              .then(response => {
+                // Add transaction ID to receipt data
+                transactionData.transactionId = response.id;
+                
+                // Show receipt with transaction ID
+                showSuccessMessage(transactionData);
+              })
+              .catch(error => {
+                showToast('❌ Gagal memproses pembayaran: ' + error.message, 'error');
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = 'Proses Pembayaran';
+              });
         }
         
         /**
          * Show success message after payment
          */
-        function showSuccessMessage() {
-            // TODO: Implement proper success modal with receipt option
-            showToast('Pembayaran berhasil!', 'success');
+        function showSuccessMessage(transactionData) {
+            // Show receipt
+            receiptManager.showReceipt(transactionData);
             
-            // Show receipt option (will be implemented in future enhancement)
-            console.log('Receipt preview/print option will be added in future update');
+            // Close payment modal
+            closePaymentModal();
+            
+            // Show toast notification
+            showToast('✅ Pembayaran berhasil! Transaksi #' + transactionData.transactionId, 'success');
+            
+            // Clear cart
+            cartItems = [];
+            renderCart();
+            updateCartSummary();
         }
         
         // ==========================================

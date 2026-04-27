@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Fitur Cetak Struk - DigiCaf POS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .subtitle {
+            color: #999;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .info-box {
+            background: #f0f7ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin-bottom: 30px;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #eeeeee;
+        }
+
+        .code-section {
+            background: #f5f5f5;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .code-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 12px;
+            line-height: 1.5;
+            font-family: 'Courier New', monospace;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .feature-card {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .feature-card h4 {
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .feature-card p {
+            color: #666;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-top: 20px;
+        }
+
+        .status.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+
+        .status.error {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        @media (max-width: 600px) {
+            .button-group,
+            .features {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/design-tokens.css">
+    <link rel="stylesheet" href="./css/receipt.css">
+</head>
+<body>
+    <div class="container">
+        <h1>
+            <i class="fas fa-receipt"></i> Test Fitur Cetak Struk
+        </h1>
+        <p class="subtitle">Halaman testing untuk fitur receipt printing DigiCaf POS</p>
+
+        <div class="info-box">
+            📝 <strong>Catatan:</strong> Halaman ini digunakan untuk testing fitur cetak struk. Klik tombol di bawah untuk melihat demo struk dan menguji fungsi cetak.
+        </div>
+
+        <h3 style="margin-bottom: 15px; color: #333; font-size: 14px;">Fitur Tersedia</h3>
+        <div class="features">
+            <div class="feature-card">
+                <h4><i class="fas fa-eye"></i> Tampilkan Struk</h4>
+                <p>Menampilkan struk pembayaran dalam modal dengan format profesional.</p>
+            </div>
+            <div class="feature-card">
+                <h4><i class="fas fa-print"></i> Cetak ke Printer</h4>
+                <p>Mencetak struk ke printer fisik atau menyimpan sebagai PDF.</p>
+            </div>
+            <div class="feature-card">
+                <h4><i class="fas fa-whatsapp"></i> Bagikan WhatsApp</h4>
+                <p>Membagikan detail struk melalui WhatsApp.</p>
+            </div>
+            <div class="feature-card">
+                <h4><i class="fas fa-envelope"></i> Email (Coming Soon)</h4>
+                <p>Mengirim struk ke email customer (akan datang).</p>
+            </div>
+        </div>
+
+        <h3 style="margin-bottom: 15px; color: #333; font-size: 14px;">Button Testing</h3>
+        <div class="button-group">
+            <button class="btn btn-primary" onclick="showTestReceipt()">
+                <i class="fas fa-eye"></i> Tampilkan Struk Demo
+            </button>
+            <button class="btn btn-secondary" onclick="showTestReceipt2()">
+                <i class="fas fa-eye"></i> Tampilkan Struk Kompleks
+            </button>
+            <button class="btn btn-secondary" onclick="printCurrentReceipt()">
+                <i class="fas fa-print"></i> Cetak Struk
+            </button>
+            <button class="btn btn-secondary" onclick="shareWhatsApp()">
+                <i class="fas fa-whatsapp"></i> Bagikan WhatsApp
+            </button>
+        </div>
+
+        <div id="status" class="status success" style="display: none;">
+            <span class="status-indicator"></span>
+            <span id="statusText">Ready for testing</span>
+        </div>
+
+        <div class="code-section">
+            <h3><i class="fas fa-code"></i> Cara Menggunakan</h3>
+            <pre>// Data transaksi (dari API)
+const transactionData = {
+  transactionId: 12345,
+  items: [
+    { id: 1, name: 'Espresso', price: 25000, quantity: 2, subtotal: 50000 },
+    { id: 2, name: 'Cappuccino', price: 30000, quantity: 1, subtotal: 30000 }
+  ],
+  subtotal: 80000,
+  tax: 8000,
+  discount: 0,
+  total: 88000,
+  paymentMethod: 'cash',
+  paymentAmount: 100000,
+  changeAmount: 12000,
+  customerName: 'John Doe',
+  timestamp: new Date(),
+  cashier: 'Admin'
+};
+
+// Tampilkan struk
+receiptManager.showReceipt(transactionData);
+
+// Cetak struk
+receiptManager.printReceipt();
+
+// Bagikan via WhatsApp
+receiptManager.shareViaWhatsApp();</pre>
+        </div>
+
+        <div class="code-section" style="margin-top: 20px;">
+            <h3><i class="fas fa-file-alt"></i> File yang Ditambahkan</h3>
+            <pre>✅ Transaksi/js/receipt.js - Receipt Manager Module
+✅ Transaksi/css/receipt.css - Receipt Styling
+✅ Transaksi/RECEIPT_GUIDE.md - Dokumentasi Lengkap
+✅ Transaksi/test-receipt.html - File ini (Testing)</pre>
+        </div>
+    </div>
+
+    <!-- Include Receipt Manager -->
+    <script src="./js/receipt.js"></script>
+
+    <script>
+        /**
+         * Show sample receipt 1 - Simple transaction
+         */
+        function showTestReceipt() {
+            const mockData = {
+                transactionId: 1001,
+                items: [
+                    { id: 1, name: 'Espresso', price: 25000, quantity: 2, subtotal: 50000 },
+                    { id: 2, name: 'Cappuccino', price: 30000, quantity: 1, subtotal: 30000 }
+                ],
+                subtotal: 80000,
+                tax: 0,
+                discount: 0,
+                total: 80000,
+                paymentMethod: 'cash',
+                paymentAmount: 100000,
+                changeAmount: 20000,
+                customerName: null,
+                timestamp: new Date(),
+                cashier: 'Budi'
+            };
+
+            receiptManager.showReceipt(mockData);
+            updateStatus('✅ Struk sederhana ditampilkan', 'success');
+        }
+
+        /**
+         * Show sample receipt 2 - Complex transaction
+         */
+        function showTestReceipt2() {
+            const mockData = {
+                transactionId: 1002,
+                items: [
+                    { id: 1, name: 'Espresso Double Shot', price: 35000, quantity: 1, subtotal: 35000 },
+                    { id: 2, name: 'Caffe Latte', price: 30000, quantity: 2, subtotal: 60000 },
+                    { id: 3, name: 'Iced Cappuccino', price: 32000, quantity: 1, subtotal: 32000 },
+                    { id: 4, name: 'Croissant', price: 25000, quantity: 2, subtotal: 50000 },
+                    { id: 5, name: 'Sandwich Tuna', price: 45000, quantity: 1, subtotal: 45000 }
+                ],
+                subtotal: 222000,
+                tax: 22200,
+                discount: 10000,
+                total: 234200,
+                paymentMethod: 'card',
+                paymentAmount: 234200,
+                changeAmount: 0,
+                customerName: 'Siti Nurhaliza',
+                customerPhone: '08123456789',
+                timestamp: new Date(),
+                cashier: 'Admin'
+            };
+
+            receiptManager.showReceipt(mockData);
+            updateStatus('✅ Struk kompleks ditampilkan (dengan tax, diskon, dan info pelanggan)', 'success');
+        }
+
+        /**
+         * Print current receipt
+         */
+        function printCurrentReceipt() {
+            if (receiptManager.currentReceipt) {
+                receiptManager.printReceipt();
+                updateStatus('🖨️ Struk dikirim ke printer', 'success');
+            } else {
+                updateStatus('⚠️ Belum ada struk untuk dicetak. Tampilkan struk terlebih dahulu.', 'error');
+            }
+        }
+
+        /**
+         * Share receipt via WhatsApp
+         */
+        function shareWhatsApp() {
+            if (receiptManager.currentReceipt) {
+                receiptManager.shareViaWhatsApp();
+                updateStatus('💬 Membuka WhatsApp...', 'success');
+            } else {
+                updateStatus('⚠️ Belum ada struk untuk dibagikan. Tampilkan struk terlebih dahulu.', 'error');
+            }
+        }
+
+        /**
+         * Update status message
+         */
+        function updateStatus(message, type = 'success') {
+            const statusEl = document.getElementById('status');
+            const statusText = document.getElementById('statusText');
+
+            statusEl.className = `status ${type}`;
+            statusText.textContent = message;
+            statusEl.style.display = 'flex';
+
+            // Auto-hide success messages after 5 seconds
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusEl.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // Initial status
+        window.addEventListener('load', () => {
+            updateStatus('✅ Siap untuk testing. Klik tombol di atas untuk mulai.', 'success');
+        });
+    </script>
+</body>
+</html>
