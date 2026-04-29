@@ -2,14 +2,35 @@ const express = require('express');
 const router = express.Router();
 const { dbHelpers } = require('../db/connection');
 
-// GET all customers
+// GET all customers with aggregated stats (total_transactions, total_spent)
 router.get('/', async (req, res, next) => {
   try {
     const customers = await dbHelpers.all(`
-      SELECT * FROM customers 
-      ORDER BY created_at DESC
+      SELECT
+        c.*,
+        COALESCE(COUNT(t.id), 0) AS total_transactions,
+        COALESCE(SUM(t.total_amount), 0) AS total_spent,
+        MAX(t.created_at) AS last_purchase_date,
+        CASE
+          WHEN COALESCE(COUNT(t.id),0) > 10 THEN 'vip'
+          WHEN COALESCE(COUNT(t.id),0) > 5 THEN 'reguler'
+          ELSE 'reguler'
+        END AS computed_type
+      FROM customers c
+      LEFT JOIN transactions t ON t.customer_id = c.id
+      GROUP BY c.id
+      ORDER BY c.created_at DESC
     `);
-    res.json(customers);
+
+    // Normalize numeric fields and compute type from aggregated value
+    const normalized = customers.map(c => ({
+      ...c,
+      total_transactions: Number(c.total_transactions || 0),
+      total_spent: Number(c.total_spent || 0),
+      type: c.computed_type || 'reguler'
+    }));
+
+    res.json(normalized);
   } catch (err) {
     next(err);
   }
@@ -42,13 +63,12 @@ router.get('/phone/:phone', async (req, res, next) => {
 // POST create new customer
 router.post('/', async (req, res, next) => {
   try {
-    const { name, phone, email, address } = req.body;
-    
+    const { name, phone, email } = req.body;
+
     if (!name) {
       return res.status(400).json({ error: 'Name is required' });
     }
 
-    // Check if customer already exists
     if (phone) {
       const existing = await dbHelpers.get('SELECT id FROM customers WHERE phone = ?', [phone]);
       if (existing) {
@@ -56,17 +76,17 @@ router.post('/', async (req, res, next) => {
       }
     }
 
+    // Insert into existing schema columns (no `type` column in schema)
     const result = await dbHelpers.run(
       'INSERT INTO customers (name, phone, email, address, total_transactions, total_spent) VALUES (?, ?, ?, ?, ?, ?)',
-      [name, phone || null, email || null, address || null, 0, 0]
+      [name, phone || null, email || null, null, 0, 0]
     );
 
     res.status(201).json({ 
-      id: result.id, 
-      name, 
-      phone, 
-      email,
-      address,
+      id: result.id,
+      name,
+      phone: phone || null,
+      email: email || null,
       total_transactions: 0,
       total_spent: 0
     });

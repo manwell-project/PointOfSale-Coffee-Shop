@@ -136,6 +136,27 @@ document.addEventListener('DOMContentLoaded', async function () {
     this.textContent = 'Processing...';
 
     try {
+      // Determine optional customer info (only use if both provided)
+      let customerId = null;
+      try {
+        const customerNameEl = document.getElementById('customerName');
+        const customerPhoneEl = document.getElementById('customerPhone');
+        const customerName = customerNameEl ? (customerNameEl.value || '').trim() : null;
+        const customerPhone = customerPhoneEl ? (customerPhoneEl.value || '').trim() : null;
+
+        if (customerName && customerPhone) {
+          const existing = await API.Customers.getByPhone(customerPhone).catch(() => null);
+          if (existing && existing.id) {
+            customerId = existing.id;
+          } else {
+            const created = await API.Customers.create({ name: customerName, phone: customerPhone }).catch(() => null);
+            if (created && created.id) customerId = created.id;
+          }
+        }
+      } catch (err) {
+        console.warn('Customer lookup/create error', err.message || err);
+      }
+
       // Save transaction to API
       const trx = await API.Transactions.create({
         items: keranjang.map((it) => ({
@@ -144,7 +165,7 @@ document.addEventListener('DOMContentLoaded', async function () {
           unit_price: it.harga,
           subtotal: it.harga * it.jumlah
         })),
-        customer_id: null,
+        customer_id: customerId,
         employee_id: null,
         payment_method: 'cash',
         total_amount: total

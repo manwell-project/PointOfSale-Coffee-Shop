@@ -144,6 +144,7 @@ async function loadCustomers() {
         
         // Load customers from API
         const response = await window.API.Customers.getAll();
+        console.debug('DEBUG: /api/customers response', response);
         customers = response.map(customer => ({
             id: customer.id,
             name: customer.name || '',
@@ -151,9 +152,9 @@ async function loadCustomers() {
             email: customer.email || '',
             address: customer.address || '',
             type: customer.type || 'regular',
-            totalPurchases: customer.total_transactions || 0,
-            totalAmount: customer.total_amount || 0,
-            lastPurchase: customer.last_purchase_date || null,
+            totalPurchases: Number(customer.total_transactions || 0),
+            totalAmount: Number(customer.total_spent || 0),
+            lastPurchase: customer.last_purchase_date || customer.updated_at || null,
             isNew: isNewCustomer(customer.created_at),
             status: customer.status || 'active',
             createdAt: customer.created_at

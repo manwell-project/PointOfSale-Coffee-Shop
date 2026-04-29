@@ -772,31 +772,49 @@
             
             console.log('Processing payment:', transactionData);
             
-            // Send to backend API
-            API.Transactions.create({
-              items: cartItems.map((it) => ({
-                product_id: it.id,
-                quantity: it.quantity,
-                unit_price: it.price,
-                subtotal: it.subtotal
-              })),
-              customer_id: null,
-              employee_id: null,
-              payment_method: selectedPaymentMethod,
-              total_amount: cartTotal
-            })
-              .then(response => {
-                // Add transaction ID to receipt data
-                transactionData.transactionId = response.id;
-                
-                // Show receipt with transaction ID
-                showSuccessMessage(transactionData);
-              })
-              .catch(error => {
-                showToast('❌ Gagal memproses pembayaran: ' + error.message, 'error');
-                confirmBtn.disabled = false;
-                confirmBtn.textContent = 'Proses Pembayaran';
-              });
+                        // Send to backend API
+                        (async () => {
+                            try {
+                                let customerId = null;
+                                // Only create/link customer when both name and phone provided
+                                if (customerName && customerPhone) {
+                                    try {
+                                        const existing = await API.Customers.getByPhone(customerPhone);
+                                        if (existing && existing.id) {
+                                            customerId = existing.id;
+                                        } else {
+                                            const created = await API.Customers.create({ name: customerName, phone: customerPhone });
+                                            customerId = created.id;
+                                        }
+                                    } catch (err) {
+                                        console.warn('Customer lookup/create failed:', err.message || err);
+                                        customerId = null;
+                                    }
+                                }
+
+                                const response = await API.Transactions.create({
+                                    items: cartItems.map((it) => ({
+                                        product_id: it.id,
+                                        quantity: it.quantity,
+                                        unit_price: it.price,
+                                        subtotal: it.subtotal
+                                    })),
+                                    customer_id: customerId,
+                                    employee_id: null,
+                                    payment_method: selectedPaymentMethod,
+                                    total_amount: cartTotal
+                                });
+
+                                // Add transaction ID to receipt data
+                                transactionData.transactionId = response.id;
+                                // Show receipt with transaction ID
+                                showSuccessMessage(transactionData);
+                            } catch (error) {
+                                showToast('❌ Gagal memproses pembayaran: ' + error.message, 'error');
+                                confirmBtn.disabled = false;
+                                confirmBtn.textContent = 'Proses Pembayaran';
+                            }
+                        })();
         }
         
         /**

@@ -112,12 +112,16 @@ router.post('/', async (req, res, next) => {
       }
     }
 
-    // Update customer stats
+    // Update customer stats if DB supports the fields; ignore errors if columns absent
     if (customer_id) {
-      await dbHelpers.run(
-        'UPDATE customers SET total_transactions = total_transactions + 1, total_spent = total_spent + ? WHERE id = ?',
-        [finalTotalAmount, customer_id]
-      );
+      try {
+        await dbHelpers.run(
+          'UPDATE customers SET total_transactions = total_transactions + 1, total_spent = total_spent + ? WHERE id = ?',
+          [finalTotalAmount, customer_id]
+        );
+      } catch (err) {
+        console.warn('Customer stats update skipped or failed:', err.message || err);
+      }
     }
 
     res.status(201).json({ 
