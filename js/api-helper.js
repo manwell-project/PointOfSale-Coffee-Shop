@@ -43,7 +43,17 @@ const StocksAPI = {
   getLowStock: () => apiFetch('/stocks/low-stock/list'),
   update: (id, data) => apiFetch(`/stocks/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   create: (data) => apiFetch('/stocks', { method: 'POST', body: JSON.stringify(data) }),
-  getHistory: (productId) => apiFetch(`/stocks/product/${productId}/history`)
+  getHistory: (productId) => apiFetch(`/stocks/product/${productId}/history`),
+  getHistoryAll: (params = {}) => {
+    const qs = new URLSearchParams(
+      Object.entries(params).reduce((acc, [k, v]) => {
+        if (v === undefined || v === null || v === '') return acc;
+        acc[k] = String(v);
+        return acc;
+      }, {})
+    ).toString();
+    return apiFetch(`/stocks/history${qs ? `?${qs}` : ''}`);
+  }
 };
 
 // ============ EMPLOYEES ============

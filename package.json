@@ -4,7 +4,7 @@
   "description": "DigiCaf - POS Coffee Shop Management System",
   "main": "server/index.js",
   "scripts": {
-    "dev:frontend": "npx --yes http-server -p 5173",
+    "dev:frontend": "npx --yes http-server -p 5173 -c -1",
     "dev:backend": "node server/index.js",
     "dev": "npm run dev:backend",
     "start": "node server/index.js",

@@ -27,7 +27,7 @@
     <link rel="stylesheet" href="../css/tablet.css">
     
     <!-- Page Specific CSS -->
-    <link rel="stylesheet" href="css/stock-layout.css">
+    <link rel="stylesheet" href="css/stock-layout.css?v=1769019800">
     <link rel="stylesheet" href="../css/shared-ui.css">
     
     <!-- Page Adjustments - MUST BE LAST to override local CSS -->
@@ -51,6 +51,43 @@
                         <p class="stock-subtitle">Kelola inventori dan stok produk</p>
                     </div>
                     <div class="stock-header-actions">
+                        <button class="btn-export" id="historyBtn" type="button" onclick="window.location.href='riwayat.html'">
+                            <i class="fas fa-clock-rotate-left"></i>
+                            Riwayat
+                        </button>
+
+                        <!-- Alerts toggle (opens notification window) -->
+                        <div class="alerts-popover" id="alertsPopover">
+                            <button class="btn-export btn-alerts-toggle" id="alertsToggleBtn" type="button" aria-haspopup="true" aria-expanded="false" title="Notifikasi Stok">
+                                <i class="fas fa-bell"></i>
+                                <span class="alerts-badge" id="alertsBadge">0</span>
+                            </button>
+
+                            <!-- Stock Alert Widget (popover window) -->
+                            <div class="stock-alerts-widget" id="alertsWidget" style="display: none;">
+                                <div class="alerts-header">
+                                    <h3 class="alerts-title">
+                                        <i class="fas fa-bell"></i>
+                                        Notifikasi Stok
+                                        <span class="alerts-badge" id="alertsBadgeWidget">0</span>
+                                    </h3>
+                                    <div class="alerts-actions">
+                                        <button class="btn-alert-filter active" data-filter="all">Semua</button>
+                                        <button class="btn-alert-filter" data-filter="critical">Kritis</button>
+                                        <button class="btn-alert-filter" data-filter="warning">Peringatan</button>
+                                    </div>
+                                </div>
+                                <div class="alerts-list" id="alertsList">
+                                    <!-- Alerts will be rendered here -->
+                                </div>
+                                <div class="alerts-footer">
+                                    <button class="btn-mark-read" id="markAllRead">
+                                        Tandai Sudah Dibaca
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
                         <button class="btn-export" id="exportBtn">
                             <i class="fas fa-download"></i>
                             Export
@@ -103,34 +140,6 @@
                             <div class="stat-value" id="totalStockQty">0</div>
                             <div class="stat-change">Total unit</div>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Stock Alert Widget -->
-                <div class="stock-alerts-widget" id="alertsWidget" style="display: none;">
-                    <div class="alerts-header">
-                        <h3 class="alerts-title">
-                            <i class="fas fa-bell"></i>
-                            Notifikasi Stok
-                            <span class="alerts-badge" id="alertsBadge">0</span>
-                        </h3>
-                        <div class="alerts-actions">
-                            <button class="btn-alert-filter active" data-filter="all">Semua</button>
-                            <button class="btn-alert-filter" data-filter="critical">Kritis</button>
-                            <button class="btn-alert-filter" data-filter="warning">Peringatan</button>
-                        </div>
-                    </div>
-                    <div class="alerts-list" id="alertsList">
-                        <!-- Alerts will be rendered here -->
-                    </div>
-                    <div class="alerts-footer">
-                        <a href="#" class="btn-view-all" id="viewAllAlerts">
-                            Lihat Semua
-                            <i class="fas fa-arrow-right"></i>
-                        </a>
-                        <button class="btn-mark-read" id="markAllRead">
-                            Tandai Sudah Dibaca
-                        </button>
                     </div>
                 </div>
 
@@ -421,10 +430,10 @@
     <script src="../js/cache.js" defer></script>
     
     <script src="../js/auth.js?v=1769014084"></script>
-    <script src="../js/api-helper.js?v=1769014084"></script>
+    <script src="../js/api-helper.js?v=1769014085"></script>
     <script src="../js/top-navbar.js?v=1769014084"></script>
     <script src="../js/sidebar-nav.js?v=1769020001"></script>
     <script src="../js/navbar.js?v=1769014084"></script>
-    <script src="stock-manager.js?v=1769014084"></script>
+    <script src="stock-manager.js?v=1769019800"></script>
 </body>
 </html>

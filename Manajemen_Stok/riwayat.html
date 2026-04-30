@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0ea5e9">
+  <title>Riwayat Stok - DigiCaf</title>
+
+  <!-- Design System CSS -->
+  <link rel="stylesheet" href="../css/design-tokens.css">
+  <link rel="stylesheet" href="../css/typography.css">
+  <link rel="stylesheet" href="../css/icons.css">
+  <link rel="stylesheet" href="../css/layout-system.css">
+  <link rel="stylesheet" href="../css/spacing-alignment.css">
+
+  <!-- Component CSS -->
+  <link rel="stylesheet" href="../css/components/buttons.css">
+  <link rel="stylesheet" href="../css/components/cards.css">
+  <link rel="stylesheet" href="../css/components/forms.css">
+  <link rel="stylesheet" href="../css/components/badges-labels.css">
+  <link rel="stylesheet" href="../css/components/top-navbar-simple.css?v=1769014084">
+  <link rel="stylesheet" href="../css/components/sidebar-nav.css?v=1769014084">
+
+  <!-- Responsive Design CSS -->
+  <link rel="stylesheet" href="../css/responsive.css">
+  <link rel="stylesheet" href="../css/mobile-optimizations.css">
+  <link rel="stylesheet" href="../css/tablet.css">
+
+  <!-- Page Specific CSS -->
+  <link rel="stylesheet" href="css/stock-layout.css">
+  <link rel="stylesheet" href="../css/shared-ui.css">
+
+  <!-- Page Adjustments - MUST BE LAST to override local CSS -->
+  <link rel="stylesheet" href="../css/components/page-adjustments.css?v=1769015876">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <div class="stock-wrapper">
+    <div class="stock-container">
+      <div class="stock-header">
+        <div class="stock-header-left">
+          <h1 class="stock-title">
+            <i class="fas fa-clock-rotate-left"></i>
+            Riwayat Stok
+          </h1>
+          <p class="stock-subtitle">Riwayat transaksi stok masuk dan keluar</p>
+        </div>
+        <div class="stock-header-actions">
+          <button class="btn-export" id="refreshHistoryBtn">
+            <i class="fas fa-rotate"></i>
+            Refresh
+          </button>
+          <button class="btn-add-stock" id="backToStockBtn">
+            <i class="fas fa-arrow-left"></i>
+            Kembali
+          </button>
+        </div>
+      </div>
+
+      <!-- Filter & Search Section -->
+      <div class="stock-filters">
+        <div class="filter-row">
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchHistoryInput" placeholder="Cari produk atau alasan perubahan...">
+          </div>
+          <div class="filter-select">
+            <select id="typeFilter">
+              <option value="">Semua Jenis</option>
+              <option value="in">Stok Masuk</option>
+              <option value="out">Stok Keluar</option>
+              <option value="adjust">Penyesuaian</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- History Table -->
+      <div class="stock-table-container">
+        <div class="stock-table-wrapper">
+          <table class="stock-table">
+            <thead>
+              <tr>
+                <th>Tanggal</th>
+                <th>Produk</th>
+                <th>Jenis</th>
+                <th>Perubahan</th>
+                <th>Stok Akhir</th>
+                <th>Alasan</th>
+                <th>Pegawai</th>
+              </tr>
+            </thead>
+            <tbody id="historyTableBody">
+              <tr>
+                <td colspan="7">
+                  <div class="empty-state">
+                    <div class="empty-icon">
+                      <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                    <h3 class="empty-title">Memuat Data...</h3>
+                    <p class="empty-text">Mohon tunggu sebentar</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-footer">
+          <div class="showing-text" id="historyShowingText">Menampilkan 0 data</div>
+          <div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation Bar -->
+  <nav class="bottom-nav">
+    <a href="../Dashboard/index.html" class="nav-item">
+      <i class="fas fa-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <a href="../Transaksi/index.html" class="nav-item">
+      <i class="fas fa-shopping-cart"></i>
+      <span>Transaksi</span>
+    </a>
+    <a href="../Manajemen_Stok/index.html" class="nav-item active">
+      <i class="fas fa-boxes"></i>
+      <span>Stok</span>
+    </a>
+    <a href="../Manajemen_Pelanggan/index.html" class="nav-item">
+      <i class="fas fa-users"></i>
+      <span>Pelanggan</span>
+    </a>
+    <a href="../Manajemen_Laporan/coffee-pos.html" class="nav-item">
+      <i class="fas fa-chart-bar"></i>
+      <span>Laporan</span>
+    </a>
+  </nav>
+
+  <!-- Performance Optimizations -->
+  <script src="../js/performance.js" defer></script>
+  <script src="../js/performance-utilities.js" defer></script>
+  <script src="../js/cache.js" defer></script>
+
+  <script src="../js/auth.js?v=1769014084"></script>
+  <script src="../js/api-helper.js?v=1769014085"></script>
+  <script src="../js/top-navbar.js?v=1769014084"></script>
+  <script src="../js/sidebar-nav.js?v=1769014084"></script>
+  <script src="../js/navbar.js?v=1769014084"></script>
+  <script src="stock-history.js?v=1769014084"></script>
+</body>
+</html>
