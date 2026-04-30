@@ -1,0 +1,305 @@
+:root {
+  --discount-accent: #0f766e;
+  --discount-accent-soft: #ccfbf1;
+  --discount-danger: #b91c1c;
+  --discount-bg: #f8fafc;
+}
+
+body {
+  background: linear-gradient(180deg, #f0fdfa 0%, var(--discount-bg) 50%);
+}
+
+.discount-wrapper {
+  padding: 24px;
+}
+
+.discount-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.discount-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.discount-title {
+  margin: 0;
+  font-size: 1.8rem;
+  color: #0f172a;
+}
+
+.discount-subtitle {
+  margin: 6px 0 0;
+  color: #475569;
+}
+
+.btn-add-discount {
+  border: 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--discount-accent);
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.discount-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.stat-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.stat-card.active {
+  border-color: #14b8a6;
+}
+
+.stat-card.upcoming {
+  border-color: #f59e0b;
+}
+
+.stat-card.ended {
+  border-color: #94a3b8;
+}
+
+.stat-label {
+  color: #475569;
+  font-size: 0.85rem;
+}
+
+.stat-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+.discount-filters {
+  display: grid;
+  grid-template-columns: 1fr 220px;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 0 12px;
+}
+
+.search-box input,
+.discount-filters select,
+.discount-modal input,
+.discount-modal select,
+.discount-modal textarea {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  padding: 10px 0;
+  background: transparent;
+}
+
+.discount-filters select {
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 10px;
+}
+
+.discount-table-wrapper {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: auto;
+}
+
+.discount-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.discount-table th,
+.discount-table td {
+  padding: 12px;
+  border-bottom: 1px solid #f1f5f9;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.discount-table th {
+  background: #f8fafc;
+  color: #334155;
+  font-size: 0.85rem;
+}
+
+.discount-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.discount-badge.active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.discount-badge.upcoming {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.discount-badge.ended,
+.discount-badge.inactive {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.action-btn {
+  border: 0;
+  border-radius: 8px;
+  padding: 7px 9px;
+  cursor: pointer;
+  margin-right: 6px;
+}
+
+.action-btn.edit {
+  background: #ccfbf1;
+  color: #134e4a;
+}
+
+.action-btn.delete {
+  background: #fee2e2;
+  color: var(--discount-danger);
+}
+
+.table-loading,
+.table-empty {
+  text-align: center;
+  color: #64748b;
+}
+
+.discount-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2100;
+  padding: 16px;
+}
+
+.discount-modal-overlay.show {
+  display: flex;
+}
+
+.discount-modal {
+  width: min(620px, 100%);
+  background: #ffffff;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.btn-close {
+  border: 0;
+  background: transparent;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+#discountForm {
+  padding: 14px 16px 18px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.form-group {
+  margin-bottom: 12px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 0.85rem;
+  color: #334155;
+}
+
+.form-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.form-checkbox input {
+  width: auto;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.btn-primary,
+.btn-secondary {
+  border: 0;
+  border-radius: 9px;
+  padding: 9px 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: var(--discount-accent);
+  color: #ffffff;
+}
+
+.btn-secondary {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+@media (max-width: 900px) {
+  .discount-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .discount-filters {
+    grid-template-columns: 1fr;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}

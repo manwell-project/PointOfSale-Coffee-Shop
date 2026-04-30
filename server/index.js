@@ -13,6 +13,7 @@ const employeesRoutes = require('./routes/employees');
 const customersRoutes = require('./routes/customers');
 const transactionsRoutes = require('./routes/transactions');
 const reportsRoutes = require('./routes/reports');
+const discountsRoutes = require('./routes/discounts');
 
 // Import middleware
 const errorHandler = require('./middleware/errorHandler');
@@ -46,6 +47,7 @@ app.use('/api/employees', employeesRoutes);
 app.use('/api/customers', customersRoutes);
 app.use('/api/transactions', transactionsRoutes);
 app.use('/api/reports', reportsRoutes);
+app.use('/api/discounts', discountsRoutes);
 
 // Serve index.html for root path
 app.get('/', (req, res) => {
@@ -79,6 +81,7 @@ Available endpoints:
   GET/POST/PUT/DELETE /api/customers
   POST/GET /api/transactions
   GET /api/reports
+  GET/POST/PUT/DELETE /api/discounts
 
 Type Ctrl+C to stop the server
   `);

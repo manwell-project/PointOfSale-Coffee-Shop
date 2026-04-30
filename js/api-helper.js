@@ -85,6 +85,16 @@ const ReportsAPI = {
   getStockSummary: () => apiFetch('/reports/stocks/summary')
 };
 
+// ============ DISCOUNTS ============
+const DiscountsAPI = {
+  getAll: () => apiFetch('/discounts'),
+  getById: (id) => apiFetch(`/discounts/${id}`),
+  getActive: () => apiFetch('/discounts/active/list'),
+  create: (data) => apiFetch('/discounts', { method: 'POST', body: JSON.stringify(data) }),
+  update: (id, data) => apiFetch(`/discounts/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  delete: (id) => apiFetch(`/discounts/${id}`, { method: 'DELETE' })
+};
+
 // Expose globally
 window.API = {
   Products: ProductsAPI,
@@ -93,6 +103,7 @@ window.API = {
   Customers: CustomersAPI,
   Transactions: TransactionsAPI,
   Reports: ReportsAPI,
+  Discounts: DiscountsAPI,
   apiFetch
 };
 

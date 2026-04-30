@@ -678,6 +678,20 @@
     }).format(amount);
   }
 
+  /**
+   * Toggle mobile menu (stub for compatibility)
+   */
+  function toggleMobileMenu() {
+    closeAllDropdowns();
+  }
+
+  /**
+   * Close mobile menu (stub for compatibility)
+   */
+  function closeMobileMenu() {
+    closeAllDropdowns();
+  }
+
   // Initialize when DOM is ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);

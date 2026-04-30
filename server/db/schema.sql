@@ -137,3 +137,21 @@ CREATE TABLE IF NOT EXISTS raw_stock_history (
 CREATE INDEX IF NOT EXISTS idx_raw_materials_category ON raw_materials(category);
 CREATE INDEX IF NOT EXISTS idx_raw_stocks_material ON raw_stocks(raw_material_id);
 CREATE INDEX IF NOT EXISTS idx_raw_stock_history_material ON raw_stock_history(raw_material_id);
+
+-- 11. DISCOUNTS (Manajemen diskon per produk menu)
+CREATE TABLE IF NOT EXISTS discounts (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  product_id INTEGER NOT NULL,
+  discount_type VARCHAR(20) NOT NULL CHECK (discount_type IN ('percentage', 'fixed')),
+  discount_value INTEGER NOT NULL CHECK (discount_value > 0),
+  start_date TEXT,
+  end_date TEXT,
+  is_active INTEGER DEFAULT 1,
+  notes TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_discounts_product_id ON discounts(product_id);
+CREATE INDEX IF NOT EXISTS idx_discounts_active ON discounts(is_active);

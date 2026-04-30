@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0f766e">
+  <title>Manajemen Diskon - DigiCaf</title>
+
+  <link rel="stylesheet" href="../css/design-tokens.css">
+  <link rel="stylesheet" href="../css/components/top-navbar-simple.css?v=1769014084">
+  <link rel="stylesheet" href="../css/components/sidebar-nav.css?v=1769014084">
+  <link rel="stylesheet" href="../css/shared-ui.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+  <link rel="stylesheet" href="../css/mobile-optimizations.css">
+  <link rel="stylesheet" href="../css/tablet.css">
+  <link rel="stylesheet" href="css/discount-layout.css">
+  <link rel="stylesheet" href="../css/components/page-adjustments.css?v=1769015876">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <div class="discount-wrapper">
+    <div class="discount-container">
+      <div class="discount-header">
+        <div>
+          <h1 class="discount-title">
+            <i class="fas fa-percent"></i>
+            Manajemen Diskon
+          </h1>
+          <p class="discount-subtitle">Tambah produk diskon dan atur periode promo</p>
+        </div>
+        <div class="discount-header-actions">
+          <button id="addDiscountBtn" class="btn-add-discount">
+            <i class="fas fa-plus"></i>
+            Tambah Diskon
+          </button>
+        </div>
+      </div>
+
+      <div class="discount-stats">
+        <div class="stat-card">
+          <div class="stat-label">Total Diskon</div>
+          <div class="stat-value" id="totalDiscounts">0</div>
+        </div>
+        <div class="stat-card active">
+          <div class="stat-label">Diskon Aktif</div>
+          <div class="stat-value" id="activeDiscounts">0</div>
+        </div>
+        <div class="stat-card upcoming">
+          <div class="stat-label">Akan Datang</div>
+          <div class="stat-value" id="upcomingDiscounts">0</div>
+        </div>
+        <div class="stat-card ended">
+          <div class="stat-label">Berakhir</div>
+          <div class="stat-value" id="endedDiscounts">0</div>
+        </div>
+      </div>
+
+      <div class="discount-filters">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" id="searchInput" placeholder="Cari nama produk diskon...">
+        </div>
+        <select id="statusFilter">
+          <option value="all">Semua Status</option>
+          <option value="active">Aktif</option>
+          <option value="upcoming">Akan Datang</option>
+          <option value="ended">Berakhir</option>
+          <option value="inactive">Nonaktif</option>
+        </select>
+      </div>
+
+      <div class="discount-table-wrapper">
+        <table class="discount-table">
+          <thead>
+            <tr>
+              <th>Produk</th>
+              <th>Harga Normal</th>
+              <th>Diskon</th>
+              <th>Harga Promo</th>
+              <th>Periode</th>
+              <th>Status</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="discountTableBody">
+            <tr>
+              <td colspan="7" class="table-loading">Memuat data diskon...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="discount-modal-overlay" id="discountModal">
+    <div class="discount-modal">
+      <div class="modal-header">
+        <h2 id="modalTitle">Tambah Diskon Produk</h2>
+        <button id="closeModalBtn" class="btn-close"><i class="fas fa-times"></i></button>
+      </div>
+      <form id="discountForm">
+        <input type="hidden" id="discountId">
+
+        <div class="form-group">
+          <label for="productId">Produk</label>
+          <select id="productId" required></select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="discountType">Tipe Diskon</label>
+            <select id="discountType" required>
+              <option value="percentage">Persentase (%)</option>
+              <option value="fixed">Nominal (Rp)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="discountValue">Nilai Diskon</label>
+            <input type="number" id="discountValue" min="1" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="startDate">Mulai Berlaku</label>
+            <input type="datetime-local" id="startDate">
+          </div>
+          <div class="form-group">
+            <label for="endDate">Akhir Berlaku</label>
+            <input type="datetime-local" id="endDate">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="notes">Catatan</label>
+          <textarea id="notes" rows="2" placeholder="Opsional"></textarea>
+        </div>
+
+        <div class="form-checkbox">
+          <input type="checkbox" id="isActive" checked>
+          <label for="isActive">Aktifkan diskon</label>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="cancelBtn" class="btn-secondary">Batal</button>
+          <button type="submit" class="btn-primary">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="../js/auth.js?v=1769014084"></script>
+  <script src="../js/api-helper.js?v=1769020002"></script>
+  <script src="../js/top-navbar.js?v=1769014084"></script>
+  <script src="../js/sidebar-nav.js?v=1769020001"></script>
+  <script src="../js/navbar.js?v=1769014084"></script>
+  <script src="js/discounts.js?v=1769020002"></script>
+</body>
+</html>

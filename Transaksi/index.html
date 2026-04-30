@@ -1083,6 +1083,98 @@
         }
         
         // ==========================================
+        // LOAD PRODUCTS AND DISCOUNTS
+        // ==========================================
+        
+        async function loadProductsWithDiscounts() {
+            try {
+                showLoadingSkeletons();
+                const API_BASE = 'http://localhost:3000/api';
+                
+                // Load products and active discounts in parallel
+                const productsRes = await fetch(`${API_BASE}/products`).then(r => r.json());
+                const discountsRes = await fetch(`${API_BASE}/discounts/active/list`).then(r => r.json());
+                
+                const products = Array.isArray(productsRes) ? productsRes : [];
+                const activeDiscounts = Array.isArray(discountsRes) ? discountsRes : [];
+                
+                // Map discounts by product_id for quick lookup
+                const discountMap = {};
+                activeDiscounts.forEach(discount => {
+                    discountMap[discount.product_id] = discount;
+                });
+                
+                // Render products with discount info
+                const productGrid = document.getElementById('productGrid');
+                productGrid.innerHTML = '';
+                
+                if (products.length === 0) {
+                    productGrid.innerHTML = '<div style="grid-column: 1/-1; padding: 20px; text-align: center; color: #999;">Produk tidak tersedia</div>';
+                    return;
+                }
+                
+                products.forEach(product => {
+                    const discount = discountMap[product.id];
+                    const hasDiscount = !!discount;
+                    const displayPrice = hasDiscount ? discount.discounted_price : product.price;
+                    
+                    const card = document.createElement('div');
+                    card.className = 'product-card';
+                    card.onclick = () => addToCart(product.id, product.name, displayPrice);
+                    
+                    // Build badge HTML
+                    let badgeHTML = '';
+                    if (hasDiscount) {
+                        const discountLabel = discount.discount_type === 'percentage' 
+                            ? `${discount.discount_value}%` 
+                            : `Rp ${parseInt(discount.discount_value).toLocaleString('id-ID')}`;
+                        badgeHTML = `<span class="product-badge promo" title="Diskon ${discountLabel}">${Math.round((discount.discount_value / (discount.discount_type === 'percentage' ? 100 : 1)) * 100) || 10}% OFF</span>`;
+                    }
+                    
+                    // Build price display - show original price crossed out if discount
+                    let priceHTML = '';
+                    if (hasDiscount) {
+                        const originalPrice = parseInt(product.price).toLocaleString('id-ID');
+                        const discountedPrice = parseInt(displayPrice).toLocaleString('id-ID');
+                        priceHTML = `
+                            <div class="product-price-wrapper">
+                                <span class="product-price-original">Rp ${originalPrice}</span>
+                                <span class="product-price-promo">Rp ${discountedPrice}</span>
+                            </div>
+                        `;
+                    } else {
+                        priceHTML = `<div class="product-price">Rp ${parseInt(displayPrice).toLocaleString('id-ID')}</div>`;
+                    }
+                    
+                    card.innerHTML = `
+                        ${badgeHTML}
+                        <div class="product-image-wrapper">
+                            <div class="product-image-placeholder">
+                                <i class="fas fa-coffee"></i>
+                            </div>
+                        </div>
+                        <div class="product-info">
+                            <div class="product-name">${product.name}</div>
+                            ${priceHTML}
+                            <div class="product-stock in-stock">
+                                <i class="fas fa-circle"></i>
+                                <span>Stok: ${product.stock || 0}</span>
+                            </div>
+                        </div>
+                    `;
+                    
+                    productGrid.appendChild(card);
+                });
+                
+                console.log(`✅ Loaded ${products.length} products with ${activeDiscounts.length} active discounts`);
+            } catch (error) {
+                console.error('❌ Error loading products:', error.message);
+                const productGrid = document.getElementById('productGrid');
+                productGrid.innerHTML = `<div style="grid-column: 1/-1; padding: 20px; color: #f44336;">⚠️ Error: ${error.message}</div>`;
+            }
+        }
+        
+        // ==========================================
         // INITIALIZATION
         // ==========================================
         
@@ -1097,8 +1189,8 @@
             renderCart();
             updateCartSummary();
             
-            // TODO: Load products from API
-            // loadProducts();
+            // Load products with discount info
+            loadProductsWithDiscounts();
         });
     </script>
 
@@ -1110,7 +1202,7 @@
     <!-- Auth & Navigation Scripts -->
     <script src="../js/auth.js?v=1769014084"></script>
     <script src="../js/top-navbar.js?v=1769014084"></script>
-    <script src="../js/sidebar-nav.js?v=1769014084"></script>
+    <script src="../js/sidebar-nav.js?v=1769020001"></script>
     <script src="../js/navbar.js?v=1769014084"></script>
 </body>
 </html>

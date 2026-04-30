@@ -231,6 +231,12 @@
             text: 'Pelanggan',
             url: '../Manajemen_Pelanggan/index.html',
             key: 'customers'
+          },
+          {
+            icon: 'fas fa-percent',
+            text: 'Diskon',
+            url: '../Manajemen_Diskon/index.html',
+            key: 'discounts'
           }
         ]
       },
