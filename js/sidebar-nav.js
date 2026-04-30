@@ -241,6 +241,17 @@
         ]
       },
       {
+        section: 'Transaksi',
+        items: [
+          {
+            icon: 'fas fa-history',
+            text: 'Riwayat Transaksi',
+            url: '../Riwayat_Transaksi/index.html',
+            key: 'history'
+          }
+        ]
+      },
+      {
         section: 'Laporan',
         items: [
           {

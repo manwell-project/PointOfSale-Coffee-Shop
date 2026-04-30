@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#6B4423">
+    <title>Riwayat Transaksi - DigiCaf</title>
+    
+    <!-- Design System CSS -->
+    <link rel="stylesheet" href="../css/design-tokens.css">
+    <link rel="stylesheet" href="../css/typography.css">
+    <link rel="stylesheet" href="../css/icons.css">
+    <link rel="stylesheet" href="../css/layout-system.css">
+    <link rel="stylesheet" href="../css/spacing-alignment.css">
+    
+    <!-- Component CSS -->
+    <link rel="stylesheet" href="../css/components/buttons.css">
+    <link rel="stylesheet" href="../css/components/cards.css">
+    <link rel="stylesheet" href="../css/components/forms.css">
+    <link rel="stylesheet" href="../css/components/badges-labels.css">
+    <link rel="stylesheet" href="../css/components/tables.css">
+    <link rel="stylesheet" href="../css/components/top-navbar-simple.css">
+    <link rel="stylesheet" href="../css/components/sidebar-nav.css">
+    <link rel="stylesheet" href="../css/components/modals.css">
+    <link rel="stylesheet" href="../css/components/loading-states.css">
+    <link rel="stylesheet" href="../css/components/empty-states.css">
+    
+    <!-- Responsive Design CSS -->
+    <link rel="stylesheet" href="../css/responsive.css">
+    <link rel="stylesheet" href="../css/mobile-optimizations.css">
+    <link rel="stylesheet" href="../css/tablet.css">
+    
+    <!-- Page Specific CSS -->
+    <link rel="stylesheet" href="./css/history-layout.css">
+    <link rel="stylesheet" href="../css/shared-ui.css">
+    <link rel="stylesheet" href="../css/components/page-adjustments.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <!-- Top Navigation Bar injected by top-navbar.js -->
+    
+    <!-- History Wrapper -->
+    <div class="history-wrapper">
+        <!-- History Container -->
+        <div class="history-container">
+            
+            <!-- History Header -->
+            <div class="history-header">
+                <div class="history-header-left">
+                    <h1 class="history-title">
+                        <i class="fas fa-history"></i>
+                        Riwayat Transaksi
+                    </h1>
+                    <p class="history-subtitle">Lihat semua transaksi penjualan Anda</p>
+                </div>
+                <div class="history-header-actions">
+                    <button class="btn-filter" id="filterToggleBtn" type="button">
+                        <i class="fas fa-sliders-h"></i>
+                        Filter
+                    </button>
+                    <button class="btn-export" id="exportBtn" type="button">
+                        <i class="fas fa-download"></i>
+                        Export
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filter Panel -->
+            <div class="filter-panel" id="filterPanel" style="display: none;">
+                <div class="filter-content">
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label for="filterFromDate">Dari Tanggal</label>
+                            <input type="date" id="filterFromDate" class="filter-input">
+                        </div>
+                        <div class="filter-group">
+                            <label for="filterToDate">Sampai Tanggal</label>
+                            <input type="date" id="filterToDate" class="filter-input">
+                        </div>
+                    </div>
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label for="filterPayment">Metode Pembayaran</label>
+                            <select id="filterPayment" class="filter-input">
+                                <option value="">Semua Metode</option>
+                                <option value="cash">Tunai</option>
+                                <option value="card">Kartu</option>
+                                <option value="transfer">Transfer</option>
+                                <option value="e-wallet">E-Wallet</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="filterStatus">Status</label>
+                            <select id="filterStatus" class="filter-input">
+                                <option value="">Semua Status</option>
+                                <option value="completed">Selesai</option>
+                                <option value="pending">Menunggu</option>
+                                <option value="cancelled">Dibatalkan</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="filter-actions">
+                        <button class="btn-secondary" id="resetFilterBtn" type="button">
+                            <i class="fas fa-redo"></i>
+                            Reset
+                        </button>
+                        <button class="btn-primary" id="applyFilterBtn" type="button">
+                            <i class="fas fa-check"></i>
+                            Terapkan
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="history-search-bar">
+                <div class="search-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        class="search-input" 
+                        placeholder="Cari berdasarkan ID transaksi, customer, atau karyawan..."
+                    >
+                </div>
+                <span class="results-count" id="resultsCount">0 transaksi</span>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="history-summary">
+                <div class="summary-card total-transactions">
+                    <div class="summary-icon">
+                        <i class="fas fa-receipt"></i>
+                    </div>
+                    <div class="summary-content">
+                        <div class="summary-label">Total Transaksi</div>
+                        <div class="summary-value" id="totalTransactions">0</div>
+                    </div>
+                </div>
+
+                <div class="summary-card total-revenue">
+                    <div class="summary-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="summary-content">
+                        <div class="summary-label">Total Pendapatan</div>
+                        <div class="summary-value" id="totalRevenue">Rp 0</div>
+                    </div>
+                </div>
+
+                <div class="summary-card avg-transaction">
+                    <div class="summary-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="summary-content">
+                        <div class="summary-label">Rata-rata Transaksi</div>
+                        <div class="summary-value" id="avgTransaction">Rp 0</div>
+                    </div>
+                </div>
+
+                <div class="summary-card completed-transactions">
+                    <div class="summary-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="summary-content">
+                        <div class="summary-label">Transaksi Selesai</div>
+                        <div class="summary-value" id="completedCount">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div class="table-loading" id="tableLoading">
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner"></i>
+                </div>
+                <p>Memuat data transaksi...</p>
+            </div>
+
+            <!-- Transactions Table -->
+            <div class="table-wrapper" id="tableWrapper" style="display: none;">
+                <table class="transactions-table" id="transactionsTable">
+                    <thead>
+                        <tr>
+                            <th>ID Transaksi</th>
+                            <th>Tanggal & Waktu</th>
+                            <th>Customer</th>
+                            <th>Karyawan</th>
+                            <th>Total</th>
+                            <th>Pembayaran</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionsTableBody">
+                        <!-- Table rows will be injected here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <div class="empty-icon">
+                    <i class="fas fa-inbox"></i>
+                </div>
+                <h3>Tidak ada transaksi</h3>
+                <p>Belum ada data transaksi yang dapat ditampilkan</p>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination" id="pagination" style="display: none;">
+                <button class="btn-pagination prev" id="prevPageBtn">
+                    <i class="fas fa-chevron-left"></i>
+                    Sebelumnya
+                </button>
+                <div class="pagination-info">
+                    <span id="pageInfo">Halaman 1</span>
+                </div>
+                <button class="btn-pagination next" id="nextPageBtn">
+                    Selanjutnya
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaction Detail Modal -->
+    <div class="modal" id="detailModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">Detail Transaksi</h2>
+                    <button class="modal-close" id="closeModalBtn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="modal-body" id="modalBody">
+                    <!-- Detail content will be injected here -->
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn-secondary" id="printReceiptBtn">
+                        <i class="fas fa-print"></i>
+                        Print Receipt
+                    </button>
+                    <button class="btn-primary" id="closeDetailBtn">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/top-navbar.js"></script>
+    <script src="../js/sidebar-nav.js"></script>
+    <script src="../js/toast.js"></script>
+    <script src="../js/api-helper.js"></script>
+    <script src="./js/transaction-history.js"></script>
+</body>
+</html>
