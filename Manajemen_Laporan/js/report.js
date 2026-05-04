@@ -3,6 +3,14 @@
  * Handles report page initialization and report core features
  */
 
+if (window.Framework7 && document.getElementById('app')) {
+    window.reportF7App = new Framework7({
+        el: '#app',
+        name: 'DigiCaf',
+        theme: 'auto'
+    });
+}
+
 // ============================================
 // DOM ELEMENT REFERENCES
 // ============================================

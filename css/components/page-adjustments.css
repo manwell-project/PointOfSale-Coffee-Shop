@@ -70,7 +70,7 @@ body.sidebar-visible.sidebar-collapsed .pos-wrapper {
 }
 
 /* Reset margins and navbar positions on mobile (sidebar hidden) */
-@media (max-width: 1024px) {
+@media (max-width: 767px) {
   body.sidebar-visible .dashboard-container,
   body.sidebar-visible .stock-wrapper,
   body.sidebar-visible .employee-wrapper,

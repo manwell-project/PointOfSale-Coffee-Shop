@@ -6,396 +6,404 @@
     <meta name="theme-color" content="#0ea5e9">
     <title>Laporan - DigiCaf</title>
     <link rel="stylesheet" href="../css/design-tokens.css">
-    <link rel="stylesheet" href="../css/components/top-navbar-simple.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/framework7/8.3.2/css/framework7-bundle.min.css">
     <link rel="stylesheet" href="../css/components/sidebar-nav.css">
     <link rel="stylesheet" href="../css/components/page-adjustments.css">
     <link rel="stylesheet" href="css/report-layout.css">
     <link rel="stylesheet" href="../css/shared-ui.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
-<body>
-    <!-- Top Navigation Bar will be injected by top-navbar.js -->
-    <!-- Report Wrapper -->
-    <div class="report-wrapper">
-        <!-- Report Container -->
-        <div class="report-container">
-            <!-- Report Header -->
-            <div class="report-header">
-                <div class="report-header-left">
-                    <h1 class="report-title">
-                        <i class="fas fa-chart-line"></i>
-                        Laporan
-                    </h1>
-                    <p class="report-subtitle">Analisis penjualan, produk, dan karyawan</p>
-                </div>
-                <div class="report-header-actions">
-                    <div class="btn-export-group">
-                        <button class="btn-export pdf" id="exportPdfBtn" type="button">
-                            <i class="fas fa-file-pdf"></i>
-                            PDF
-                        </button>
-                        <button class="btn-export excel" id="exportExcelBtn" type="button">
-                            <i class="fas fa-file-excel"></i>
-                            Excel
-                        </button>
-                        <button class="btn-export csv" id="exportCsvBtn" type="button">
-                            <i class="fas fa-file-csv"></i>
-                            CSV
-                        </button>
-                    </div>
-                    <button class="btn-print" id="printReportBtn" type="button">
-                        <i class="fas fa-print"></i>
-                        Print
-                    </button>
-                </div>
-            </div>
-
-            <!-- Report Type Tabs -->
-            <div class="report-type-tabs">
-                <button class="report-tab active" data-report="sales">
-                    <i class="fas fa-chart-bar"></i>
-                    Penjualan
-                    <span class="report-tab-badge" id="badgeSales">0</span>
-                </button>
-                <button class="report-tab" data-report="products">
-                    <i class="fas fa-box"></i>
-                    Produk
-                    <span class="report-tab-badge" id="badgeProducts">0</span>
-                </button>
-                <button class="report-tab" data-report="employees">
-                    <i class="fas fa-user-tie"></i>
-                    Karyawan
-                    <span class="report-tab-badge" id="badgeEmployees">0</span>
-                </button>
-            </div>
-
-            <!-- Report Content Header -->
-            <div class="report-content-header">
-                <h2 class="report-content-title" id="reportContentTitle">
-                    <i class="fas fa-chart-bar"></i>
-                    Laporan Penjualan
-                </h2>
-                <div class="report-period" id="reportPeriod">
-                    <i class="fas fa-calendar"></i>
-                    <span>-</span>
-                </div>
-            </div>
-
-            <!-- Summary Cards -->
-            <div class="report-summary">
-                <div class="summary-card revenue">
-                    <div class="summary-icon">
-                        <i class="fas fa-money-bill-wave"></i>
-                    </div>
-                    <div class="summary-content">
-                        <div class="summary-label">Total Pendapatan</div>
-                        <div class="summary-value" id="totalRevenue">Rp 0</div>
-                        <div class="summary-change positive">
-                            <i class="fas fa-arrow-up"></i>
-                            <span>+0%</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="summary-card transactions">
-                    <div class="summary-icon">
-                        <i class="fas fa-shopping-cart"></i>
-                    </div>
-                    <div class="summary-content">
-                        <div class="summary-label">Total Transaksi</div>
-                        <div class="summary-value" id="totalTransactions">0</div>
-                        <div class="summary-change positive">
-                            <i class="fas fa-arrow-up"></i>
-                            <span>+0%</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="summary-card products">
-                    <div class="summary-icon">
-                        <i class="fas fa-box"></i>
-                    </div>
-                    <div class="summary-content">
-                        <div class="summary-label">Produk Terjual</div>
-                        <div class="summary-value" id="totalProductsSold">0</div>
-                        <div class="summary-change positive">
-                            <i class="fas fa-arrow-up"></i>
-                            <span>+0%</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="summary-card average">
-                    <div class="summary-icon">
-                        <i class="fas fa-calculator"></i>
-                    </div>
-                    <div class="summary-content">
-                        <div class="summary-label">Rata-rata Transaksi</div>
-                        <div class="summary-value" id="avgTransaction">Rp 0</div>
-                        <div class="summary-change positive">
-                            <i class="fas fa-arrow-up"></i>
-                            <span>+0%</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Filter Section -->
-            <div class="report-filters">
-                <div class="filter-header">
-                    <h3 class="filter-title">
-                        <i class="fas fa-filter"></i>
-                        Filter Laporan
-                    </h3>
-                    <button class="btn-reset-filter" id="resetFilterBtn">
-                        <i class="fas fa-redo"></i>
-                        Reset
-                    </button>
-                </div>
-
-                <div class="filter-grid">
-                    <!-- Date Range Picker -->
-                    <div class="filter-group">
-                        <label class="filter-label required">Periode Tanggal</label>
-                        <div class="date-range-picker">
-                            <div class="date-range-row">
-                                <div class="date-input-wrapper">
-                                    <input type="date" id="dateFrom" class="date-input">
-                                    <i class="fas fa-calendar-alt date-input-icon"></i>
+<body class="report-page">
+    <!-- Sidebar Navigation handled by sidebar-nav.js -->
+    <div id="app" class="app">
+        <div class="view view-main">
+            <div class="page" data-name="reports">
+                <div class="page-content">
+                    <!-- Report Wrapper -->
+                    <div class="report-wrapper">
+                        <!-- Report Container -->
+                        <div class="report-container">
+                            <!-- Report Header -->
+                            <div class="report-header card">
+                                <div class="report-header-left">
+                                    <h1 class="report-title">
+                                        <i class="fas fa-chart-line"></i>
+                                        Laporan
+                                    </h1>
+                                    <p class="report-subtitle">Analisis penjualan, produk, dan karyawan</p>
                                 </div>
-                                <span class="date-separator">—</span>
-                                <div class="date-input-wrapper">
-                                    <input type="date" id="dateTo" class="date-input">
-                                    <i class="fas fa-calendar-alt date-input-icon"></i>
+                                <div class="report-header-actions">
+                                    <div class="btn-export-group">
+                                        <button class="btn-export pdf" id="exportPdfBtn" type="button">
+                                            <i class="fas fa-file-pdf"></i>
+                                            PDF
+                                        </button>
+                                        <button class="btn-export excel" id="exportExcelBtn" type="button">
+                                            <i class="fas fa-file-excel"></i>
+                                            Excel
+                                        </button>
+                                        <button class="btn-export csv" id="exportCsvBtn" type="button">
+                                            <i class="fas fa-file-csv"></i>
+                                            CSV
+                                        </button>
+                                    </div>
+                                    <button class="btn-print" id="printReportBtn" type="button">
+                                        <i class="fas fa-print"></i>
+                                        Print
+                                    </button>
                                 </div>
                             </div>
-                            <div class="date-presets">
-                                <button class="preset-btn" data-preset="today">Hari Ini</button>
-                                <button class="preset-btn" data-preset="yesterday">Kemarin</button>
-                                <button class="preset-btn" data-preset="week">Minggu Ini</button>
-                                <button class="preset-btn" data-preset="month">Bulan Ini</button>
-                                <button class="preset-btn" data-preset="year">Tahun Ini</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Category Filter (for Products) -->
-                    <div class="filter-group" id="categoryFilterGroup" style="display: none;">
-                        <label class="filter-label">Kategori Produk</label>
-                        <div class="filter-select">
-                            <select id="filterCategory">
-                                <option value="all">Semua Kategori</option>
-                                <option value="coffee">Kopi</option>
-                                <option value="non-coffee">Non-Kopi</option>
-                                <option value="food">Makanan</option>
-                                <option value="snack">Snack</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Status Filter -->
-                    <div class="filter-group">
-                        <label class="filter-label">Status</label>
-                        <div class="filter-select">
-                            <select id="filterStatus">
-                                <option value="all">Semua Status</option>
-                                <option value="completed">Selesai</option>
-                                <option value="pending">Pending</option>
-                                <option value="cancelled">Dibatalkan</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Payment Method Filter -->
-                    <div class="filter-group">
-                        <label class="filter-label">Metode Pembayaran</label>
-                        <div class="filter-select">
-                            <select id="filterPayment">
-                                <option value="all">Semua Metode</option>
-                                <option value="cash">Tunai</option>
-                                <option value="debit">Kartu Debit</option>
-                                <option value="credit">Kartu Kredit</option>
-                                <option value="ewallet">E-Wallet</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="filter-actions">
-                    <button class="btn-filter-action btn-filter-cancel" id="cancelFilterBtn">
-                        <i class="fas fa-times"></i>
-                        Batal
-                    </button>
-                    <button class="btn-filter-action btn-filter-apply" id="applyFilterBtn">
-                        <i class="fas fa-check"></i>
-                        Terapkan Filter
-                    </button>
-                </div>
-            </div>
-
-            <!-- Report Content -->
-            <div class="report-content">
-                <!-- Charts Section -->
-                <div class="charts-section">
-                    <div class="charts-grid">
-                        <!-- Sales Chart -->
-                        <div class="chart-container bar-chart full-width">
-                            <div class="chart-header">
-                                <h3 class="chart-title">
+                
+                            <!-- Report Type Tabs -->
+                            <div class="report-type-tabs segmented segmented-strong">
+                                <button class="report-tab button button-small active" data-report="sales">
                                     <i class="fas fa-chart-bar"></i>
-                                    Grafik Penjualan
-                                </h3>
-                                <div class="chart-actions">
-                                    <button class="chart-action-btn" title="Fullscreen">
-                                        <i class="fas fa-expand"></i>
-                                    </button>
-                                    <button class="chart-action-btn" title="Download">
-                                        <i class="fas fa-download"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="chart-canvas" id="salesChart">
-                                <div class="chart-placeholder">
-                                    <i class="fas fa-chart-bar"></i>
-                                    <p class="chart-placeholder-text">Grafik penjualan akan ditampilkan di sini</p>
-                                </div>
-                            </div>
-                            <div class="chart-legend">
-                                <div class="legend-item">
-                                    <div class="legend-color" style="background: #0ea5e9;"></div>
-                                    <span class="legend-label">Penjualan:</span>
-                                    <span class="legend-value">Rp 0</span>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="legend-color" style="background: #059669;"></div>
-                                    <span class="legend-label">Target:</span>
-                                    <span class="legend-value">Rp 0</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Product Distribution Chart -->
-                        <div class="chart-container pie-chart">
-                            <div class="chart-header">
-                                <h3 class="chart-title">
-                                    <i class="fas fa-chart-pie"></i>
-                                    Distribusi Produk
-                                </h3>
-                                <div class="chart-actions">
-                                    <button class="chart-action-btn" title="Download">
-                                        <i class="fas fa-download"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="chart-canvas" id="productChart">
-                                <div class="chart-placeholder">
-                                    <i class="fas fa-chart-pie"></i>
-                                    <p class="chart-placeholder-text">Grafik distribusi produk</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Payment Methods Chart -->
-                        <div class="chart-container pie-chart">
-                            <div class="chart-header">
-                                <h3 class="chart-title">
-                                    <i class="fas fa-credit-card"></i>
-                                    Metode Pembayaran
-                                </h3>
-                                <div class="chart-actions">
-                                    <button class="chart-action-btn" title="Download">
-                                        <i class="fas fa-download"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="chart-canvas" id="paymentChart">
-                                <div class="chart-placeholder">
-                                    <i class="fas fa-chart-pie"></i>
-                                    <p class="chart-placeholder-text">Grafik metode pembayaran</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Data Table Section -->
-                <div class="data-table-section">
-                    <div class="table-header">
-                        <h3 class="table-title">
-                            <i class="fas fa-table"></i>
-                            Detail Transaksi
-                        </h3>
-                        <div class="table-controls">
-                            <div class="table-search">
-                                <input type="text" id="tableSearch" placeholder="Cari transaksi...">
-                                <i class="fas fa-search"></i>
-                            </div>
-                            <div class="table-view-toggle">
-                                <button class="view-toggle-btn active" data-view="table">
-                                    <i class="fas fa-table"></i>
+                                    Penjualan
+                                    <span class="report-tab-badge" id="badgeSales">0</span>
                                 </button>
-                                <button class="view-toggle-btn" data-view="grid">
-                                    <i class="fas fa-th"></i>
+                                <button class="report-tab button button-small" data-report="products">
+                                    <i class="fas fa-box"></i>
+                                    Produk
+                                    <span class="report-tab-badge" id="badgeProducts">0</span>
+                                </button>
+                                <button class="report-tab button button-small" data-report="employees">
+                                    <i class="fas fa-user-tie"></i>
+                                    Karyawan
+                                    <span class="report-tab-badge" id="badgeEmployees">0</span>
                                 </button>
                             </div>
-                        </div>
-                    </div>
-
-                    <div class="report-table-wrapper">
-                        <table class="report-table" id="reportTable">
-                            <thead>
-                                <tr>
-                                    <th class="sortable" data-sort="id">ID</th>
-                                    <th class="sortable" data-sort="date">Tanggal</th>
-                                    <th class="sortable" data-sort="customer">Pelanggan</th>
-                                    <th class="sortable" data-sort="items">Item</th>
-                                    <th class="sortable number" data-sort="amount">Total</th>
-                                    <th class="sortable" data-sort="payment">Pembayaran</th>
-                                    <th>Status</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="reportTableBody">
-                                <!-- Table rows will be inserted here -->
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td colspan="4" style="text-align: right;"><strong>Total:</strong></td>
-                                    <td class="currency" id="tableTotal">Rp 0</td>
-                                    <td colspan="3"></td>
-                                </tr>
-                            </tfoot>
-                        </table>
-
-                        <!-- Loading State -->
-                        <div class="report-loading" id="tableLoading" style="display: none;">
-                            <div class="loading-spinner"></div>
-                            <div class="loading-text">Memuat data...</div>
-                        </div>
-
-                        <!-- Empty State -->
-                        <div class="report-empty-state" id="tableEmpty" style="display: none;">
-                            <div class="empty-icon">
-                                <i class="fas fa-inbox"></i>
+                
+                            <!-- Report Content Header -->
+                            <div class="report-content-header">
+                                <h2 class="report-content-title block-title" id="reportContentTitle">
+                                    <i class="fas fa-chart-bar"></i>
+                                    Laporan Penjualan
+                                </h2>
+                                <div class="report-period" id="reportPeriod">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>-</span>
+                                </div>
                             </div>
-                            <div class="empty-title">Tidak Ada Data</div>
-                            <div class="empty-text">Tidak ada transaksi ditemukan untuk periode yang dipilih</div>
-                        </div>
-                    </div>
-
-                    <!-- Table Pagination -->
-                    <div class="table-pagination" id="tablePagination">
-                        <div class="pagination-info" id="paginationInfo">
-                            Menampilkan 0 dari 0 transaksi
-                        </div>
-                        <div class="pagination-controls">
-                            <button class="pagination-btn" id="btnPrevPage" disabled>
-                                <i class="fas fa-chevron-left"></i>
-                            </button>
-                            <div id="paginationButtons"></div>
-                            <button class="pagination-btn" id="btnNextPage" disabled>
-                                <i class="fas fa-chevron-right"></i>
-                            </button>
+                
+                            <!-- Summary Cards -->
+                            <div class="report-summary cards-list">
+                                <div class="summary-card card revenue">
+                                    <div class="summary-icon">
+                                        <i class="fas fa-money-bill-wave"></i>
+                                    </div>
+                                    <div class="summary-content">
+                                        <div class="summary-label">Total Pendapatan</div>
+                                        <div class="summary-value" id="totalRevenue">Rp 0</div>
+                                        <div class="summary-change positive">
+                                            <i class="fas fa-arrow-up"></i>
+                                            <span>+0%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                
+                                <div class="summary-card card transactions">
+                                    <div class="summary-icon">
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </div>
+                                    <div class="summary-content">
+                                        <div class="summary-label">Total Transaksi</div>
+                                        <div class="summary-value" id="totalTransactions">0</div>
+                                        <div class="summary-change positive">
+                                            <i class="fas fa-arrow-up"></i>
+                                            <span>+0%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                
+                                <div class="summary-card card products">
+                                    <div class="summary-icon">
+                                        <i class="fas fa-box"></i>
+                                    </div>
+                                    <div class="summary-content">
+                                        <div class="summary-label">Produk Terjual</div>
+                                        <div class="summary-value" id="totalProductsSold">0</div>
+                                        <div class="summary-change positive">
+                                            <i class="fas fa-arrow-up"></i>
+                                            <span>+0%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                
+                                <div class="summary-card card average">
+                                    <div class="summary-icon">
+                                        <i class="fas fa-calculator"></i>
+                                    </div>
+                                    <div class="summary-content">
+                                        <div class="summary-label">Rata-rata Transaksi</div>
+                                        <div class="summary-value" id="avgTransaction">Rp 0</div>
+                                        <div class="summary-change positive">
+                                            <i class="fas fa-arrow-up"></i>
+                                            <span>+0%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                
+                            <!-- Filter Section -->
+                            <div class="report-filters card">
+                                <div class="filter-header">
+                                    <h3 class="filter-title">
+                                        <i class="fas fa-filter"></i>
+                                        Filter Laporan
+                                    </h3>
+                                    <button class="btn-reset-filter" id="resetFilterBtn">
+                                        <i class="fas fa-redo"></i>
+                                        Reset
+                                    </button>
+                                </div>
+                
+                                <div class="filter-grid">
+                                    <!-- Date Range Picker -->
+                                    <div class="filter-group">
+                                        <label class="filter-label required">Periode Tanggal</label>
+                                        <div class="date-range-picker">
+                                            <div class="date-range-row">
+                                                <div class="date-input-wrapper">
+                                                    <input type="date" id="dateFrom" class="date-input">
+                                                    <i class="fas fa-calendar-alt date-input-icon"></i>
+                                                </div>
+                                                <span class="date-separator">—</span>
+                                                <div class="date-input-wrapper">
+                                                    <input type="date" id="dateTo" class="date-input">
+                                                    <i class="fas fa-calendar-alt date-input-icon"></i>
+                                                </div>
+                                            </div>
+                                            <div class="date-presets segmented segmented-strong">
+                                                <button class="preset-btn button button-small" data-preset="today">Hari Ini</button>
+                                                <button class="preset-btn button button-small" data-preset="yesterday">Kemarin</button>
+                                                <button class="preset-btn button button-small" data-preset="week">Minggu Ini</button>
+                                                <button class="preset-btn button button-small" data-preset="month">Bulan Ini</button>
+                                                <button class="preset-btn button button-small" data-preset="year">Tahun Ini</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                
+                                    <!-- Category Filter (for Products) -->
+                                    <div class="filter-group" id="categoryFilterGroup" style="display: none;">
+                                        <label class="filter-label">Kategori Produk</label>
+                                        <div class="filter-select">
+                                            <select id="filterCategory">
+                                                <option value="all">Semua Kategori</option>
+                                                <option value="coffee">Kopi</option>
+                                                <option value="non-coffee">Non-Kopi</option>
+                                                <option value="food">Makanan</option>
+                                                <option value="snack">Snack</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                
+                                    <!-- Status Filter -->
+                                    <div class="filter-group">
+                                        <label class="filter-label">Status</label>
+                                        <div class="filter-select">
+                                            <select id="filterStatus">
+                                                <option value="all">Semua Status</option>
+                                                <option value="completed">Selesai</option>
+                                                <option value="pending">Pending</option>
+                                                <option value="cancelled">Dibatalkan</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                
+                                    <!-- Payment Method Filter -->
+                                    <div class="filter-group">
+                                        <label class="filter-label">Metode Pembayaran</label>
+                                        <div class="filter-select">
+                                            <select id="filterPayment">
+                                                <option value="all">Semua Metode</option>
+                                                <option value="cash">Tunai</option>
+                                                <option value="debit">Kartu Debit</option>
+                                                <option value="credit">Kartu Kredit</option>
+                                                <option value="ewallet">E-Wallet</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                
+                                <div class="filter-actions">
+                                    <button class="btn-filter-action btn-filter-cancel" id="cancelFilterBtn">
+                                        <i class="fas fa-times"></i>
+                                        Batal
+                                    </button>
+                                    <button class="btn-filter-action btn-filter-apply" id="applyFilterBtn">
+                                        <i class="fas fa-check"></i>
+                                        Terapkan Filter
+                                    </button>
+                                </div>
+                            </div>
+                
+                            <!-- Report Content -->
+                            <div class="report-content card">
+                                <!-- Charts Section -->
+                                <div class="charts-section">
+                                    <div class="charts-grid">
+                                        <!-- Sales Chart -->
+                                        <div class="chart-container card bar-chart full-width">
+                                            <div class="chart-header">
+                                                <h3 class="chart-title">
+                                                    <i class="fas fa-chart-bar"></i>
+                                                    Grafik Penjualan
+                                                </h3>
+                                                <div class="chart-actions">
+                                                    <button class="chart-action-btn" title="Fullscreen">
+                                                        <i class="fas fa-expand"></i>
+                                                    </button>
+                                                    <button class="chart-action-btn" title="Download">
+                                                        <i class="fas fa-download"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="chart-canvas" id="salesChart">
+                                                <div class="chart-placeholder">
+                                                    <i class="fas fa-chart-bar"></i>
+                                                    <p class="chart-placeholder-text">Grafik penjualan akan ditampilkan di sini</p>
+                                                </div>
+                                            </div>
+                                            <div class="chart-legend">
+                                                <div class="legend-item">
+                                                    <div class="legend-color" style="background: #0ea5e9;"></div>
+                                                    <span class="legend-label">Penjualan:</span>
+                                                    <span class="legend-value">Rp 0</span>
+                                                </div>
+                                                <div class="legend-item">
+                                                    <div class="legend-color" style="background: #059669;"></div>
+                                                    <span class="legend-label">Target:</span>
+                                                    <span class="legend-value">Rp 0</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                
+                                        <!-- Product Distribution Chart -->
+                                        <div class="chart-container card pie-chart">
+                                            <div class="chart-header">
+                                                <h3 class="chart-title">
+                                                    <i class="fas fa-chart-pie"></i>
+                                                    Distribusi Produk
+                                                </h3>
+                                                <div class="chart-actions">
+                                                    <button class="chart-action-btn" title="Download">
+                                                        <i class="fas fa-download"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="chart-canvas" id="productChart">
+                                                <div class="chart-placeholder">
+                                                    <i class="fas fa-chart-pie"></i>
+                                                    <p class="chart-placeholder-text">Grafik distribusi produk</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                
+                                        <!-- Payment Methods Chart -->
+                                        <div class="chart-container card pie-chart">
+                                            <div class="chart-header">
+                                                <h3 class="chart-title">
+                                                    <i class="fas fa-credit-card"></i>
+                                                    Metode Pembayaran
+                                                </h3>
+                                                <div class="chart-actions">
+                                                    <button class="chart-action-btn" title="Download">
+                                                        <i class="fas fa-download"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="chart-canvas" id="paymentChart">
+                                                <div class="chart-placeholder">
+                                                    <i class="fas fa-chart-pie"></i>
+                                                    <p class="chart-placeholder-text">Grafik metode pembayaran</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                
+                                <!-- Data Table Section -->
+                                <div class="data-table-section">
+                                    <div class="table-header">
+                                        <h3 class="table-title">
+                                            <i class="fas fa-table"></i>
+                                            Detail Transaksi
+                                        </h3>
+                                        <div class="table-controls">
+                                            <div class="table-search">
+                                                <input type="text" id="tableSearch" placeholder="Cari transaksi...">
+                                                <i class="fas fa-search"></i>
+                                            </div>
+                                            <div class="table-view-toggle">
+                                                <button class="view-toggle-btn active" data-view="table">
+                                                    <i class="fas fa-table"></i>
+                                                </button>
+                                                <button class="view-toggle-btn" data-view="grid">
+                                                    <i class="fas fa-th"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                
+                                    <div class="report-table-wrapper data-table">
+                                        <table class="report-table" id="reportTable">
+                                            <thead>
+                                                <tr>
+                                                    <th class="sortable" data-sort="id">ID</th>
+                                                    <th class="sortable" data-sort="date">Tanggal</th>
+                                                    <th class="sortable" data-sort="customer">Pelanggan</th>
+                                                    <th class="sortable" data-sort="items">Item</th>
+                                                    <th class="sortable number" data-sort="amount">Total</th>
+                                                    <th class="sortable" data-sort="payment">Pembayaran</th>
+                                                    <th>Status</th>
+                                                    <th>Aksi</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="reportTableBody">
+                                                <!-- Table rows will be inserted here -->
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <td colspan="4" style="text-align: right;"><strong>Total:</strong></td>
+                                                    <td class="currency" id="tableTotal">Rp 0</td>
+                                                    <td colspan="3"></td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                
+                                        <!-- Loading State -->
+                                        <div class="report-loading" id="tableLoading" style="display: none;">
+                                            <div class="loading-spinner"></div>
+                                            <div class="loading-text">Memuat data...</div>
+                                        </div>
+                
+                                        <!-- Empty State -->
+                                        <div class="report-empty-state" id="tableEmpty" style="display: none;">
+                                            <div class="empty-icon">
+                                                <i class="fas fa-inbox"></i>
+                                            </div>
+                                            <div class="empty-title">Tidak Ada Data</div>
+                                            <div class="empty-text">Tidak ada transaksi ditemukan untuk periode yang dipilih</div>
+                                        </div>
+                                    </div>
+                
+                                    <!-- Table Pagination -->
+                                    <div class="table-pagination" id="tablePagination">
+                                        <div class="pagination-info" id="paginationInfo">
+                                            Menampilkan 0 dari 0 transaksi
+                                        </div>
+                                        <div class="pagination-controls">
+                                            <button class="pagination-btn" id="btnPrevPage" disabled>
+                                                <i class="fas fa-chevron-left"></i>
+                                            </button>
+                                            <div id="paginationButtons"></div>
+                                            <button class="pagination-btn" id="btnNextPage" disabled>
+                                                <i class="fas fa-chevron-right"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -404,9 +412,9 @@
     </div>
 
     <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/framework7/8.3.2/js/framework7-bundle.min.js"></script>
     <script src="../js/auth.js"></script>
     <script src="../js/api-helper.js"></script>
-    <script src="../js/top-navbar.js"></script>
     <script src="../js/sidebar-nav.js"></script>
     <script src="../js/navbar.js"></script>
     <script src="js/report.js"></script>
