@@ -59,6 +59,12 @@ const exportExcelBtn = document.getElementById('exportExcelBtn');
 const exportCsvBtn = document.getElementById('exportCsvBtn');
 const printReportBtn = document.getElementById('printReportBtn');
 
+const profitRevenueEl = document.getElementById('profitRevenue');
+const profitExpenseEl = document.getElementById('profitExpense');
+const profitNetEl = document.getElementById('profitNet');
+const profitMarginEl = document.getElementById('profitMargin');
+const profitStatusEl = document.getElementById('profitStatus');
+
 // ============================================
 // STATE MANAGEMENT
 // ============================================
@@ -66,6 +72,8 @@ const printReportBtn = document.getElementById('printReportBtn');
 let transactions = [];
 let filteredTransactions = [];
 let currentRows = [];
+let rawStockHistory = [];
+let rawMaterialPrices = new Map();
 let currentReport = 'sales';
 let currentPage = 1;
 const pageSize = 10;
@@ -204,7 +212,24 @@ async function loadReportData() {
     showLoading(true);
 
     try {
-        const rawTransactions = await window.API.Transactions.getAll();
+        const [transactionsResult, historyResult, rawStocksResult] = await Promise.allSettled([
+            window.API.Transactions.getAll(),
+            window.API.Stocks.getHistoryAll({ limit: 1000 }),
+            window.API.Stocks.getAll()
+        ]);
+
+        const rawTransactions = transactionsResult.status === 'fulfilled' ? transactionsResult.value : [];
+        rawStockHistory = historyResult.status === 'fulfilled' ? historyResult.value : [];
+        rawMaterialPrices = buildRawMaterialPriceMap(rawStocksResult.status === 'fulfilled' ? rawStocksResult.value : []);
+
+        if (historyResult.status === 'rejected') {
+            console.warn('Stock history unavailable for profit/loss:', historyResult.reason);
+        }
+
+        if (rawStocksResult.status === 'rejected') {
+            console.warn('Raw stock prices unavailable for profit/loss:', rawStocksResult.reason);
+        }
+
         transactions = await enrichTransactionsWithItems(rawTransactions || []);
         renderReport();
     } catch (error) {
@@ -212,6 +237,8 @@ async function loadReportData() {
         transactions = [];
         filteredTransactions = [];
         currentRows = [];
+        rawStockHistory = [];
+        rawMaterialPrices = new Map();
         renderReport();
         showReportMessage('Gagal memuat data laporan dari server.', 'error');
     } finally {
@@ -478,8 +505,67 @@ function renderReport() {
 
     currentRows = sortRows(currentRows);
     updateSummaryCards(filteredTransactions, productRows, employeeRows);
+    updateProfitLoss(filteredTransactions);
     updateReportMeta();
     renderTable();
+}
+
+function updateProfitLoss(salesData) {
+    if (!profitRevenueEl || !profitExpenseEl || !profitNetEl || !profitMarginEl) return;
+
+    const revenue = salesData.reduce((sum, tx) => sum + (Number(tx.totalAmount) || 0), 0);
+    const expense = calculateStockExpense();
+    const net = revenue - expense;
+    const margin = revenue > 0 ? (net / revenue) * 100 : 0;
+
+    setElementText(profitRevenueEl, formatCurrency(revenue));
+    setElementText(profitExpenseEl, formatCurrency(expense));
+    setElementText(profitNetEl, formatCurrency(net));
+    setElementText(profitMarginEl, `${margin.toFixed(1)}%`);
+
+    if (profitStatusEl) {
+        profitStatusEl.textContent = net >= 0 ? 'Laba' : 'Rugi';
+        profitStatusEl.classList.toggle('negative', net < 0);
+    }
+}
+
+function calculateStockExpense() {
+    if (!Array.isArray(rawStockHistory) || rawStockHistory.length === 0) return 0;
+
+    const dateFrom = appliedFilters.dateFrom ? new Date(`${appliedFilters.dateFrom}T00:00:00`) : null;
+    const dateTo = appliedFilters.dateTo ? new Date(`${appliedFilters.dateTo}T23:59:59`) : null;
+
+    return rawStockHistory.reduce((sum, row) => {
+        const changedAtRaw = row.changed_at || row.changedAt;
+        if (!changedAtRaw) return sum;
+        const changedAt = new Date(changedAtRaw);
+        if (Number.isNaN(changedAt.getTime())) return sum;
+        if (dateFrom && changedAt < dateFrom) return sum;
+        if (dateTo && changedAt > dateTo) return sum;
+
+        const delta = Number(row.delta ?? (Number(row.quantity_after) - Number(row.quantity_before)));
+        if (!Number.isFinite(delta) || delta <= 0) return sum;
+
+        const rawId = Number(row.raw_material_id ?? row.rawMaterialId ?? row.material_id ?? row.materialId);
+        const price = rawMaterialPrices.get(rawId) ?? Number(row.price) ?? 0;
+
+        return sum + (delta * (Number(price) || 0));
+    }, 0);
+}
+
+function buildRawMaterialPriceMap(rawStocks) {
+    const map = new Map();
+    if (!Array.isArray(rawStocks)) return map;
+
+    rawStocks.forEach((row) => {
+        const rawId = Number(row.raw_material_id ?? row.rawMaterialId ?? row.id);
+        const price = Number(row.price ?? row.costPrice ?? 0);
+        if (Number.isFinite(rawId) && Number.isFinite(price)) {
+            map.set(rawId, price);
+        }
+    });
+
+    return map;
 }
 
 function getFilteredTransactions() {

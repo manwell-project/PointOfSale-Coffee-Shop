@@ -165,12 +165,10 @@
                                             <div class="date-range-row">
                                                 <div class="date-input-wrapper">
                                                     <input type="date" id="dateFrom" class="date-input">
-                                                    <i class="fas fa-calendar-alt date-input-icon"></i>
                                                 </div>
                                                 <span class="date-separator">—</span>
                                                 <div class="date-input-wrapper">
                                                     <input type="date" id="dateTo" class="date-input">
-                                                    <i class="fas fa-calendar-alt date-input-icon"></i>
                                                 </div>
                                             </div>
                                             <div class="date-presets segmented segmented-strong">
@@ -299,24 +297,37 @@
                                             </div>
                                         </div>
                 
-                                        <!-- Payment Methods Chart -->
-                                        <div class="chart-container card pie-chart">
+                                        <!-- Profit & Loss Table -->
+                                        <div class="chart-container card profit-loss-card">
                                             <div class="chart-header">
                                                 <h3 class="chart-title">
-                                                    <i class="fas fa-credit-card"></i>
-                                                    Metode Pembayaran
+                                                    <i class="fas fa-scale-balanced"></i>
+                                                    Laba Rugi Otomatis
                                                 </h3>
-                                                <div class="chart-actions">
-                                                    <button class="chart-action-btn" title="Download">
-                                                        <i class="fas fa-download"></i>
-                                                    </button>
-                                                </div>
                                             </div>
-                                            <div class="chart-canvas" id="paymentChart">
-                                                <div class="chart-placeholder">
-                                                    <i class="fas fa-chart-pie"></i>
-                                                    <p class="chart-placeholder-text">Grafik metode pembayaran</p>
-                                                </div>
+                                            <div class="profit-loss-table-wrapper">
+                                                <table class="profit-loss-table">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>Total Pendapatan</td>
+                                                            <td class="value" id="profitRevenue">Rp 0</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Estimasi Biaya Bahan</td>
+                                                            <td class="value" id="profitExpense">Rp 0</td>
+                                                        </tr>
+                                                        <tr class="profit-loss-total">
+                                                            <td>Laba / Rugi</td>
+                                                            <td class="value" id="profitNet">Rp 0</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Margin</td>
+                                                            <td class="value" id="profitMargin">0%</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                <div class="profit-loss-status" id="profitStatus">Laba</div>
+                                                <div class="profit-loss-note">Catatan: biaya bahan dihitung dari stok masuk (pembelian) pada periode.</div>
                                             </div>
                                         </div>
                                     </div>
