@@ -14,7 +14,7 @@
 body {
   margin: 0;
   padding: 0;
-  background: #f8fafc;
+  background: #ffffff;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
 }
 
@@ -27,8 +27,12 @@ body {
 
 /* Report Wrapper - Full page container with bottom nav padding */
 .report-wrapper {
+  position: relative;
   min-height: 100vh;
-  background: #f8fafc;
+  width: 100%;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
 }
 
 body.report-page .sidebar-nav {
@@ -41,17 +45,19 @@ body.report-page .page-content {
 
 /* Report Container - Main content area */
 .report-container {
-  max-width: 1440px;
+  flex: 1;
+  max-width: 1400px;
+  width: 100%;
   margin: 0 auto;
-  padding: var(--spacing-xl) var(--spacing-lg);
-  padding-top: var(--spacing-xl);
+  padding: var(--spacing-lg) var(--spacing-md);
+  padding-top: calc(var(--spacing-2xl) + var(--spacing-xl));
   min-height: calc(100vh - var(--bottom-nav-height, 64px));
   box-sizing: border-box;
 }
 
 @media (max-width: 1024px) {
   .report-container {
-    padding: var(--spacing-lg);
+    padding: var(--spacing-lg) var(--spacing-md);
   }
 
   .report-header-actions {
@@ -114,6 +120,19 @@ body.report-page .page-content {
 .summary-card.card,
 .chart-container.card {
   margin: 0;
+}
+
+body.report-page,
+body.report-page #app,
+body.report-page .app,
+body.report-page .view,
+body.report-page .page {
+  min-height: 100vh;
+}
+
+body.report-page .page-content {
+  padding: 0;
+  background: transparent;
 }
 
 .report-summary.cards-list {
@@ -1320,21 +1339,21 @@ body.report-page .page-content {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* Report Table */
 .report-table-wrapper {
   background: #ffffff;
   border-radius: var(--radius-lg);
   border: 1px solid #e2e8f0;
-  overflow: hidden;
+  overflow: auto;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   -webkit-overflow-scrolling: touch;
+  max-height: 60vh; /* constrain height to prevent huge gaps */
 }
 
 .report-table {
   width: 100%;
   border-collapse: collapse;
   font-size: var(--font-size-sm);
-  table-layout: fixed;
+  table-layout: auto; /* let columns size naturally */
 }
 
 .report-table thead {
@@ -1343,14 +1362,14 @@ body.report-page .page-content {
 }
 
 .report-table th {
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: var(--spacing-sm) var(--spacing-md);
   text-align: left;
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-bold);
   color: #64748b;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  white-space: nowrap;
+  white-space: normal; /* allow header wrapping */
   position: sticky;
   top: 0;
   background: #f8fafc;
@@ -1405,12 +1424,13 @@ body.report-page .page-content {
 }
 
 .report-table td {
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: var(--spacing-sm) var(--spacing-md);
   color: #1e293b;
-  vertical-align: middle;
+  vertical-align: top; /* ensure cells align to top */
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal; /* allow wrapping so data is readable */
+  word-break: break-word;
 }
 
 .report-table td.number {

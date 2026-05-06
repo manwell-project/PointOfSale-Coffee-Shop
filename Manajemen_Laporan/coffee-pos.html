@@ -15,14 +15,9 @@
 </head>
 <body class="report-page">
     <!-- Sidebar Navigation handled by sidebar-nav.js -->
-    <div id="app" class="app">
-        <div class="view view-main">
-            <div class="page" data-name="reports">
-                <div class="page-content">
-                    <!-- Report Wrapper -->
-                    <div class="report-wrapper">
-                        <!-- Report Container -->
-                        <div class="report-container">
+    <div class="report-wrapper">
+        <!-- Report Container -->
+        <div class="report-container">
                             <!-- Report Header -->
                             <div class="report-header card">
                                 <div class="report-header-left">
@@ -187,23 +182,6 @@
                                         <div class="filter-select">
                                             <select id="filterCategory">
                                                 <option value="all">Semua Kategori</option>
-                                                <option value="coffee">Kopi</option>
-                                                <option value="non-coffee">Non-Kopi</option>
-                                                <option value="food">Makanan</option>
-                                                <option value="snack">Snack</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                
-                                    <!-- Status Filter -->
-                                    <div class="filter-group">
-                                        <label class="filter-label">Status</label>
-                                        <div class="filter-select">
-                                            <select id="filterStatus">
-                                                <option value="all">Semua Status</option>
-                                                <option value="completed">Selesai</option>
-                                                <option value="pending">Pending</option>
-                                                <option value="cancelled">Dibatalkan</option>
                                             </select>
                                         </div>
                                     </div>
@@ -276,12 +254,12 @@
                                             </div>
                                         </div>
                 
-                                        <!-- Product Distribution Chart -->
+                                        <!-- Product Trend Chart (Top 5) -->
                                         <div class="chart-container card pie-chart">
                                             <div class="chart-header">
                                                 <h3 class="chart-title">
-                                                    <i class="fas fa-chart-pie"></i>
-                                                    Distribusi Produk
+                                                    <i class="fas fa-chart-column"></i>
+                                                    Tren unit terjual per produk
                                                 </h3>
                                                 <div class="chart-actions">
                                                     <button class="chart-action-btn" title="Download">
@@ -289,11 +267,8 @@
                                                     </button>
                                                 </div>
                                             </div>
-                                            <div class="chart-canvas" id="productChart">
-                                                <div class="chart-placeholder">
-                                                    <i class="fas fa-chart-pie"></i>
-                                                    <p class="chart-placeholder-text">Grafik distribusi produk</p>
-                                                </div>
+                                            <div class="chart-canvas" id="productTrendChart">
+                                                <canvas id="productTrendChartCanvas" height="260"></canvas>
                                             </div>
                                         </div>
                 
@@ -302,32 +277,48 @@
                                             <div class="chart-header">
                                                 <h3 class="chart-title">
                                                     <i class="fas fa-scale-balanced"></i>
-                                                    Laba Rugi Otomatis
+                                                                Laporan Laba / Rugi
                                                 </h3>
                                             </div>
                                             <div class="profit-loss-table-wrapper">
-                                                <table class="profit-loss-table">
-                                                    <tbody>
-                                                        <tr>
-                                                            <td>Total Pendapatan</td>
-                                                            <td class="value" id="profitRevenue">Rp 0</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>Estimasi Biaya Bahan</td>
-                                                            <td class="value" id="profitExpense">Rp 0</td>
-                                                        </tr>
-                                                        <tr class="profit-loss-total">
-                                                            <td>Laba / Rugi</td>
-                                                            <td class="value" id="profitNet">Rp 0</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>Margin</td>
-                                                            <td class="value" id="profitMargin">0%</td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
+                                                            <table class="profit-loss-table">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td>Pendapatan Kotor (Penjualan)</td>
+                                                                        <td class="value" id="profitRevenue">Rp 0</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>Harga Pokok Penjualan (HPP)</td>
+                                                                        <td class="value" id="profitHPP">Rp 0</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td><strong>Laba Kotor</strong></td>
+                                                                        <td class="value" id="profitGross">Rp 0</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>Biaya Operasional</td>
+                                                                        <td class="value" id="profitOperational">Rp 0</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>Biaya Karyawan (Gaji & Insentif)</td>
+                                                                        <td class="value" id="profitEmployee">Rp 0</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>Biaya Lain-lain (Sewa, Listrik, dll)</td>
+                                                                        <td class="value" id="profitOther">Rp 0</td>
+                                                                    </tr>
+                                                                    <tr class="profit-loss-total">
+                                                                        <td><strong>Laba Bersih (Net Profit)</strong></td>
+                                                                        <td class="value" id="profitNet">Rp 0</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>Margin Laba Bersih</td>
+                                                                        <td class="value" id="profitMargin">0%</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
                                                 <div class="profit-loss-status" id="profitStatus">Laba</div>
-                                                <div class="profit-loss-note">Catatan: biaya bahan dihitung dari stok masuk (pembelian) pada periode.</div>
+                                                            <div class="profit-loss-note">Catatan: laba/rugi dihitung dari transaksi selesai; HPP dihitung dari stok/pembelian relevan. Biaya operasional, karyawan, dan lain-lain diset manual atau via integrasi pengeluaran.</div>
                                             </div>
                                         </div>
                                     </div>
@@ -416,9 +407,6 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -428,6 +416,7 @@
     <script src="../js/api-helper.js"></script>
     <script src="../js/sidebar-nav.js?v=20260506-2"></script>
     <script src="../js/navbar.js"></script>
-    <script src="js/report.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="js/report.js"></script>
 </body>
 </html>

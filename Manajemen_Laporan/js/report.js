@@ -61,6 +61,11 @@ const printReportBtn = document.getElementById('printReportBtn');
 
 const profitRevenueEl = document.getElementById('profitRevenue');
 const profitExpenseEl = document.getElementById('profitExpense');
+const profitHPPEl = document.getElementById('profitHPP');
+const profitGrossEl = document.getElementById('profitGross');
+const profitOperationalEl = document.getElementById('profitOperational');
+const profitEmployeeEl = document.getElementById('profitEmployee');
+const profitOtherEl = document.getElementById('profitOther');
 const profitNetEl = document.getElementById('profitNet');
 const profitMarginEl = document.getElementById('profitMargin');
 const profitStatusEl = document.getElementById('profitStatus');
@@ -257,7 +262,7 @@ async function enrichTransactionsWithItems(rawTransactions) {
 }
 
 function mergeTransactionDetail(transaction, detail) {
-    const txItems = Array.isArray(detail?.items) ? detail.items : [];
+    const txItems = normalizeTransactionItems(detail?.items);
     const itemCount = txItems.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
 
     return {
@@ -281,10 +286,8 @@ function setDefaultDateRange() {
     if (!dateFromInput || !dateToInput) return;
 
     const today = new Date();
-    const lastMonth = new Date(today);
-    lastMonth.setDate(today.getDate() - 30);
-
-    dateFromInput.valueAsDate = lastMonth;
+    // default range: 1 Jan 2025 to today
+    dateFromInput.value = '2025-01-01';
     dateToInput.valueAsDate = today;
 }
 
@@ -488,10 +491,11 @@ function renderReport() {
     updateFilterVisibility();
 
     filteredTransactions = getFilteredTransactions();
+    const completedTransactions = getCompletedTransactions(filteredTransactions);
 
     const salesRows = buildSalesRows(filteredTransactions);
-    const productRows = buildProductRows(filteredTransactions);
-    const employeeRows = buildEmployeeRows(filteredTransactions);
+    const productRows = buildProductRows(completedTransactions);
+    const employeeRows = buildEmployeeRows(completedTransactions);
 
     updateTabBadges(salesRows.length, productRows.length, employeeRows.length);
 
@@ -504,22 +508,35 @@ function renderReport() {
     }
 
     currentRows = sortRows(currentRows);
-    updateSummaryCards(filteredTransactions, productRows, employeeRows);
-    updateProfitLoss(filteredTransactions);
+    updateSummaryCards(completedTransactions, productRows, employeeRows);
+    updateProfitLoss(completedTransactions);
+    // Render product trend (Top 5) chart
+    try { renderProductTrendChart(productRows); } catch (e) { console.warn('Product chart render failed', e); }
     updateReportMeta();
     renderTable();
 }
 
 function updateProfitLoss(salesData) {
-    if (!profitRevenueEl || !profitExpenseEl || !profitNetEl || !profitMarginEl) return;
+    if (!profitRevenueEl || !profitHPPEl || !profitGrossEl || !profitNetEl || !profitMarginEl) return;
 
-    const revenue = salesData.reduce((sum, tx) => sum + (Number(tx.totalAmount) || 0), 0);
-    const expense = calculateStockExpense();
-    const net = revenue - expense;
+    const revenue = (Array.isArray(salesData) ? salesData : []).reduce((sum, tx) => sum + (Number(tx.totalAmount) || 0), 0);
+    const hpp = calculateStockExpense();
+    const gross = revenue - hpp;
+
+    // placeholders for costs: to be integrated with expenses/HR module if available
+    const operational = 0;
+    const employee = 0;
+    const other = 0;
+
+    const net = gross - operational - employee - other;
     const margin = revenue > 0 ? (net / revenue) * 100 : 0;
 
     setElementText(profitRevenueEl, formatCurrency(revenue));
-    setElementText(profitExpenseEl, formatCurrency(expense));
+    setElementText(profitHPPEl, formatCurrency(hpp));
+    setElementText(profitGrossEl, formatCurrency(gross));
+    setElementText(profitOperationalEl, formatCurrency(operational));
+    setElementText(profitEmployeeEl, formatCurrency(employee));
+    setElementText(profitOtherEl, formatCurrency(other));
     setElementText(profitNetEl, formatCurrency(net));
     setElementText(profitMarginEl, `${margin.toFixed(1)}%`);
 
@@ -546,10 +563,13 @@ function calculateStockExpense() {
         const delta = Number(row.delta ?? (Number(row.quantity_after) - Number(row.quantity_before)));
         if (!Number.isFinite(delta) || delta <= 0) return sum;
 
+        if (!isPurchaseLikeStockChange(row.change_reason)) return sum;
+
         const rawId = Number(row.raw_material_id ?? row.rawMaterialId ?? row.material_id ?? row.materialId);
         const price = rawMaterialPrices.get(rawId) ?? Number(row.price) ?? 0;
+        if (!Number.isFinite(price) || price <= 0) return sum;
 
-        return sum + (delta * (Number(price) || 0));
+        return sum + (delta * price);
     }, 0);
 }
 
@@ -566,6 +586,124 @@ function buildRawMaterialPriceMap(rawStocks) {
     });
 
     return map;
+}
+
+// Product Trend Chart (Top 5) using Chart.js
+let _productTrendChart = null;
+function renderProductTrendChart(productRows) {
+    if (!productRows) return;
+    // productRows expected shape from buildProductRows -> uses sortValues and cells
+    const normalized = productRows.map((r) => ({
+        product_name: (r.sortValues && r.sortValues.name) || (r.cells && r.cells[1]) || 'Unknown',
+        qty: Number(r.sortValues?.quantity || 0)
+    }));
+
+    const rows = normalized.slice().sort((a, b) => b.qty - a.qty).slice(0, 5);
+    const labels = rows.map((r) => String(r.product_name).replace(/<[^>]*>/g, '').trim());
+    const data = rows.map((r) => r.qty);
+
+    const canvas = document.getElementById('productTrendChart');
+    if (!canvas) return;
+
+    // replace placeholder content if canvas is not an actual <canvas>
+    if (canvas.tagName.toLowerCase() !== 'canvas') {
+        // try to find inner canvas
+        const inner = canvas.querySelector('canvas');
+        if (inner) {
+            _renderChartOnCanvas(inner, labels, data);
+            return;
+        }
+        // create canvas inside
+        canvas.innerHTML = '<canvas id="productTrendChartCanvas" height="260"></canvas>';
+        const newCanvas = canvas.querySelector('#productTrendChartCanvas');
+        if (newCanvas) {
+            _renderChartOnCanvas(newCanvas, labels, data);
+        }
+        return;
+    }
+
+    _renderChartOnCanvas(canvas, labels, data);
+}
+
+function _renderChartOnCanvas(ctxEl, labels, data) {
+    try {
+        if (_productTrendChart) {
+            _productTrendChart.data.labels = labels;
+            _productTrendChart.data.datasets[0].data = data;
+            _productTrendChart.update();
+            return;
+        }
+
+        _productTrendChart = new Chart(ctxEl.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Unit Terjual',
+                    data,
+                    backgroundColor: '#6B4423',
+                    borderColor: '#51331a',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                plugins: {legend: {display: false}},
+                scales: { x: { grid: { display: false } }, y: { beginAtZero: true } }
+            }
+        });
+    } catch (err) {
+        console.warn('Chart render error', err);
+    }
+}
+
+function normalizeTransactionItems(items) {
+    if (!Array.isArray(items)) return [];
+
+    return items.map((item) => {
+        const quantity = Number(item.quantity ?? item.qty ?? 0) || 0;
+        const unitPrice = Number(item.unit_price ?? item.price ?? 0) || 0;
+
+        return {
+            ...item,
+            product_id: Number(item.product_id ?? item.productId ?? 0) || 0,
+            product_name: item.product_name || item.productName || 'Produk Tidak Dikenal',
+            category: item.category || item.product_category || item.productCategory || '',
+            quantity,
+            unit_price: unitPrice,
+            subtotal: Number(item.subtotal ?? (quantity * unitPrice)) || 0
+        };
+    }).filter((item) => Number.isFinite(Number(item.quantity)));
+}
+
+function getCompletedTransactions(transactionsList) {
+    return (Array.isArray(transactionsList) ? transactionsList : []).filter((transaction) => isCompletedTransaction(transaction));
+}
+
+function isCompletedTransaction(transaction) {
+    return String(transaction?.status || '').toLowerCase() === 'completed';
+}
+
+function isPurchaseLikeStockChange(reason) {
+    const normalized = String(reason || '').toLowerCase().trim();
+    if (!normalized) return true;
+
+    if (normalized.includes('keluar') || normalized.includes('out') || normalized.includes('jual') || normalized.includes('sold')) {
+        return false;
+    }
+
+    if (normalized.includes('stock out') || normalized.includes('barang keluar') || normalized.includes('pengurangan')) {
+        return false;
+    }
+
+    return normalized.includes('masuk')
+        || normalized.includes('beli')
+        || normalized.includes('restock')
+        || normalized.includes('purchase')
+        || normalized.includes('in')
+        || normalized.includes('penambahan')
+        || normalized.includes('pembelian')
+        || normalized.includes('pemasukan')
+        || normalized.includes('manual adjustment');
 }
 
 function getFilteredTransactions() {
