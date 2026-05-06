@@ -18,7 +18,9 @@ body {
 .employee-wrapper,
 .customer-wrapper,
 .report-wrapper,
-.pos-wrapper {
+.pos-wrapper,
+.discount-wrapper,
+.history-wrapper {
   background-color: var(--color-bg-primary);
   min-height: 100vh;
 }
@@ -54,9 +56,31 @@ body.sidebar-visible .stock-wrapper,
 body.sidebar-visible .employee-wrapper,
 body.sidebar-visible .customer-wrapper,
 body.sidebar-visible .report-wrapper,
-body.sidebar-visible .pos-wrapper {
+body.sidebar-visible .pos-wrapper,
+body.sidebar-visible .discount-wrapper,
+body.sidebar-visible .history-wrapper {
   margin-left: var(--sidebar-width, 260px);
+  width: calc(100% - var(--sidebar-width, 260px));
+  box-sizing: border-box;
   transition: margin-left 0.3s ease;
+}
+
+/*
+  Page centering:
+  When sidebar is visible, centering within the remaining space can look "too right".
+  Add right padding equal to sidebar width so the content center aligns with viewport center.
+*/
+@media (min-width: 1025px) {
+  body.sidebar-visible .dashboard-container,
+  body.sidebar-visible .stock-wrapper,
+  body.sidebar-visible .employee-wrapper,
+  body.sidebar-visible .customer-wrapper,
+  body.sidebar-visible .report-wrapper,
+  body.sidebar-visible .pos-wrapper,
+  body.sidebar-visible .discount-wrapper,
+  body.sidebar-visible .history-wrapper {
+    padding-right: var(--sidebar-width, 260px);
+  }
 }
 
 /* Adjust for collapsed sidebar */
@@ -65,8 +89,25 @@ body.sidebar-visible.sidebar-collapsed .stock-wrapper,
 body.sidebar-visible.sidebar-collapsed .employee-wrapper,
 body.sidebar-visible.sidebar-collapsed .customer-wrapper,
 body.sidebar-visible.sidebar-collapsed .report-wrapper,
-body.sidebar-visible.sidebar-collapsed .pos-wrapper {
+body.sidebar-visible.sidebar-collapsed .pos-wrapper,
+body.sidebar-visible.sidebar-collapsed .discount-wrapper,
+body.sidebar-visible.sidebar-collapsed .history-wrapper {
   margin-left: var(--sidebar-width-collapsed, 64px);
+  width: calc(100% - var(--sidebar-width-collapsed, 64px));
+  box-sizing: border-box;
+}
+
+@media (min-width: 1025px) {
+  body.sidebar-visible.sidebar-collapsed .dashboard-container,
+  body.sidebar-visible.sidebar-collapsed .stock-wrapper,
+  body.sidebar-visible.sidebar-collapsed .employee-wrapper,
+  body.sidebar-visible.sidebar-collapsed .customer-wrapper,
+  body.sidebar-visible.sidebar-collapsed .report-wrapper,
+  body.sidebar-visible.sidebar-collapsed .pos-wrapper,
+  body.sidebar-visible.sidebar-collapsed .discount-wrapper,
+  body.sidebar-visible.sidebar-collapsed .history-wrapper {
+    padding-right: var(--sidebar-width-collapsed, 64px);
+  }
 }
 
 /* Reset margins and navbar positions on mobile (sidebar hidden) */
@@ -76,8 +117,11 @@ body.sidebar-visible.sidebar-collapsed .pos-wrapper {
   body.sidebar-visible .employee-wrapper,
   body.sidebar-visible .customer-wrapper,
   body.sidebar-visible .report-wrapper,
-  body.sidebar-visible .pos-wrapper {
+  body.sidebar-visible .pos-wrapper,
+  body.sidebar-visible .discount-wrapper,
+  body.sidebar-visible .history-wrapper {
     margin-left: 0;
+    width: 100%;
   }
   
   /* Reset navbar positions on mobile */

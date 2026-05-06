@@ -500,20 +500,18 @@
    CONTENT OFFSET
    ============================================ */
 
-/* Offset main content when sidebar is visible */
+/*
+  NOTE:
+  Content positioning is handled by page wrappers (see css/components/page-adjustments.css)
+  using margin-left on .stock-wrapper/.dashboard-container/etc.
+  Avoid applying padding-left here to prevent double-offset (content too far right).
+*/
 body.sidebar-visible {
-  padding-left: var(--sidebar-width, 260px);
-  transition: padding-left 0.3s ease;
+  padding-left: 0;
 }
 
 body.sidebar-visible.sidebar-collapsed {
-  padding-left: var(--sidebar-width-collapsed, 64px);
-}
-
-@media (max-width: 1024px) {
-  body.sidebar-visible {
-    padding-left: 0 !important;
-  }
+  padding-left: 0;
 }
 
 /* ============================================
@@ -524,10 +522,6 @@ body.sidebar-visible.sidebar-collapsed {
 @media (max-width: 1024px) {
   .sidebar-nav {
     width: 220px;
-  }
-  
-  body.sidebar-visible {
-    padding-left: 220px;
   }
 }
 
