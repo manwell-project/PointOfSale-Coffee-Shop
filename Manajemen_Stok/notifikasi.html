@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#0ea5e9">
-  <title>Riwayat Stok - DigiCaf</title>
+  <title>Notifikasi Stok - DigiCaf</title>
 
   <!-- Design System CSS -->
   <link rel="stylesheet" href="../css/design-tokens.css">
@@ -42,74 +42,47 @@
       <div class="stock-header">
         <div class="stock-header-left">
           <h1 class="stock-title">
-            <i class="fas fa-clock-rotate-left"></i>
-            Riwayat Stok
+            <i class="fas fa-bell"></i>
+            Notifikasi Stok
           </h1>
-          <p class="stock-subtitle">Riwayat transaksi stok masuk dan keluar</p>
+          <p class="stock-subtitle">Daftar notifikasi stok rendah dan stok habis</p>
         </div>
         <div class="stock-header-actions">
-          <button class="btn-export" id="refreshHistoryBtn">
+          <button class="btn-export" id="refreshAlertsBtn" type="button">
             <i class="fas fa-rotate"></i>
             Refresh
           </button>
-          <button class="btn-add-stock" id="backToStockBtn">
+          <button class="btn-add-stock" id="backToStockBtn" type="button">
             <i class="fas fa-arrow-left"></i>
             Kembali
           </button>
         </div>
       </div>
 
-      <!-- Filter & Search Section -->
-      <div class="stock-filters">
-        <div class="filter-row">
-          <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input type="text" id="searchHistoryInput" placeholder="Cari produk atau alasan perubahan...">
-          </div>
-          <div class="filter-select">
-            <select id="typeFilter">
-              <option value="">Semua Jenis</option>
-              <option value="in">Stok Masuk</option>
-              <option value="out">Stok Keluar</option>
-              <option value="adjust">Penyesuaian</option>
-            </select>
+      <div class="alerts-page">
+        <div class="alerts-header">
+          <h3 class="alerts-title">
+            <i class="fas fa-bell"></i>
+            Notifikasi Stok
+            <span class="alerts-badge" id="alertsBadgePage">0</span>
+          </h3>
+          <div class="alerts-actions">
+            <button class="btn-alert-filter active" data-filter="all" type="button">Semua</button>
+            <button class="btn-alert-filter" data-filter="critical" type="button">Kritis</button>
+            <button class="btn-alert-filter" data-filter="warning" type="button">Peringatan</button>
           </div>
         </div>
-      </div>
 
-      <!-- History Table -->
-      <div class="stock-table-container">
-        <div class="stock-table-wrapper">
-          <table class="stock-table">
-            <thead>
-              <tr>
-                <th>Tanggal</th>
-                <th>Produk</th>
-                <th>Jenis</th>
-                <th>Perubahan</th>
-                <th>Stok Akhir</th>
-                <th>Alasan</th>
-                <th>Pegawai</th>
-              </tr>
-            </thead>
-            <tbody id="historyTableBody">
-              <tr>
-                <td colspan="7">
-                  <div class="empty-state">
-                    <div class="empty-icon">
-                      <i class="fas fa-spinner fa-spin"></i>
-                    </div>
-                    <h3 class="empty-title">Memuat Data...</h3>
-                    <p class="empty-text">Mohon tunggu sebentar</p>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="alerts-list alerts-list-page" id="alertsPageList">
+          <div class="alerts-empty">
+            <div class="empty-alert-icon"><i class="fas fa-spinner fa-spin"></i></div>
+            <div class="empty-alert-title">Memuat notifikasi...</div>
+            <div class="empty-alert-text">Mohon tunggu sebentar</div>
+          </div>
         </div>
-        <div class="table-footer">
-          <div class="showing-text" id="historyShowingText">Menampilkan 0 data</div>
-          <div></div>
+
+        <div class="alerts-footer">
+          <button class="btn-mark-read" id="markAllReadPage" type="button">Tandai Sudah Dibaca</button>
         </div>
       </div>
     </div>
@@ -149,6 +122,7 @@
   <script src="../js/top-navbar.js?v=20260506-2"></script>
   <script src="../js/sidebar-nav.js?v=20260506-2"></script>
   <script src="../js/navbar.js?v=1769014084"></script>
-  <script src="stock-history.js?v=1769014084"></script>
+
+  <script src="stock-notifications.js"></script>
 </body>
 </html>

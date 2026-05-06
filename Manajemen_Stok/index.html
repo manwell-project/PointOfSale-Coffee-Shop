@@ -27,7 +27,7 @@
     <link rel="stylesheet" href="../css/tablet.css">
     
     <!-- Page Specific CSS -->
-    <link rel="stylesheet" href="css/stock-layout.css?v=1769019800">
+    <link rel="stylesheet" href="css/stock-layout.css?v=20260506-1">
     <link rel="stylesheet" href="../css/shared-ui.css">
     
     <!-- Page Adjustments - MUST BE LAST to override local CSS -->
@@ -81,6 +81,10 @@
                                     <!-- Alerts will be rendered here -->
                                 </div>
                                 <div class="alerts-footer">
+                                    <a class="btn-view-all" id="viewAllAlerts" href="notifikasi.html">
+                                        Lihat Semua
+                                        <i class="fas fa-arrow-right"></i>
+                                    </a>
                                     <button class="btn-mark-read" id="markAllRead">
                                         Tandai Sudah Dibaca
                                     </button>
@@ -95,6 +99,10 @@
                         <button class="btn-add-stock" id="addStockBtn">
                             <i class="fas fa-plus"></i>
                             Tambah Stok
+                        </button>
+                        <button class="btn-export" id="stockOutBtn" type="button">
+                            <i class="fas fa-arrow-up"></i>
+                            Barang Keluar
                         </button>
                     </div>
                 </div>
@@ -424,6 +432,104 @@
         </div>
     </div>
 
+    <!-- Stock Out Modal (Barang Keluar) -->
+    <div class="stock-modal-overlay" id="stockOutModal">
+        <div class="stock-modal">
+            <div class="modal-header">
+                <div>
+                    <h2 class="modal-title" id="stockOutModalTitle">
+                        <i class="fas fa-arrow-up"></i>
+                        Barang Keluar
+                    </h2>
+                    <p class="modal-subtitle" id="stockOutModalSubtitle">Kurangi stok dari barang yang sudah ada</p>
+                </div>
+                <button class="btn-close-modal" id="stockOutCloseModalBtn" type="button">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <form id="stockOutForm" class="stock-form">
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-box"></i>
+                            Pilih Barang
+                        </h3>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Barang <span class="required">*</span>
+                                </label>
+                                <select class="form-select" id="stockOutStockId" required>
+                                    <option value="" selected disabled>Memuat daftar barang...</option>
+                                </select>
+                                <span class="form-hint">Daftar diambil dari stok yang sudah ada</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Stok Saat Ini</label>
+                                <div class="input-with-unit">
+                                    <input type="number" class="form-input" id="stockOutCurrentQty" readonly value="0">
+                                    <span class="input-unit">Unit</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-divider"></div>
+
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-arrow-up"></i>
+                            Informasi Barang Keluar
+                        </h3>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Jumlah Keluar <span class="required">*</span>
+                                </label>
+                                <div class="input-with-unit">
+                                    <input type="number" class="form-input" id="stockOutQty" required min="1" value="1">
+                                    <span class="input-unit">Unit</span>
+                                </div>
+                                <span class="form-hint">Tidak boleh melebihi stok saat ini</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">ID Karyawan (Opsional)</label>
+                                <div class="input-with-icon">
+                                    <i class="fas fa-user"></i>
+                                    <input type="number" class="form-input" id="stockOutEmployeeId" min="1" placeholder="Contoh: 1">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row single">
+                            <div class="form-group">
+                                <label class="form-label">Alasan (Opsional)</label>
+                                <div class="input-with-icon">
+                                    <i class="fas fa-note-sticky"></i>
+                                    <input type="text" class="form-input" id="stockOutReason" placeholder="Contoh: Pemakaian harian / Rusak / Retur">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <div class="modal-footer-left"></div>
+                <div class="modal-footer-right">
+                    <button type="button" class="btn-modal btn-modal-cancel" id="stockOutCancelBtn">Batal</button>
+                    <button type="submit" form="stockOutForm" class="btn-modal btn-modal-save" id="stockOutSaveBtn">
+                        <i class="fas fa-check"></i>
+                        Simpan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Performance Optimizations -->
     <script src="../js/performance.js" defer></script>
     <script src="../js/performance-utilities.js" defer></script>
@@ -431,9 +537,9 @@
     
     <script src="../js/auth.js?v=1769014084"></script>
     <script src="../js/api-helper.js?v=1769014085"></script>
-    <script src="../js/top-navbar.js?v=1769014084"></script>
-    <script src="../js/sidebar-nav.js?v=1769020001"></script>
+    <script src="../js/top-navbar.js?v=20260506-2"></script>
+    <script src="../js/sidebar-nav.js?v=20260506-2"></script>
     <script src="../js/navbar.js?v=1769014084"></script>
-    <script src="stock-manager.js?v=1769019800"></script>
+    <script src="stock-manager.js?v=20260506-1"></script>
 </body>
 </html>

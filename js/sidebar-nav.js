@@ -265,25 +265,6 @@
             key: 'reports'
           }
         ]
-      },
-      {
-        section: 'Notifikasi',
-        items: [
-          {
-            icon: 'fas fa-bell',
-            text: 'Notifikasi',
-            url: '#',
-            key: 'notifications',
-            badge: '0',
-            submenu: [
-              {
-                text: 'Memuat notifikasi...',
-                url: '#',
-                key: 'notifications-loading'
-              }
-            ]
-          }
-        ]
       }
     ];
 

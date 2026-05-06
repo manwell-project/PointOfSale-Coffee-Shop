@@ -2047,7 +2047,8 @@ body {
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-lg);
-  pointer-events: auto;
+  /* Important: avoid blocking clicks when popover is hidden */
+  pointer-events: none;
 
   opacity: 0;
   visibility: hidden;
@@ -2059,6 +2060,7 @@ body {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
+  pointer-events: auto;
 }
 
 .stock-alerts-widget.expanded {
@@ -2415,8 +2417,23 @@ body {
   border-top: 1px solid #e2e8f0;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
   background: #f8fafc;
+}
+
+/* Alerts page container (full page) */
+.alerts-page {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.alerts-page .alerts-list.alerts-list-page {
+  max-height: none;
+  overflow: visible;
 }
 
 /*

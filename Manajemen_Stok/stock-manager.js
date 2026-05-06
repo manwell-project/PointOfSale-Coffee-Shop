@@ -9,6 +9,7 @@ let currentPage = 1;
 let itemsPerPage = 10;
 let currentSort = { field: 'name', direction: 'asc' };
 let currentFilters = { search: '', category: '', status: '' };
+let isLoadingStocks = false;
 
 // Alerts state
 let currentAlerts = [];
@@ -19,6 +20,13 @@ const ALERTS_READ_STORAGE_KEY = 'digicaf.stockAlerts.readKeys';
 // DOM Elements
 const stockModal = document.getElementById('stockModal');
 const stockForm = document.getElementById('stockForm');
+const stockOutModal = document.getElementById('stockOutModal');
+const stockOutForm = document.getElementById('stockOutForm');
+const stockOutSelect = document.getElementById('stockOutStockId');
+const stockOutCurrentQtyInput = document.getElementById('stockOutCurrentQty');
+const stockOutQtyInput = document.getElementById('stockOutQty');
+const stockOutReasonInput = document.getElementById('stockOutReason');
+const stockOutEmployeeIdInput = document.getElementById('stockOutEmployeeId');
 const searchInput = document.getElementById('searchStockInput');
 const categoryFilter = document.getElementById('categoryFilter');
 const statusFilter = document.getElementById('statusFilter');
@@ -30,9 +38,9 @@ const alertsToggleBtn = document.getElementById('alertsToggleBtn');
 
 // Initialize
 async function init() {
-    await loadStocks();
     setupEventListeners();
     setupSortableColumns();
+    await loadStocks();
 }
 
 function setupEventListeners() {
@@ -41,6 +49,30 @@ function setupEventListeners() {
     document.getElementById('closeModalBtn').addEventListener('click', closeModal);
     document.getElementById('cancelBtn').addEventListener('click', closeModal);
     stockForm.addEventListener('submit', saveStock);
+
+    // Stock out (Barang Keluar)
+    const stockOutBtn = document.getElementById('stockOutBtn');
+    if (stockOutBtn) {
+        stockOutBtn.addEventListener('click', () => {
+            openStockOutModal().catch((err) => {
+                showNotification('Gagal membuka form barang keluar: ' + (err?.message || err), 'error');
+            });
+        });
+    }
+    const stockOutCloseBtn = document.getElementById('stockOutCloseModalBtn');
+    if (stockOutCloseBtn) {
+        stockOutCloseBtn.addEventListener('click', closeStockOutModal);
+    }
+    const stockOutCancelBtn = document.getElementById('stockOutCancelBtn');
+    if (stockOutCancelBtn) {
+        stockOutCancelBtn.addEventListener('click', closeStockOutModal);
+    }
+    if (stockOutForm) {
+        stockOutForm.addEventListener('submit', saveStockOut);
+    }
+    if (stockOutSelect) {
+        stockOutSelect.addEventListener('change', syncStockOutSelection);
+    }
 
     // History page
     const historyBtn = document.getElementById('historyBtn');
@@ -73,6 +105,12 @@ function setupEventListeners() {
     stockModal.addEventListener('click', (e) => {
         if (e.target === stockModal) closeModal();
     });
+
+    if (stockOutModal) {
+        stockOutModal.addEventListener('click', (e) => {
+            if (e.target === stockOutModal) closeStockOutModal();
+        });
+    }
 
     // Export button
     document.getElementById('exportBtn').addEventListener('click', exportData);
@@ -125,6 +163,157 @@ function setupEventListeners() {
     }
 }
 
+async function openStockOutModal(prefillStockId = null) {
+    if (!stockOutModal || !stockOutForm || !stockOutSelect) return;
+
+    // Open first so user sees something even if loading
+    stockOutModal.classList.add('active');
+
+    stockOutForm.reset();
+    setStockOutSelectLoading();
+    setStockOutSaveEnabled(false);
+
+    // Ensure stocks are loaded (do not block UI interactions)
+    if ((!stocks || !stocks.length) && !isLoadingStocks) {
+        try {
+            await loadStocks();
+        } catch {
+            // loadStocks already shows notification/table state
+        }
+    }
+
+    populateStockOutOptions(stocks || [], prefillStockId);
+    syncStockOutSelection();
+}
+
+function closeStockOutModal() {
+    if (!stockOutModal) return;
+    stockOutModal.classList.remove('active');
+}
+
+function populateStockOutOptions(selectableStocks, prefillStockId = null) {
+    if (!stockOutSelect) return;
+
+    const items = Array.isArray(selectableStocks) ? selectableStocks : [];
+    if (!items.length) {
+        stockOutSelect.innerHTML = '<option value="" disabled selected>Tidak ada data stok</option>';
+        return;
+    }
+
+    const optionsHtml = ['<option value="" disabled selected>Pilih barang...</option>'];
+
+    items
+        .slice()
+        .sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'id'))
+        .forEach((s) => {
+            const id = Number(s.id);
+            if (!Number.isFinite(id)) return;
+            const qty = Number(s.quantity) || 0;
+            const name = escapeHtml(String(s.name || ''));
+            const disabled = qty <= 0 ? 'disabled' : '';
+            optionsHtml.push(`<option value="${id}" ${disabled}>${name} (stok: ${qty})</option>`);
+        });
+
+    stockOutSelect.innerHTML = optionsHtml.join('');
+
+    if (prefillStockId !== null && prefillStockId !== undefined && prefillStockId !== '') {
+        const targetId = String(prefillStockId);
+        try {
+            const opt = stockOutSelect.querySelector(`option[value="${CSS.escape(targetId)}"]`);
+            if (opt && !opt.disabled) {
+                stockOutSelect.value = targetId;
+            }
+        } catch {
+            // ignore CSS.escape issues
+        }
+    }
+}
+
+function syncStockOutSelection() {
+    if (!stockOutSelect || !stockOutCurrentQtyInput || !stockOutQtyInput) return;
+
+    const selectedId = Number(stockOutSelect.value);
+    const stock = (stocks || []).find(s => Number(s.id) === selectedId);
+    const currentQty = Number(stock?.quantity) || 0;
+
+    stockOutCurrentQtyInput.value = currentQty;
+    stockOutQtyInput.max = String(Math.max(currentQty, 1));
+
+    // If current input exceeds stock, clamp it
+    const outQty = Number(stockOutQtyInput.value) || 1;
+    if (outQty > currentQty && currentQty > 0) {
+        stockOutQtyInput.value = String(currentQty);
+    }
+
+    if (!Number.isFinite(selectedId)) {
+        setStockOutSaveEnabled(false);
+        return;
+    }
+
+    if (currentQty <= 0) {
+        stockOutQtyInput.value = '1';
+        setStockOutSaveEnabled(false);
+        return;
+    }
+
+    setStockOutSaveEnabled(true);
+}
+
+function setStockOutSaveEnabled(enabled) {
+    const btn = document.getElementById('stockOutSaveBtn');
+    if (!btn) return;
+    btn.disabled = !enabled;
+}
+
+function setStockOutSelectLoading() {
+    if (!stockOutSelect) return;
+    stockOutSelect.innerHTML = '<option value="" disabled selected>Memuat daftar barang...</option>';
+}
+
+async function saveStockOut(e) {
+    e.preventDefault();
+
+    if (!stockOutSelect || !stockOutQtyInput) return;
+
+    const stockId = Number(stockOutSelect.value);
+    if (!Number.isFinite(stockId)) {
+        showNotification('Pilih barang terlebih dahulu', 'error');
+        return;
+    }
+
+    const stock = (stocks || []).find(s => Number(s.id) === stockId);
+    const currentQty = Number(stock?.quantity) || 0;
+    const outQty = Math.trunc(Number(stockOutQtyInput.value));
+
+    if (!Number.isFinite(outQty) || outQty <= 0) {
+        showNotification('Jumlah keluar harus lebih dari 0', 'error');
+        return;
+    }
+    if (outQty > currentQty) {
+        showNotification('Jumlah keluar melebihi stok saat ini', 'error');
+        return;
+    }
+
+    const newQty = currentQty - outQty;
+    const reasonRaw = stockOutReasonInput ? String(stockOutReasonInput.value || '').trim() : '';
+    const employeeIdRaw = stockOutEmployeeIdInput ? String(stockOutEmployeeIdInput.value || '').trim() : '';
+    const employeeIdNum = employeeIdRaw ? Number(employeeIdRaw) : undefined;
+    const payload = {
+        quantity: newQty,
+        change_reason: reasonRaw || 'Barang keluar',
+        employee_id: Number.isFinite(employeeIdNum) && employeeIdNum > 0 ? employeeIdNum : undefined
+    };
+
+    try {
+        await window.API.Stocks.update(stockId, payload);
+        showNotification('Barang keluar berhasil disimpan', 'success');
+        closeStockOutModal();
+        await loadStocks();
+    } catch (err) {
+        showNotification('Gagal menyimpan barang keluar: ' + (err.message || err), 'error');
+    }
+}
+
 function setupSortableColumns() {
     document.querySelectorAll('.stock-table th.sortable').forEach(th => {
         th.addEventListener('click', () => {
@@ -148,6 +337,7 @@ function setupSortableColumns() {
 }
 
 async function loadStocks() {
+    isLoadingStocks = true;
     try {
         stocks = await window.API.Stocks.getAll();
         updateStats();
@@ -166,6 +356,8 @@ async function loadStocks() {
                 </td>
             </tr>
         `;
+    } finally {
+        isLoadingStocks = false;
     }
 }
 
