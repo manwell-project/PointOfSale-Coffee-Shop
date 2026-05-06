@@ -1415,6 +1415,31 @@ body.report-page .page-content {
   transition: all var(--transition-base);
 }
 
+/* Force true table layout to avoid inherited block/flex behaviors */
+.report-table {
+  display: table !important;
+}
+
+.report-table thead {
+  display: table-header-group !important;
+}
+
+.report-table tbody {
+  display: table-row-group !important;
+  vertical-align: middle;
+}
+
+.report-table tbody tr {
+  display: table-row !important;
+  height: auto !important;
+}
+
+.report-table tbody td,
+.report-table tbody th {
+  display: table-cell !important;
+  height: auto !important;
+}
+
 .report-table tbody tr:last-child {
   border-bottom: none;
 }
@@ -1431,6 +1456,82 @@ body.report-page .page-content {
   text-overflow: ellipsis;
   white-space: normal; /* allow wrapping so data is readable */
   word-break: break-word;
+}
+
+.report-table tbody td,
+.report-table tbody th,
+.report-table tbody tr {
+  height: auto !important;
+}
+
+.report-grid-view {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm) 0;
+  align-content: start;
+}
+
+.report-grid-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-md);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  align-self: start;
+}
+
+.report-grid-card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  align-items: flex-start;
+}
+
+.report-grid-title {
+  font-weight: var(--font-weight-bold);
+  color: #1e293b;
+}
+
+.report-grid-id {
+  color: #64748b;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.report-grid-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--spacing-sm);
+}
+
+.report-grid-meta div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.report-grid-meta span {
+  font-size: var(--font-size-xs);
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.report-grid-meta strong {
+  color: #1e293b;
+  font-size: var(--font-size-sm);
+  word-break: break-word;
+}
+
+.report-grid-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: var(--spacing-xs);
+  border-top: 1px solid #e2e8f0;
 }
 
 .report-table td.number {

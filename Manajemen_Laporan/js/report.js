@@ -21,6 +21,7 @@ const reportTitleEl = document.getElementById('reportContentTitle');
 const reportPeriodEl = document.getElementById('reportPeriod');
 const reportTable = document.getElementById('reportTable');
 const reportTableBody = document.getElementById('reportTableBody');
+const reportGridView = document.getElementById('reportGridView');
 const tableTotalEl = document.getElementById('tableTotal');
 const tableTitleEl = document.querySelector('.table-title');
 const tableLoadingEl = document.getElementById('tableLoading');
@@ -80,6 +81,7 @@ let currentRows = [];
 let rawStockHistory = [];
 let rawMaterialPrices = new Map();
 let currentReport = 'sales';
+let currentViewMode = 'table';
 let currentPage = 1;
 const pageSize = 10;
 let sortColumn = 'date';
@@ -186,8 +188,9 @@ function initializeEventListeners() {
             button.classList.add('active');
 
             const viewMode = button.getAttribute('data-view');
-            if (viewMode === 'grid') {
-                showReportMessage('Mode grid akan menyusul. Saat ini data tetap tampil dalam tabel.', 'info');
+            if (viewMode === 'grid' || viewMode === 'table') {
+                currentViewMode = viewMode;
+                renderTable();
             }
         });
     });
@@ -1000,30 +1003,47 @@ function updateTabBadges(salesCount, productCount, employeeCount) {
 }
 
 function renderTable() {
-    const totalRows = currentRows.length;
+    const normalizedRows = (Array.isArray(currentRows) ? currentRows : []).filter(isRenderableRow);
+    const totalRows = normalizedRows.length;
     const totalPages = Math.max(1, Math.ceil(totalRows / pageSize));
     if (currentPage > totalPages) currentPage = totalPages;
 
     const startIndex = (currentPage - 1) * pageSize;
     const endIndex = startIndex + pageSize;
-    const pageRows = currentRows.slice(startIndex, endIndex);
+    const pageRows = normalizedRows.slice(startIndex, endIndex);
 
-    if (reportTableBody) {
-        reportTableBody.innerHTML = pageRows.map((row) => `
-            <tr>
-                <td>${row.cells[0]}</td>
-                <td>${row.cells[1]}</td>
-                <td>${row.cells[2]}</td>
-                <td>${row.cells[3]}</td>
-                <td class="currency">${row.cells[4]}</td>
-                <td>${row.cells[5]}</td>
-                <td class="status">${row.cells[6]}</td>
-                <td>${row.cells[7]}</td>
-            </tr>
-        `).join('');
+    if (currentViewMode === 'grid') {
+        if (reportTableBody) {
+            reportTableBody.innerHTML = '';
+        }
+        renderGridCards(pageRows);
+        if (reportTable) reportTable.style.display = 'none';
+        if (reportGridView) reportGridView.style.display = totalRows === 0 ? 'none' : 'grid';
+    } else {
+        if (reportGridView) {
+            reportGridView.style.display = 'none';
+            reportGridView.innerHTML = '';
+        }
+
+        if (reportTableBody) {
+            reportTableBody.innerHTML = pageRows.map((row) => `
+                <tr>
+                    <td>${row.cells[0]}</td>
+                    <td>${row.cells[1]}</td>
+                    <td>${row.cells[2]}</td>
+                    <td>${row.cells[3]}</td>
+                    <td class="currency">${row.cells[4]}</td>
+                    <td>${row.cells[5]}</td>
+                    <td class="status">${row.cells[6]}</td>
+                    <td>${row.cells[7]}</td>
+                </tr>
+            `).join('');
+        }
+
+        if (reportTable) reportTable.style.display = totalRows === 0 ? 'none' : 'table';
     }
 
-    const tableTotal = currentRows.reduce((sum, row) => sum + (Number(row.sortValues?.amount) || 0), 0);
+    const tableTotal = normalizedRows.reduce((sum, row) => sum + (Number(row.sortValues?.amount) || 0), 0);
     if (tableTotalEl) {
         tableTotalEl.textContent = formatCurrency(tableTotal);
     }
@@ -1032,16 +1052,42 @@ function renderTable() {
         tableEmptyEl.style.display = totalRows === 0 ? 'flex' : 'none';
     }
 
-    if (reportTable) {
-        reportTable.style.display = totalRows === 0 ? 'none' : 'table';
-    }
-
     if (tablePaginationEl) {
         tablePaginationEl.style.display = totalRows === 0 ? 'none' : 'flex';
     }
 
     updatePagination(totalRows, totalPages, startIndex, endIndex);
     updateSortableHeaderState();
+}
+
+function isRenderableRow(row) {
+    return !!(row && Array.isArray(row.cells) && row.cells.length >= 8);
+}
+
+function renderGridCards(rows) {
+    if (!reportGridView) return;
+
+    if (rows.length === 0) {
+        reportGridView.innerHTML = '';
+        return;
+    }
+
+    reportGridView.innerHTML = rows.map((row) => `
+        <article class="report-grid-card">
+            <div class="report-grid-card-head">
+                <div class="report-grid-title">${row.cells[2]}</div>
+                <div class="report-grid-id">${row.cells[0]}</div>
+            </div>
+            <div class="report-grid-meta">
+                <div><span>Tanggal</span><strong>${row.cells[1]}</strong></div>
+                <div><span>Item</span><strong>${row.cells[3]}</strong></div>
+                <div><span>Total</span><strong class="currency">${row.cells[4]}</strong></div>
+                <div><span>Pembayaran</span><strong>${row.cells[5]}</strong></div>
+                <div><span>Status</span><strong>${row.cells[6]}</strong></div>
+            </div>
+            <div class="report-grid-actions">${row.cells[7]}</div>
+        </article>
+    `).join('');
 }
 
 function updatePagination(totalRows, totalPages, startIndex, endIndex) {
