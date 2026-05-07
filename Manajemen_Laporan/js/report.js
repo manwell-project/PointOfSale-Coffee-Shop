@@ -151,6 +151,31 @@ function initializeEventListeners() {
         tableSearchInput.addEventListener('input', handleSearchInput);
     }
 
+    // Compact table toggle: add button dynamically to avoid editing HTML template
+    const tableControls = document.querySelector('.table-controls');
+    if (tableControls) {
+        const compactBtn = document.createElement('button');
+        compactBtn.type = 'button';
+        compactBtn.className = 'btn-compact-toggle button button-small';
+        compactBtn.title = 'Mode ringkas (compact)';
+        compactBtn.innerHTML = '<i class="fas fa-compress"></i>';
+        tableControls.appendChild(compactBtn);
+
+        // initialize state from localStorage
+        const compactKey = 'report_table_compact';
+        const saved = localStorage.getItem(compactKey);
+        if (saved === 'true') {
+            reportTable && reportTable.classList.add('compact');
+            compactBtn.classList.add('active');
+        }
+
+        compactBtn.addEventListener('click', () => {
+            const isCompact = reportTable.classList.toggle('compact');
+            compactBtn.classList.toggle('active', isCompact);
+            localStorage.setItem(compactKey, isCompact ? 'true' : 'false');
+        });
+    }
+
     if (btnPrevPage) {
         btnPrevPage.addEventListener('click', () => changePage(currentPage - 1));
     }

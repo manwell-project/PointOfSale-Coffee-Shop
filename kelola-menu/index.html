@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Kelola Menu - DigiCaf</title>
+  <link rel="stylesheet" href="../css/components/sidebar-nav.css">
+  <link rel="stylesheet" href="../Kelola%20Menu/css/kelola-menu.css">
+</head>
+<body>
+
+  <main class="page-content">
+    <div class="page-header">
+      <h1>Kelola Menu</h1>
+      <p class="subtitle">Tambah, edit, dan hapus item menu yang akan tampil di Point of Sale</p>
+    </div>
+
+    <div class="page-actions">
+      <button id="btnAddProduct" class="button">Tambah Menu</button>
+      <input id="searchInput" placeholder="Cari menu..." />
+    </div>
+
+    <section class="menu-list-section">
+      <div id="menuList" class="menu-grid">
+        <!-- Daftar menu di-load lewat JS -->
+      </div>
+    </section>
+
+    <!-- Modal sederhana untuk Tambah / Edit -->
+    <div id="productModal" class="modal" aria-hidden="true">
+      <div class="modal-content">
+        <h2 id="modalTitle">Tambah Menu</h2>
+        <form id="productForm">
+          <input type="hidden" id="productId" />
+          <label>Nama</label>
+          <input id="productName" required />
+          <label>Kategori</label>
+          <input id="productCategory" />
+          <label>Harga (IDR)</label>
+          <input id="productPrice" type="number" min="0" required />
+          <label>Keterangan</label>
+          <textarea id="productDesc"></textarea>
+
+          <div class="modal-actions">
+            <button type="submit" class="button primary">Simpan</button>
+            <button type="button" id="btnCancel" class="button">Batal</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="../js/sidebar-nav.js?v=20260507-1"></script>
+  <script src="../js/api-helper.js"></script>
+  <script src="../Kelola%20Menu/js/kelola-menu.js"></script>
+</body>
+</html>

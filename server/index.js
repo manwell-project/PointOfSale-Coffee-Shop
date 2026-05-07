@@ -29,8 +29,9 @@ app.use(cors({
   allowedHeaders: ['Content-Type']
 }));
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Increase payload limits to allow image data (base64) uploads from client
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Serve static files from root directory (for frontend)
 app.use(express.static(path.join(__dirname, '..')));

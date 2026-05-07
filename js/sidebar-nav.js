@@ -16,6 +16,11 @@
     notificationCheckInterval: 60000
   };
 
+  // Set global opt-out flag for top navbar so pages can hide it by default
+  if (typeof window !== 'undefined') {
+    window.__DIGICAF_HIDE_TOP_NAVBAR = true;
+  }
+
   // State
   let currentUser = null;
   let isCollapsed = false;
@@ -223,6 +228,12 @@
             text: 'Stok Produk',
             url: '../Manajemen_Stok/index.html',
             key: 'stock'
+          },
+          {
+            icon: 'fas fa-utensils',
+            text: 'Kelola Menu',
+            url: '../Kelola Menu/index.html',
+            key: 'manage_menu'
           },
           {
             icon: 'fas fa-users',

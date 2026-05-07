@@ -1192,6 +1192,12 @@
             // Load products with discount info
             loadProductsWithDiscounts();
         });
+
+        // Listen for external product updates (e.g., from Kelola Menu)
+        window.addEventListener('products-updated', () => {
+            console.log('[POS] products-updated event received — reloading products');
+            try { loadProductsWithDiscounts(); } catch(e){ console.error('Failed reloading products after update', e); }
+        });
     </script>
 
     <!-- Performance Optimizations -->
@@ -1202,7 +1208,7 @@
     <!-- Auth & Navigation Scripts -->
     <script src="../js/auth.js?v=1769014084"></script>
     <script src="../js/top-navbar.js?v=20260506-2"></script>
-    <script src="../js/sidebar-nav.js?v=20260506-2"></script>
+    <script src="../js/sidebar-nav.js?v=20260507-1"></script>
     <script src="../js/navbar.js?v=1769014084"></script>
 </body>
 </html>

@@ -1449,9 +1449,9 @@ body.report-page .page-content {
 }
 
 .report-table td {
-  padding: var(--spacing-sm) var(--spacing-md);
+  padding: var(--spacing-2) var(--spacing-md);
   color: #1e293b;
-  vertical-align: top; /* ensure cells align to top */
+  vertical-align: middle; /* align cells vertically centered to reduce perceived row gap */
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: normal; /* allow wrapping so data is readable */
@@ -1470,6 +1470,29 @@ body.report-page .page-content {
   gap: var(--spacing-md);
   padding: var(--spacing-sm) 0;
   align-content: start;
+}
+
+/* Compact table mode: smaller row heights and tighter header/footer */
+.report-table.compact tbody td,
+.report-table.compact tbody th {
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
+}
+
+.report-table.compact thead th {
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+}
+
+.report-table.compact tfoot td {
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+}
+
+/* Small helper: make status badges vertically centered */
+.report-table.compact td .badge,
+.report-table.compact td .status-badge {
+  vertical-align: middle;
 }
 
 .report-grid-card {

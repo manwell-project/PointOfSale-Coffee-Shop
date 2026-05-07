@@ -13,6 +13,12 @@
     notificationCheckInterval: 60000, // Check every minute
   };
 
+  // Optional global opt-out: set window.__DIGICAF_HIDE_TOP_NAVBAR = true to disable injection
+  if (typeof window !== 'undefined' && window.__DIGICAF_HIDE_TOP_NAVBAR === true) {
+    console.log('[TopNavbar] Injection skipped due to __DIGICAF_HIDE_TOP_NAVBAR flag');
+    return;
+  }
+
   // State
   let searchTimeout = null;
   let currentUser = null;
