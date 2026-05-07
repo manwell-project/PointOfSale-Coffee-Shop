@@ -1343,10 +1343,14 @@ body.report-page .page-content {
   background: #ffffff;
   border-radius: var(--radius-lg);
   border: 1px solid #e2e8f0;
-  overflow: auto;
+  overflow-x: auto;
+  overflow-y: visible;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   -webkit-overflow-scrolling: touch;
-  max-height: 60vh; /* constrain height to prevent huge gaps */
+  max-height: none !important;
+  height: auto !important;
+  min-height: auto !important;
+  display: block !important;
 }
 
 .report-table {
@@ -1354,6 +1358,8 @@ body.report-page .page-content {
   border-collapse: collapse;
   font-size: var(--font-size-sm);
   table-layout: auto; /* let columns size naturally */
+  height: auto !important;
+  min-height: 0 !important;
 }
 
 .report-table thead {
@@ -1413,11 +1419,14 @@ body.report-page .page-content {
 .report-table tbody tr {
   border-bottom: 1px solid #e2e8f0;
   transition: all var(--transition-base);
+  height: auto !important;
+  min-height: auto !important;
 }
 
 /* Force true table layout to avoid inherited block/flex behaviors */
 .report-table {
   display: table !important;
+  width: 100%;
 }
 
 .report-table thead {
@@ -1427,17 +1436,21 @@ body.report-page .page-content {
 .report-table tbody {
   display: table-row-group !important;
   vertical-align: middle;
+  height: auto !important;
+  min-height: 0 !important;
 }
 
 .report-table tbody tr {
   display: table-row !important;
   height: auto !important;
+  min-height: auto !important;
 }
 
 .report-table tbody td,
 .report-table tbody th {
   display: table-cell !important;
   height: auto !important;
+  min-height: auto !important;
 }
 
 .report-table tbody tr:last-child {
@@ -1456,12 +1469,14 @@ body.report-page .page-content {
   text-overflow: ellipsis;
   white-space: normal; /* allow wrapping so data is readable */
   word-break: break-word;
+  height: auto !important;
 }
 
 .report-table tbody td,
 .report-table tbody th,
 .report-table tbody tr {
   height: auto !important;
+  min-height: auto !important;
 }
 
 .report-grid-view {
@@ -1994,4 +2009,128 @@ body.report-page .page-content {
   .no-print {
     display: none;
   }
+}
+
+/* ====================================================
+   FINAL OVERRIDE: Ensure table row spacing is compact
+   These rules override any global styles that may
+   cause excessive vertical spacing between rows
+   ==================================================== */
+
+.report-table-wrapper {
+  max-height: none !important;
+  height: auto !important;
+  display: block !important;
+  overflow: auto !important;
+  overflow-y: auto !important;
+  overflow-x: auto !important;
+}
+
+.report-table,
+.report-table tbody,
+.report-table thead,
+.report-table tfoot {
+  height: auto !important;
+  min-height: auto !important;
+  max-height: none !important;
+}
+
+.report-table tbody tr {
+  height: auto !important;
+  min-height: auto !important;
+  line-height: normal !important;
+  display: table-row !important;
+}
+
+.report-table tbody tr td,
+.report-table tbody tr th {
+  height: auto !important;
+  min-height: auto !important;
+  display: table-cell !important;
+  vertical-align: top !important;
+  padding: var(--spacing-2) var(--spacing-3) !important;
+  line-height: 1.5 !important;
+}
+
+/* Override any flex/grid properties from parent containers */
+.report-content .report-table-wrapper {
+  display: block !important;
+  width: 100% !important;
+  flex: none !important;
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  height: auto !important;
+}
+
+.report-content .data-table-section {
+  display: block !important;
+  width: 100% !important;
+  flex: none !important;
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
+  min-height: auto !important;
+  max-height: none !important;
+  height: auto !important;
+}
+
+/* Remove any margins that might add space */
+.report-table tbody tr {
+  margin: 0 !important;
+}
+
+.report-table tbody td,
+.report-table tbody th {
+  margin: 0 !important;
+}
+
+/* Final tight spacing configuration */
+.report-table tbody td {
+  padding: 6px 12px !important;
+  line-height: 1.4 !important;
+  vertical-align: top !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  height: auto !important;
+  min-height: auto !important;
+}
+
+.report-table tbody tr {
+  line-height: 1.4 !important;
+  height: auto !important;
+  min-height: auto !important;
+  border-collapse: collapse !important;
+  border-spacing: 0 !important;
+  display: table-row !important;
+  vertical-align: middle !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* Override tbody grid/flex if accidentally set */
+.report-table tbody {
+  display: table-row-group !important;
+  border-collapse: collapse !important;
+  border-spacing: 0 !important;
+  vertical-align: middle !important;
+}
+
+/* CRITICAL: Override any Framework7 or inherited flex/grid that might stretch rows */
+.report-table {
+  display: table !important;
+  width: 100% !important;
+  border-collapse: collapse !important;
+  border-spacing: 0 !important;
+  table-layout: auto !important;
+}
+
+/* Prevent .card flex from stretching table wrapper */
+.report-table-wrapper {
+  align-self: flex-start !important;
+  align-items: auto !important;
+  flex: none !important;
+  max-height: none !important;
+  overflow-y: auto !important;
 }
