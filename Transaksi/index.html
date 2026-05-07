@@ -419,22 +419,33 @@
         /**
          * Add item to cart or increase quantity if exists
          */
-        function addToCart(productId, productName, productPrice) {
+        function addToCart(productId, productName, productPrice, maxStock) {
+            maxStock = maxStock === undefined ? 9999 : maxStock;
+            
             // Check if item already exists in cart
             const existingItem = cartItems.find(item => item.id === productId);
             
             if (existingItem) {
+                if (existingItem.quantity >= maxStock) {
+                    showToast('🔴 Stok produk tidak mencukupi', 'error');
+                    return;
+                }
                 // Increase quantity
                 existingItem.quantity += 1;
                 existingItem.subtotal = existingItem.price * existingItem.quantity;
             } else {
+                if (maxStock <= 0) {
+                    showToast('🔴 Produk kehabisan stok', 'error');
+                    return;
+                }
                 // Add new item
                 cartItems.push({
                     id: productId,
                     name: productName,
                     price: productPrice,
                     quantity: 1,
-                    subtotal: productPrice
+                    subtotal: productPrice,
+                    maxStock: maxStock
                 });
             }
             
@@ -474,6 +485,11 @@
             if (item) {
                 const newQuantity = item.quantity + change;
                 
+                if (change > 0 && newQuantity > item.maxStock) {
+                    showToast('🔴 Stok produk tidak mencukupi', 'error');
+                    return;
+                }
+                
                 // Minimum quantity is 1
                 if (newQuantity >= 1) {
                     item.quantity = newQuantity;
@@ -485,7 +501,7 @@
                 }
                 
                 // If quantity becomes 0, remove item
-                if (newQuantity === 0) {
+                if (newQuantity <= 0) {
                     removeFromCart(productId);
                 }
             }
@@ -834,6 +850,9 @@
             cartItems = [];
             renderCart();
             updateCartSummary();
+            
+            // Refresh products to show updated stock
+            loadProductsWithDiscounts();
         }
         
         // ==========================================
@@ -1118,13 +1137,27 @@
                     const hasDiscount = !!discount;
                     const displayPrice = hasDiscount ? discount.discounted_price : product.price;
                     
+                    const stockQuantity = product.quantity || 0;
+                    const stockMin = product.min_stock || 0;
+                    
+                    let stockClass = 'in-stock';
+                    if (stockQuantity <= 0) {
+                        stockClass = 'out-of-stock';
+                    } else if (stockQuantity <= stockMin) {
+                        stockClass = 'low-stock';
+                    }
+                    
                     const card = document.createElement('div');
-                    card.className = 'product-card';
-                    card.onclick = () => addToCart(product.id, product.name, displayPrice);
+                    card.className = `product-card ${stockClass}`;
+                    if (stockQuantity > 0) {
+                        card.onclick = () => addToCart(product.id, product.name, displayPrice, stockQuantity);
+                    }
                     
                     // Build badge HTML
                     let badgeHTML = '';
-                    if (hasDiscount) {
+                    if (stockQuantity <= 0) {
+                        badgeHTML = `<span class="product-badge out">Habis</span>`;
+                    } else if (hasDiscount) {
                         const discountLabel = discount.discount_type === 'percentage' 
                             ? `${discount.discount_value}%` 
                             : `Rp ${parseInt(discount.discount_value).toLocaleString('id-ID')}`;
@@ -1156,9 +1189,9 @@
                         <div class="product-info">
                             <div class="product-name">${product.name}</div>
                             ${priceHTML}
-                            <div class="product-stock in-stock">
+                            <div class="product-stock ${stockClass}">
                                 <i class="fas fa-circle"></i>
-                                <span>Stok: ${product.stock || 0}</span>
+                                <span>Stok: ${stockQuantity}</span>
                             </div>
                         </div>
                     `;
