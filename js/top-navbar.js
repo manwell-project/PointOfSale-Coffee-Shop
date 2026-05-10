@@ -13,9 +13,23 @@
     notificationCheckInterval: 60000, // Check every minute
   };
 
-  // Optional global opt-out: set window.__DIGICAF_HIDE_TOP_NAVBAR = true to disable injection
-  if (typeof window !== 'undefined' && window.__DIGICAF_HIDE_TOP_NAVBAR === true) {
-    console.log('[TopNavbar] Injection skipped due to __DIGICAF_HIDE_TOP_NAVBAR flag');
+  function shouldSkipInjection() {
+    try {
+      // Optional global opt-out
+      if (typeof window !== 'undefined' && window.__DIGICAF_HIDE_TOP_NAVBAR === true) return true;
+
+      // Per-page opt-out (used to match Reports style: no search/top nav)
+      if (document.body && document.body.classList.contains('no-top-navbar')) return true;
+      if (document.documentElement && String(document.documentElement.getAttribute('data-top-navbar')).toLowerCase() === 'off') return true;
+      if (document.querySelector && document.querySelector('[data-top-navbar="off"]')) return true;
+    } catch (e) {
+      // If checks fail, default to not skipping.
+    }
+    return false;
+  }
+
+  if (shouldSkipInjection()) {
+    console.log('[TopNavbar] Injection skipped (disabled for this page)');
     return;
   }
 

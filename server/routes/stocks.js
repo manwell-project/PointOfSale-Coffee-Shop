@@ -156,9 +156,17 @@ router.put('/:id', async (req, res, next) => {
 
     // Log stock history if quantity changed
     if (quantity !== undefined && quantity !== stock.quantity) {
+      const delta = Number(quantity) - Number(stock.quantity);
+      const reasonFromClient = typeof change_reason === 'string' ? change_reason.trim() : '';
+      const defaultReason = delta > 0
+        ? 'Stok masuk'
+        : delta < 0
+          ? 'Penyesuaian stok'
+          : 'Manual adjustment';
+
       await dbHelpers.run(
         'INSERT INTO raw_stock_history (raw_material_id, quantity_before, quantity_after, change_reason, changed_by_employee_id) VALUES (?, ?, ?, ?, ?)',
-        [stock.raw_material_id, stock.quantity, quantity, change_reason || 'Manual adjustment', employee_id || null]
+        [stock.raw_material_id, stock.quantity, quantity, reasonFromClient || defaultReason, employee_id || null]
       );
     }
 
@@ -190,7 +198,17 @@ router.post('/', async (req, res, next) => {
     const results = await dbHelpers.transaction(queries);
     const rawMaterialId = results[0].id;
 
-    const stockRes = await dbHelpers.run('INSERT INTO raw_stocks (raw_material_id, quantity, min_stock) VALUES (?, ?, ?)', [rawMaterialId, quantity, min_stock]);
+    const stockRes = await dbHelpers.run(
+      'INSERT INTO raw_stocks (raw_material_id, quantity, min_stock) VALUES (?, ?, ?)',
+      [rawMaterialId, quantity, min_stock]
+    );
+
+    // Log initial stock so "barang masuk" is visible in Riwayat Stok.
+    const initialQty = Number(quantity) || 0;
+    await dbHelpers.run(
+      'INSERT INTO raw_stock_history (raw_material_id, quantity_before, quantity_after, change_reason, changed_by_employee_id) VALUES (?, ?, ?, ?, ?)',
+      [rawMaterialId, 0, initialQty, initialQty > 0 ? 'Stok masuk' : 'Stok awal', null]
+    );
 
     const created = await dbHelpers.get('SELECT rs.*, rm.name, rm.category, rm.price, rm.id as raw_material_id FROM raw_stocks rs JOIN raw_materials rm ON rs.raw_material_id = rm.id WHERE rs.id = ?', [stockRes.id]);
 

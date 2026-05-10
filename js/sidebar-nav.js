@@ -42,6 +42,13 @@
     
     // Inject sidebar HTML
     injectSidebarHTML();
+
+    // This app uses the left sidebar as primary navigation.
+    // Ensure bottom navigation is disabled/removed on all viewports.
+    try {
+      document.body.classList.add('no-bottom-nav');
+      document.querySelectorAll('.bottom-nav').forEach(el => el.remove());
+    } catch (e) {}
     
     // Setup event listeners
     setupEventListeners();

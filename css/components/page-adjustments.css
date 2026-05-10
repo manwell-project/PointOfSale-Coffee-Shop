@@ -13,6 +13,27 @@ body {
   background-color: var(--color-bg-primary);
 }
 
+/*
+  Optional: remove the fixed top navbar (and its reserved spacing) to match the
+  Reports page style (no search bar / no top nav).
+*/
+body.no-top-navbar {
+  --top-nav-height: 0px;
+}
+
+body.no-top-navbar .top-navbar {
+  display: none !important;
+}
+
+/* Optional: remove the bottom navigation when using the left sidebar nav */
+body.no-bottom-nav {
+  --bottom-nav-height: 0px;
+}
+
+body.no-bottom-nav .bottom-nav {
+  display: none !important;
+}
+
 /* Page wrappers with light brown background */
 .stock-wrapper,
 .employee-wrapper,

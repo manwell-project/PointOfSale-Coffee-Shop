@@ -1,5 +1,27 @@
 // Centralized bottom navigation injector and router
 (function(){
+  function shouldDisableBottomNav() {
+    try {
+      if (document.body && document.body.classList.contains('no-bottom-nav')) return true;
+      if (document.documentElement && String(document.documentElement.getAttribute('data-bottom-nav')).toLowerCase() === 'off') return true;
+      if (document.querySelector && document.querySelector('[data-bottom-nav="off"]')) return true;
+
+      // If the sidebar nav script is present/active, we don't use bottom nav.
+      if (document.querySelector && document.querySelector('script[src*="sidebar-nav.js"]')) return true;
+      if (document.querySelector && document.querySelector('.sidebar-nav')) return true;
+    } catch (e) {
+      // default to enabled
+    }
+    return false;
+  }
+
+  if (shouldDisableBottomNav()) {
+    try {
+      document.querySelectorAll('.bottom-nav').forEach(e => e.remove());
+    } catch (e) {}
+    return;
+  }
+
   // Inject minimal styles for the bottom navigation if not already present
   if (!document.getElementById('navbar-styles')) {
     const css = `
