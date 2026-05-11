@@ -1234,6 +1234,24 @@
             
             // Load products with discount info
             loadProductsWithDiscounts();
+            
+            // Auto-convert leading 0 to country code 62 for customer phone
+            const customerPhoneEl = document.getElementById('customerPhone');
+            if (customerPhoneEl) {
+                const normalizePhone = () => {
+                    let v = customerPhoneEl.value || '';
+                    v = v.trim();
+                    // If starts with '0' and not already '62' or '+62', replace leading 0 with 62
+                    if (/^0/.test(v) && !/^\+?62/.test(v)) {
+                        const rest = v.slice(1).replace(/\D/g, '');
+                        customerPhoneEl.value = '62' + rest;
+                    }
+                };
+
+                customerPhoneEl.addEventListener('input', normalizePhone);
+                customerPhoneEl.addEventListener('blur', normalizePhone);
+                customerPhoneEl.addEventListener('paste', () => setTimeout(normalizePhone, 0));
+            }
         });
 
         // Listen for external product updates (e.g., from Kelola Menu)
