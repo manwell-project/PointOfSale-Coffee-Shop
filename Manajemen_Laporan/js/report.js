@@ -476,11 +476,11 @@ function configureTableHeaders() {
         employees: [
             { label: 'ID', sort: 'id', sortable: true, number: false },
             { label: 'Karyawan', sort: 'name', sortable: true, number: false },
-            { label: '', sort: '', sortable: false, number: false },
+            { label: 'Kontribusi', sort: 'share', sortable: true, number: false },
             { label: 'Transaksi', sort: 'transactions', sortable: true, number: true },
             { label: 'Total', sort: 'amount', sortable: true, number: true },
             { label: 'Rata-rata', sort: 'average', sortable: true, number: false },
-            { label: '', sort: '', sortable: false, number: false }
+            { label: 'Status', sort: '', sortable: false, number: false }
         ]
     };
 
@@ -835,7 +835,7 @@ function buildProductRows(data) {
 
     return Array.from(productMap.values()).map((product) => {
         const share = totalRevenue > 0 ? (product.amount / totalRevenue) * 100 : 0;
-        const statusText = product.quantity >= 20 ? 'Laris' : product.quantity >= 8 ? 'Normal' : 'Rendah';
+        const statusText = product.quantity >= 20 ? 'Laris' : product.quantity >= 8 ? 'Sedang' : 'Kurang Diminati';
         const statusClass = product.quantity >= 20 ? 'success' : product.quantity >= 8 ? 'info' : 'warning';
 
         return {
@@ -870,7 +870,6 @@ function buildEmployeeRows(data) {
             employeeMap.set(employeeKey, {
                 id: '-',
                 name: employeeKey,
-                shift: 'N/A',
                 transactions: 0,
                 amount: 0
             });
@@ -881,17 +880,21 @@ function buildEmployeeRows(data) {
         bucket.amount += transaction.totalAmount;
     });
 
+    const totalTransactions = Array.from(employeeMap.values())
+        .reduce((sum, employee) => sum + employee.transactions, 0);
+
     return Array.from(employeeMap.values()).map((employee) => {
         const average = employee.transactions > 0 ? employee.amount / employee.transactions : 0;
-        const statusText = employee.transactions >= 10 ? 'Aktif' : employee.transactions >= 4 ? 'Normal' : 'Rendah';
+        const statusText = employee.transactions >= 10 ? 'Sangat Baik' : employee.transactions >= 4 ? 'Baik' : 'Perlu Perhatian';
         const statusClass = employee.transactions >= 10 ? 'success' : employee.transactions >= 4 ? 'info' : 'warning';
+        const share = totalTransactions > 0 ? (employee.transactions / totalTransactions) * 100 : 0;
 
         return {
             id: employee.id,
             sortValues: {
                 id: String(employee.id),
                 name: employee.name,
-                shift: employee.shift,
+                share,
                 transactions: employee.transactions,
                 amount: employee.amount,
                 average
@@ -899,11 +902,11 @@ function buildEmployeeRows(data) {
             cells: [
                 `<strong>${escapeHtml(String(employee.id))}</strong>`,
                 `${escapeHtml(employee.name)}`,
-                ``,
+                `${share.toFixed(1)}%`,
                 `${employee.transactions}`,
                 `${formatCurrency(employee.amount)}`,
                 `${formatCurrency(average)}`,
-                ``
+                `<span class="table-badge ${statusClass}">${statusText}</span>`
             ]
         };
     });
