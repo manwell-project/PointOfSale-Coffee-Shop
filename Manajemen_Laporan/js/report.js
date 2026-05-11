@@ -1180,93 +1180,151 @@ async function handleExportPdf() {
     const titleText = reportTitleEl ? reportTitleEl.textContent.trim() : 'Laporan';
     const periodText = reportPeriodEl ? reportPeriodEl.textContent.replace(/\s+/g, ' ').trim() : '-';
     const headers = getTableHeaders();
-    const bodyRows = getTableRows();
+    const bodyRows = getExportRows();
+    const totalText = formatCurrency(getExportTotal());
+
+    let exportRoot = null;
 
     try {
-        const JsPdf = await ensureJsPdfLoaded();
-        const pdf = new JsPdf({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+        const [JsPdf, html2canvas] = await Promise.all([
+            ensureJsPdfLoaded(),
+            ensureHtml2CanvasLoaded()
+        ]);
 
-        pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(16);
-        pdf.text(titleText, 40, 40);
+        exportRoot = buildExportElement({
+            titleText,
+            periodText,
+            headers,
+            bodyRows,
+            totalText,
+            headingLabel: 'Export PDF Laporan'
+        });
 
-        pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(10);
-        pdf.text(`Periode: ${periodText}`, 40, 58);
-        pdf.text(`Dibuat: ${new Date().toLocaleString('id-ID')}`, 40, 74);
+        const canvas = await html2canvas(exportRoot, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: '#fff7ef'
+        });
 
-        let currentY = 100;
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new JsPdf({ orientation: 'portrait', unit: 'pt', format: 'a4' });
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const margin = 20;
+        const imgWidth = pageWidth - (margin * 2);
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-        if (headers.length > 0) {
-            const headerLine = headers.join(' | ');
-            pdf.setFont('helvetica', 'bold');
-            pdf.setFontSize(9);
-            const wrappedHeaders = pdf.splitTextToSize(headerLine, 760);
-            pdf.text(wrappedHeaders, 40, currentY);
-            currentY += (wrappedHeaders.length * 12) + 6;
-        }
+        let heightLeft = imgHeight;
+        let position = margin;
 
-        pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(9);
+        pdf.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
+        heightLeft -= (pageHeight - (margin * 2));
 
-        if (bodyRows.length === 0) {
-            pdf.text('Tidak ada data transaksi untuk ditampilkan.', 40, currentY);
-        } else {
-            bodyRows.forEach((row) => {
-                const rowLine = row.join(' | ');
-                const wrappedRow = pdf.splitTextToSize(rowLine, 760);
-
-                if (currentY > 530) {
-                    pdf.addPage();
-                    currentY = 40;
-                }
-
-                pdf.text(wrappedRow, 40, currentY);
-                currentY += (wrappedRow.length * 11) + 4;
-            });
-        }
-
-        if (tableTotalEl && tableTotalEl.textContent.trim()) {
-            if (currentY > 560) {
-                pdf.addPage();
-                currentY = 40;
-            }
-
-            pdf.setFont('helvetica', 'bold');
-            pdf.text(`Total: ${tableTotalEl.textContent.trim()}`, 40, currentY + 8);
+        while (heightLeft > 0) {
+            pdf.addPage();
+            position = margin - heightLeft;
+            pdf.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
+            heightLeft -= (pageHeight - (margin * 2));
         }
 
         pdf.save(`laporan-${generateFileDate()}.pdf`);
         showReportMessage('Export PDF berhasil.', 'success');
     } catch (error) {
         console.error('Export PDF error:', error);
-        showReportMessage('Export PDF menggunakan mode print karena library PDF tidak tersedia.', 'warning');
-        openPrintWindow('pdf');
+        showReportMessage('Gagal export PDF. Coba lagi beberapa saat.', 'error');
+    } finally {
+        if (exportRoot && exportRoot.parentNode) {
+            exportRoot.parentNode.removeChild(exportRoot);
+        }
     }
 }
 
 function handleExportExcel() {
-    if (!reportTable) {
-        showReportMessage('Tabel laporan tidak ditemukan.', 'error');
-        return;
-    }
+    const headers = getTableHeaders();
+    const bodyRows = getExportRows();
+    const totalText = formatCurrency(getExportTotal());
+    const periodText = reportPeriodEl ? reportPeriodEl.textContent.replace(/\s+/g, ' ').trim() : '-';
+    const titleText = reportTitleEl ? reportTitleEl.textContent.trim() : 'Laporan';
 
-    const htmlContent = buildExcelDocument();
-    const blob = new Blob([htmlContent], { type: 'application/vnd.ms-excel;charset=utf-8;' });
-    const filename = `laporan-${generateFileDate()}.xls`;
-    downloadBlob(blob, filename);
-    showReportMessage('Export Excel berhasil.', 'success');
+    ensureExcelJsLoaded()
+        .then((ExcelJS) => {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Laporan');
+
+            worksheet.columns = [
+                { width: 8 },
+                { width: 22 },
+                { width: 20 },
+                { width: 10 },
+                { width: 14 },
+                { width: 14 },
+                { width: 12 }
+            ];
+
+            const titleRow = worksheet.addRow([titleText]);
+            const periodRow = worksheet.addRow([`Periode: ${periodText}`]);
+            const createdRow = worksheet.addRow([`Dibuat: ${new Date().toLocaleString('id-ID')}`]);
+            worksheet.addRow([]);
+
+            const headerRow = worksheet.addRow(headers);
+            bodyRows.forEach((row) => worksheet.addRow(row));
+
+            if (totalText) {
+                worksheet.addRow(['', '', '', 'Total', totalText, '', '']);
+            }
+
+            const lastColumn = headers.length || 7;
+            worksheet.mergeCells(1, 1, 1, lastColumn);
+            worksheet.mergeCells(2, 1, 2, lastColumn);
+            worksheet.mergeCells(3, 1, 3, lastColumn);
+
+            titleRow.font = { bold: true, size: 14, color: { argb: 'FF3F2A1D' } };
+            titleRow.alignment = { horizontal: 'center', vertical: 'middle' };
+            periodRow.font = { color: { argb: 'FF6B4B35' } };
+            createdRow.font = { color: { argb: 'FF6B4B35' } };
+
+            headerRow.eachCell((cell) => {
+                cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF8B5E3C' } };
+                cell.alignment = { horizontal: 'center', vertical: 'middle' };
+            });
+
+            const borderStyle = { style: 'thin', color: { argb: 'FFE0CBB8' } };
+            worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
+                row.eachCell({ includeEmpty: false }, (cell) => {
+                    cell.border = {
+                        top: borderStyle,
+                        left: borderStyle,
+                        bottom: borderStyle,
+                        right: borderStyle
+                    };
+                    if (rowNumber > headerRow.number) {
+                        cell.alignment = cell.alignment || { horizontal: 'left', vertical: 'middle' };
+                    }
+                });
+            });
+
+            return workbook.xlsx.writeBuffer();
+        })
+        .then((buffer) => {
+            const blob = new Blob([buffer], {
+                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            });
+            const filename = `laporan-${generateFileDate()}.xlsx`;
+            downloadBlob(blob, filename);
+            showReportMessage('Export Excel berhasil.', 'success');
+        })
+        .catch((error) => {
+            console.error('Export Excel error:', error);
+            showReportMessage('Gagal export Excel. Coba lagi beberapa saat.', 'error');
+        });
 }
 
 function handleExportCsv() {
-    if (!reportTable) {
-        showReportMessage('Tabel laporan tidak ditemukan.', 'error');
-        return;
-    }
-
     const csvRows = [];
     const headers = getTableHeaders();
-    const bodyRows = getTableRows();
+    const bodyRows = getExportRows();
+    const totalText = formatCurrency(getExportTotal());
 
     if (headers.length > 0) {
         csvRows.push(convertToCsvRow(headers));
@@ -1276,8 +1334,8 @@ function handleExportCsv() {
         csvRows.push(convertToCsvRow(row));
     });
 
-    if (tableTotalEl) {
-        csvRows.push(convertToCsvRow(['', '', '', 'Total', tableTotalEl.textContent.trim(), '', '']));
+    if (totalText) {
+        csvRows.push(convertToCsvRow(['', '', '', 'Total', totalText, '', '']));
     }
 
     const csvContent = `\uFEFF${csvRows.join('\n')}`;
@@ -1312,9 +1370,20 @@ function openPrintWindow(mode) {
 function buildPrintableDocument(mode) {
     const titleText = reportTitleEl ? reportTitleEl.textContent.trim() : 'Laporan';
     const periodText = reportPeriodEl ? reportPeriodEl.textContent.replace(/\s+/g, ' ').trim() : '-';
-    const tableHtml = reportTable ? reportTable.outerHTML : '<p>Tabel laporan tidak tersedia.</p>';
+    const headers = getTableHeaders();
+    const bodyRows = getExportRows();
+    const totalText = formatCurrency(getExportTotal());
+    const tableHtml = buildExportTableHtml(headers, bodyRows, totalText);
     const generatedAt = new Date().toLocaleString('id-ID');
     const printHeading = mode === 'pdf' ? 'Export PDF Laporan' : 'Print View Laporan';
+    const styles = buildExportStyles();
+    const contentHtml = buildExportContentHtml({
+        titleText,
+        periodText,
+        generatedAt,
+        headingLabel: printHeading,
+        tableHtml
+    });
 
     return `<!DOCTYPE html>
 <html lang="id">
@@ -1323,89 +1392,11 @@ function buildPrintableDocument(mode) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${escapeHtml(titleText)}</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 24px;
-            color: #1e293b;
-        }
-        .report-print-header {
-            margin-bottom: 16px;
-        }
-        .report-print-title {
-            font-size: 24px;
-            margin: 0 0 4px;
-        }
-        .report-print-subtitle {
-            font-size: 14px;
-            color: #475569;
-            margin: 0;
-        }
-        .report-print-meta {
-            margin: 16px 0;
-            font-size: 12px;
-            color: #64748b;
-            display: flex;
-            justify-content: space-between;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
-        }
-        th,
-        td {
-            border: 1px solid #cbd5e1;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background: #f1f5f9;
-            font-weight: 700;
-        }
-        tfoot td {
-            background: #f8fafc;
-            font-weight: 700;
-        }
+        ${styles}
     </style>
 </head>
 <body>
-    <header class="report-print-header">
-        <h1 class="report-print-title">${escapeHtml(titleText)}</h1>
-        <p class="report-print-subtitle">${escapeHtml(periodText)}</p>
-    </header>
-    <div class="report-print-meta">
-        <span>${escapeHtml(printHeading)}</span>
-        <span>Dibuat: ${escapeHtml(generatedAt)}</span>
-    </div>
-    ${tableHtml}
-</body>
-</html>`;
-}
-
-function buildExcelDocument() {
-    const titleText = reportTitleEl ? reportTitleEl.textContent.trim() : 'Laporan';
-    const periodText = reportPeriodEl ? reportPeriodEl.textContent.replace(/\s+/g, ' ').trim() : '-';
-    const tableHtml = reportTable ? reportTable.outerHTML : '';
-
-    return `
-<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-<head>
-    <meta charset="UTF-8">
-    <style>
-        body { font-family: Arial, sans-serif; }
-        h2 { margin-bottom: 4px; }
-        p { margin-top: 0; color: #475569; }
-        table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1px solid #cbd5e1; padding: 8px; }
-        th { background: #f1f5f9; }
-    </style>
-</head>
-<body>
-    <h2>${escapeHtml(titleText)}</h2>
-    <p>${escapeHtml(periodText)}</p>
-    ${tableHtml}
+    ${contentHtml}
 </body>
 </html>`;
 }
@@ -1417,19 +1408,168 @@ function getTableHeaders() {
     return Array.from(headerElements).map((header) => header.textContent.trim());
 }
 
-function getTableRows() {
-    if (!reportTable) return [];
+function getExportRows() {
+    if (!Array.isArray(currentRows)) return [];
 
-    const sourceRows = reportTableBody && reportTableBody.querySelectorAll('tr').length > 0
-        ? reportTableBody.querySelectorAll('tr')
-        : reportTable.querySelectorAll('tbody tr');
+    return currentRows
+        .filter(isRenderableRow)
+        .map((row) => row.cells.map((cell) => stripHtml(cell)));
+}
 
-    return Array.from(sourceRows)
-        .map((row) => {
-            const cells = row.querySelectorAll('td');
-            return Array.from(cells).map((cell) => cell.textContent.replace(/\s+/g, ' ').trim());
-        })
-        .filter((row) => row.length > 0 && row.some((cell) => cell !== ''));
+function getExportTotal() {
+    if (!Array.isArray(currentRows)) return 0;
+    return currentRows.reduce((sum, row) => sum + (Number(row.sortValues?.amount) || 0), 0);
+}
+
+function buildExportTableHtml(headers, rows, totalText) {
+    if (!headers || headers.length === 0) return '<p>Tabel laporan tidak tersedia.</p>';
+
+    const headerHtml = headers.map((header) => `<th>${escapeHtml(header)}</th>`).join('');
+    const bodyHtml = (rows || []).map((row) => {
+        const rowCells = row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join('');
+        return `<tr>${rowCells}</tr>`;
+    }).join('');
+
+    const totalRow = totalText
+        ? `<tr><td colspan="4">Total</td><td>${escapeHtml(totalText)}</td><td colspan="2"></td></tr>`
+        : '';
+
+    return `
+<table>
+    <thead>
+        <tr>${headerHtml}</tr>
+    </thead>
+    <tbody>
+        ${bodyHtml}
+    </tbody>
+    <tfoot>
+        ${totalRow}
+    </tfoot>
+</table>`;
+}
+
+function buildExportStyles() {
+    return `
+        :root {
+            color-scheme: light;
+        }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 28px;
+            color: #2b1e16;
+            background: #fff7ef;
+        }
+        .report-print-header {
+            background: linear-gradient(135deg, #c48a5a, #8b5e3c);
+            color: #ffffff;
+            padding: 18px 22px;
+            border-radius: 14px;
+            margin-bottom: 18px;
+        }
+        .report-print-title {
+            font-size: 22px;
+            margin: 0 0 6px;
+            letter-spacing: 0.3px;
+        }
+        .report-print-subtitle {
+            font-size: 13px;
+            color: #fef3e6;
+            margin: 0;
+        }
+        .report-print-meta {
+            margin: 14px 0 18px;
+            font-size: 12px;
+            color: #6b4b35;
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .report-table-wrap {
+            background: #ffffff;
+            border: 1px solid #ead8c5;
+            border-radius: 12px;
+            padding: 12px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        th,
+        td {
+            border: 1px solid #ead8c5;
+            padding: 8px 10px;
+            text-align: left;
+        }
+        th {
+            background: #8b5e3c;
+            color: #ffffff;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        tbody tr:nth-child(even) td {
+            background: #fef5ea;
+        }
+        tfoot td {
+            background: #f5e2cf;
+            font-weight: 700;
+            color: #2b1e16;
+        }
+        .export-root {
+            width: 900px;
+            padding: 24px;
+            background: #fff7ef;
+        }
+    `;
+}
+
+function buildExportContentHtml({ titleText, periodText, generatedAt, headingLabel, tableHtml }) {
+    return `
+    <header class="report-print-header">
+        <h1 class="report-print-title">${escapeHtml(titleText)}</h1>
+        <p class="report-print-subtitle">${escapeHtml(periodText)}</p>
+    </header>
+    <div class="report-print-meta">
+        <span>${escapeHtml(headingLabel)}</span>
+        <span>Dibuat: ${escapeHtml(generatedAt)}</span>
+    </div>
+    <div class="report-table-wrap">
+        ${tableHtml}
+    </div>
+    `;
+}
+
+function buildExportElement({ titleText, periodText, headers, bodyRows, totalText, headingLabel }) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'export-root';
+    wrapper.style.position = 'fixed';
+    wrapper.style.left = '-10000px';
+    wrapper.style.top = '0';
+    wrapper.style.zIndex = '-1';
+    wrapper.style.background = '#fff7ef';
+
+    const styleTag = document.createElement('style');
+    styleTag.textContent = buildExportStyles();
+
+    const tableHtml = buildExportTableHtml(headers, bodyRows, totalText);
+    const contentHtml = buildExportContentHtml({
+        titleText,
+        periodText,
+        generatedAt: new Date().toLocaleString('id-ID'),
+        headingLabel,
+        tableHtml
+    });
+
+    const contentWrapper = document.createElement('div');
+    contentWrapper.innerHTML = contentHtml;
+
+    wrapper.appendChild(styleTag);
+    wrapper.appendChild(contentWrapper);
+    document.body.appendChild(wrapper);
+
+    return wrapper;
 }
 
 function convertToCsvRow(rowData) {
@@ -1451,6 +1591,42 @@ function downloadBlob(blob, filename) {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+}
+
+function ensureXlsxLoaded() {
+    return new Promise((resolve, reject) => {
+        if (window.XLSX) {
+            resolve(window.XLSX);
+            return;
+        }
+
+        const existingScript = document.querySelector('script[data-lib="xlsx"]');
+        if (existingScript) {
+            existingScript.addEventListener('load', () => {
+                if (window.XLSX) {
+                    resolve(window.XLSX);
+                } else {
+                    reject(new Error('XLSX loaded but unavailable in window scope'));
+                }
+            });
+            existingScript.addEventListener('error', () => reject(new Error('Failed to load XLSX script')));
+            return;
+        }
+
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+        script.async = true;
+        script.setAttribute('data-lib', 'xlsx');
+        script.onload = () => {
+            if (window.XLSX) {
+                resolve(window.XLSX);
+                return;
+            }
+            reject(new Error('XLSX loaded but unavailable in window scope'));
+        };
+        script.onerror = () => reject(new Error('Failed to load XLSX script'));
+        document.head.appendChild(script);
+    });
 }
 
 function ensureJsPdfLoaded() {
@@ -1486,6 +1662,78 @@ function ensureJsPdfLoaded() {
             reject(new Error('jsPDF loaded but unavailable in window scope'));
         };
         script.onerror = () => reject(new Error('Failed to load jsPDF script'));
+        document.head.appendChild(script);
+    });
+}
+
+function ensureHtml2CanvasLoaded() {
+    return new Promise((resolve, reject) => {
+        if (window.html2canvas) {
+            resolve(window.html2canvas);
+            return;
+        }
+
+        const existingScript = document.querySelector('script[data-lib="html2canvas"]');
+        if (existingScript) {
+            existingScript.addEventListener('load', () => {
+                if (window.html2canvas) {
+                    resolve(window.html2canvas);
+                } else {
+                    reject(new Error('html2canvas loaded but unavailable in window scope'));
+                }
+            });
+            existingScript.addEventListener('error', () => reject(new Error('Failed to load html2canvas script')));
+            return;
+        }
+
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+        script.async = true;
+        script.setAttribute('data-lib', 'html2canvas');
+        script.onload = () => {
+            if (window.html2canvas) {
+                resolve(window.html2canvas);
+                return;
+            }
+            reject(new Error('html2canvas loaded but unavailable in window scope'));
+        };
+        script.onerror = () => reject(new Error('Failed to load html2canvas script'));
+        document.head.appendChild(script);
+    });
+}
+
+function ensureExcelJsLoaded() {
+    return new Promise((resolve, reject) => {
+        if (window.ExcelJS) {
+            resolve(window.ExcelJS);
+            return;
+        }
+
+        const existingScript = document.querySelector('script[data-lib="exceljs"]');
+        if (existingScript) {
+            existingScript.addEventListener('load', () => {
+                if (window.ExcelJS) {
+                    resolve(window.ExcelJS);
+                } else {
+                    reject(new Error('ExcelJS loaded but unavailable in window scope'));
+                }
+            });
+            existingScript.addEventListener('error', () => reject(new Error('Failed to load ExcelJS script')));
+            return;
+        }
+
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js';
+        script.async = true;
+        script.setAttribute('data-lib', 'exceljs');
+        script.onload = () => {
+            if (window.ExcelJS) {
+                resolve(window.ExcelJS);
+                return;
+            }
+            reject(new Error('ExcelJS loaded but unavailable in window scope'));
+        };
+        script.onerror = () => reject(new Error('Failed to load ExcelJS script'));
         document.head.appendChild(script);
     });
 }
@@ -1634,6 +1882,13 @@ function escapeHtml(value) {
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
 }
+
+    function stripHtml(value) {
+        return String(value || '')
+        .replace(/<[^>]*>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
 
 function showReportMessage(message, type = 'info') {
     if (typeof window.showNotification === 'function') {
