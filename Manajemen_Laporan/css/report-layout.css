@@ -964,7 +964,7 @@ body.report-page .page-content {
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   gap: var(--spacing-xl);
   margin-bottom: var(--spacing-xl);
-  align-items: stretch;
+  align-items: start;
 }
 
 @media (max-width: 1200px) {
@@ -1213,6 +1213,7 @@ body.report-page .page-content {
 /* Data Tables Section */
 .data-table-section {
   margin-bottom: var(--spacing-2xl);
+  align-self: start;
 }
 
 .table-header {
@@ -1344,10 +1345,10 @@ body.report-page .page-content {
   border-radius: var(--radius-lg);
   border: 1px solid #e2e8f0;
   overflow-x: auto;
-  overflow-y: visible;
+  overflow-y: auto;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   -webkit-overflow-scrolling: touch;
-  max-height: none !important;
+  max-height: clamp(320px, 55vh, 560px);
   height: auto !important;
   min-height: auto !important;
   display: block !important;
@@ -2018,21 +2019,20 @@ body.report-page .page-content {
    ==================================================== */
 
 .report-table-wrapper {
-  max-height: none !important;
+  max-height: clamp(320px, 55vh, 560px) !important;
   height: auto !important;
   display: block !important;
   overflow: auto !important;
-  overflow-y: auto !important;
-  overflow-x: auto !important;
 }
 
-.report-table,
-.report-table tbody,
-.report-table thead,
-.report-table tfoot {
+.report-table {
   height: auto !important;
   min-height: auto !important;
   max-height: none !important;
+  display: table !important;
+  width: 100% !important;
+  border-collapse: collapse !important;
+  table-layout: auto !important;
 }
 
 .report-table tbody tr {
@@ -2047,9 +2047,9 @@ body.report-page .page-content {
   height: auto !important;
   min-height: auto !important;
   display: table-cell !important;
-  vertical-align: top !important;
-  padding: var(--spacing-2) var(--spacing-3) !important;
-  line-height: 1.5 !important;
+  vertical-align: middle !important;
+  padding: 8px 12px !important;
+  line-height: 1.4 !important;
 }
 
 /* Override any flex/grid properties from parent containers */
@@ -2060,7 +2060,7 @@ body.report-page .page-content {
   flex-shrink: 0 !important;
   flex-grow: 0 !important;
   min-height: 0 !important;
-  max-height: none !important;
+  max-height: clamp(320px, 55vh, 560px) !important;
   height: auto !important;
 }
 
@@ -2073,6 +2073,7 @@ body.report-page .page-content {
   min-height: auto !important;
   max-height: none !important;
   height: auto !important;
+  align-self: start !important;
 }
 
 /* Remove any margins that might add space */
@@ -2114,15 +2115,10 @@ body.report-page .page-content {
   display: table-row-group !important;
   border-collapse: collapse !important;
   border-spacing: 0 !important;
-  vertical-align: middle !important;
 }
 
 /* CRITICAL: Override any Framework7 or inherited flex/grid that might stretch rows */
 .report-table {
-  display: table !important;
-  width: 100% !important;
-  border-collapse: collapse !important;
-  border-spacing: 0 !important;
   table-layout: auto !important;
 }
 
@@ -2131,6 +2127,6 @@ body.report-page .page-content {
   align-self: flex-start !important;
   align-items: auto !important;
   flex: none !important;
-  max-height: none !important;
+  max-height: clamp(320px, 55vh, 560px) !important;
   overflow-y: auto !important;
 }

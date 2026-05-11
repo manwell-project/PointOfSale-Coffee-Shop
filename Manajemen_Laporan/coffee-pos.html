@@ -218,38 +218,76 @@
                                 <!-- Charts Section -->
                                 <div class="charts-section">
                                     <div class="charts-grid">
-                                        <!-- Sales Chart -->
-                                        <div class="chart-container card bar-chart full-width">
-                                            <div class="chart-header">
-                                                <h3 class="chart-title">
-                                                    <i class="fas fa-chart-bar"></i>
-                                                    Grafik Penjualan
+                                        <!-- Detail Transaksi -->
+                                        <div class="chart-container card full-width data-table-section">
+                                            <div class="table-header">
+                                                <h3 class="table-title">
+                                                    <i class="fas fa-table"></i>
+                                                    Detail Transaksi
                                                 </h3>
-                                                <div class="chart-actions">
-                                                    <button class="chart-action-btn" title="Fullscreen">
-                                                        <i class="fas fa-expand"></i>
-                                                    </button>
-                                                    <button class="chart-action-btn" title="Download">
-                                                        <i class="fas fa-download"></i>
-                                                    </button>
+                                                <div class="table-controls">
+                                                    <div class="table-search">
+                                                        <i class="fas fa-search"></i>
+                                                        <input type="text" id="tableSearch" placeholder="Cari transaksi">
+                                                    </div>
+                                                    <div class="table-view-toggle">
+                                                        <button class="view-toggle-btn active" data-view="table" type="button" title="Tampilan tabel">
+                                                            <i class="fas fa-table"></i>
+                                                        </button>
+                                                        <button class="view-toggle-btn" data-view="grid" type="button" title="Tampilan grid">
+                                                            <i class="fas fa-th-large"></i>
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="chart-canvas" id="salesChart">
-                                                <div class="chart-placeholder">
-                                                    <i class="fas fa-chart-bar"></i>
-                                                    <p class="chart-placeholder-text">Grafik penjualan akan ditampilkan di sini</p>
+
+                                            <div class="report-table-wrapper">
+                                                <table class="report-table" id="reportTable">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="sortable" data-sort="id">ID</th>
+                                                            <th class="sortable" data-sort="date">Tanggal</th>
+                                                            <th class="sortable" data-sort="customer">Pelanggan</th>
+                                                            <th class="sortable" data-sort="items">Item</th>
+                                                            <th class="sortable" data-sort="amount">Total</th>
+                                                            <th class="sortable" data-sort="payment">Pembayaran</th>
+                                                            <th>Status</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="reportTableBody"></tbody>
+                                                    <tfoot>
+                                                        <tr>
+                                                            <td colspan="4">Total</td>
+                                                            <td class="currency" id="tableTotal">Rp 0</td>
+                                                            <td colspan="2"></td>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+
+                                                <div class="report-grid-view" id="reportGridView" style="display: none;"></div>
+
+                                                <div class="report-loading" id="tableLoading" style="display: none;">
+                                                    <div class="loading-spinner"></div>
+                                                    <div class="loading-text">Memuat data transaksi...</div>
+                                                </div>
+
+                                                <div class="report-empty-state" id="tableEmpty" style="display: none;">
+                                                    <div class="empty-icon"><i class="fas fa-receipt"></i></div>
+                                                    <div class="empty-title">Belum ada transaksi</div>
+                                                    <div class="empty-text">Coba ubah filter periode atau metode pembayaran.</div>
                                                 </div>
                                             </div>
-                                            <div class="chart-legend">
-                                                <div class="legend-item">
-                                                    <div class="legend-color" style="background: #0ea5e9;"></div>
-                                                    <span class="legend-label">Penjualan:</span>
-                                                    <span class="legend-value">Rp 0</span>
-                                                </div>
-                                                <div class="legend-item">
-                                                    <div class="legend-color" style="background: #059669;"></div>
-                                                    <span class="legend-label">Target:</span>
-                                                    <span class="legend-value">Rp 0</span>
+
+                                            <div class="table-pagination" id="tablePagination" style="display: none;">
+                                                <div class="pagination-info" id="paginationInfo">Menampilkan 0 dari 0 data</div>
+                                                <div class="pagination-controls">
+                                                    <button class="pagination-btn" id="btnPrevPage" type="button">
+                                                        <i class="fas fa-chevron-left"></i>
+                                                    </button>
+                                                    <div id="paginationButtons"></div>
+                                                    <button class="pagination-btn" id="btnNextPage" type="button">
+                                                        <i class="fas fa-chevron-right"></i>
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>

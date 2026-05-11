@@ -452,7 +452,7 @@ function updateFilterVisibility() {
 }
 
 function configureTableHeaders() {
-    if (tableHeaderCells.length !== 8) return;
+    if (tableHeaderCells.length !== 7) return;
 
     const headerConfigByReport = {
         sales: [
@@ -462,8 +462,7 @@ function configureTableHeaders() {
             { label: 'Item', sort: 'items', sortable: true, number: false },
             { label: 'Total', sort: 'amount', sortable: true, number: true },
             { label: 'Pembayaran', sort: 'payment', sortable: true, number: false },
-            { label: 'Status', sort: '', sortable: false, number: false },
-            { label: 'Aksi', sort: '', sortable: false, number: false }
+            { label: 'Status', sort: '', sortable: false, number: false }
         ],
         products: [
             { label: 'ID', sort: 'id', sortable: true, number: false },
@@ -472,8 +471,7 @@ function configureTableHeaders() {
             { label: 'Terjual', sort: 'quantity', sortable: true, number: true },
             { label: 'Pendapatan', sort: 'amount', sortable: true, number: true },
             { label: 'Kontribusi', sort: 'share', sortable: true, number: false },
-            { label: 'Status', sort: '', sortable: false, number: false },
-            { label: 'Aksi', sort: '', sortable: false, number: false }
+            { label: 'Status', sort: '', sortable: false, number: false }
         ],
         employees: [
             { label: 'ID', sort: 'id', sortable: true, number: false },
@@ -482,8 +480,7 @@ function configureTableHeaders() {
             { label: 'Transaksi', sort: 'transactions', sortable: true, number: true },
             { label: 'Total', sort: 'amount', sortable: true, number: true },
             { label: 'Rata-rata', sort: 'average', sortable: true, number: false },
-            { label: 'Status', sort: '', sortable: false, number: false },
-            { label: 'Aksi', sort: '', sortable: false, number: false }
+            { label: 'Status', sort: '', sortable: false, number: false }
         ]
     };
 
@@ -797,8 +794,7 @@ function buildSalesRows(data) {
                 `${escapeHtml(itemLabel)}`,
                 `${formatCurrency(transaction.totalAmount)}`,
                 `${paymentLabel(transaction.paymentMethod)}`,
-                `<span class="table-badge ${statusBadgeClass(transaction.status)}">${statusLabel(transaction.status)}</span>`,
-                `<div class="table-actions"><button class="table-action-btn view" data-id="${transaction.id}" data-label="Transaksi" title="Lihat"><i class="fas fa-eye"></i></button></div>`
+                `<span class="table-badge ${statusBadgeClass(transaction.status)}">${statusLabel(transaction.status)}</span>`
             ]
         };
     });
@@ -859,8 +855,7 @@ function buildProductRows(data) {
                 `${product.quantity}`,
                 `${formatCurrency(product.amount)}`,
                 `${share.toFixed(1)}%`,
-                `<span class="table-badge ${statusClass}">${statusText}</span>`,
-                `<div class="table-actions"><button class="table-action-btn view" data-id="${escapeHtml(String(product.id))}" data-label="Produk" title="Lihat"><i class="fas fa-eye"></i></button></div>`
+                `<span class="table-badge ${statusClass}">${statusText}</span>`
             ]
         };
     });
@@ -908,8 +903,7 @@ function buildEmployeeRows(data) {
                 `${employee.transactions}`,
                 `${formatCurrency(employee.amount)}`,
                 `${formatCurrency(average)}`,
-                `<span class="table-badge ${statusClass}">${statusText}</span>`,
-                `<div class="table-actions"><button class="table-action-btn view" data-id="${escapeHtml(String(employee.id))}" data-label="Karyawan" title="Lihat"><i class="fas fa-eye"></i></button></div>`
+                `<span class="table-badge ${statusClass}">${statusText}</span>`
             ]
         };
     });
@@ -1060,7 +1054,6 @@ function renderTable() {
                     <td class="currency">${row.cells[4]}</td>
                     <td>${row.cells[5]}</td>
                     <td class="status">${row.cells[6]}</td>
-                    <td>${row.cells[7]}</td>
                 </tr>
             `).join('');
         }
@@ -1086,7 +1079,7 @@ function renderTable() {
 }
 
 function isRenderableRow(row) {
-    return !!(row && Array.isArray(row.cells) && row.cells.length >= 8);
+    return !!(row && Array.isArray(row.cells) && row.cells.length >= 7);
 }
 
 function renderGridCards(rows) {
@@ -1110,7 +1103,6 @@ function renderGridCards(rows) {
                 <div><span>Pembayaran</span><strong>${row.cells[5]}</strong></div>
                 <div><span>Status</span><strong>${row.cells[6]}</strong></div>
             </div>
-            <div class="report-grid-actions">${row.cells[7]}</div>
         </article>
     `).join('');
 }
@@ -1285,7 +1277,7 @@ function handleExportCsv() {
     });
 
     if (tableTotalEl) {
-        csvRows.push(convertToCsvRow(['', '', '', 'Total', tableTotalEl.textContent.trim(), '', '', '']));
+        csvRows.push(convertToCsvRow(['', '', '', 'Total', tableTotalEl.textContent.trim(), '', '']));
     }
 
     const csvContent = `\uFEFF${csvRows.join('\n')}`;
