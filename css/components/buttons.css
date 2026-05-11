@@ -398,6 +398,27 @@
   height: var(--button-height);
 }
 
+/* Compact icon button used in product cards */
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--spacing-1)) calc(var(--spacing-2));
+  min-height: var(--button-height-sm);
+  height: var(--button-height-sm);
+  min-width: var(--button-height-sm);
+  font-size: var(--font-size-sm);
+  border-radius: calc(var(--button-border-radius) * 0.8);
+  background-color: transparent;
+  border: 1px solid rgba(0,0,0,0.06);
+}
+
+.btn-icon i {
+  font-size: 0.95em;
+}
+
+.btn-icon:hover { transform: none; box-shadow: none; background-color: rgba(0,0,0,0.03); }
+
 .btn-icon-only.btn-sm {
   width: var(--button-height-sm);
   min-width: var(--button-height-sm);

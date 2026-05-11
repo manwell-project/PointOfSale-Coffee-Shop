@@ -12,6 +12,15 @@
 
   let products = [];
 
+  function isValidImageUrl(url){
+    if (!url) return false;
+    if (typeof url !== 'string') return false;
+    const trimmed = url.trim().toLowerCase();
+    if (!trimmed) return false;
+    if (trimmed === 'null' || trimmed === 'undefined') return false;
+    return true;
+  }
+
   function openModal(edit = false, product = null){
     modal.setAttribute('aria-hidden','false');
     modalTitle.textContent = edit ? 'Edit Menu' : 'Tambah Menu';
@@ -25,7 +34,7 @@
     const removeBtn = document.getElementById('removeImageBtn');
     const uploadArea = document.getElementById('imageUploadArea');
     const input = document.getElementById('productImageInput');
-    if (product && product.image_url) {
+    if (product && isValidImageUrl(product.image_url)) {
       preview.src = product.image_url;
       preview.style.display = 'block';
       removeBtn.style.display = 'inline-block';
@@ -62,7 +71,7 @@
       // allow clicking on card to not add to cart; override pointer events on buttons
       card.innerHTML = `
         <div class="product-image-wrapper">
-          ${p.image_url ? `<div class="product-image"><img src="${p.image_url}" alt="${escapeHtml(p.name)}" /></div>` : `<div class="product-image-placeholder"><i class="fas fa-utensils"></i></div>`}
+          ${isValidImageUrl(p.image_url) ? `<div class="product-image"><img src="${p.image_url}" alt="${escapeHtml(p.name)}" /></div>` : `<div class="product-image-placeholder"><i class="fas fa-utensils"></i></div>`}
         </div>
         <div class="product-info">
           <div class="product-name">${escapeHtml(p.name)}</div>
@@ -70,9 +79,9 @@
           <div class="product-desc">${escapeHtml(p.description || '')}</div>
         </div>
         <div class="product-card-footer">
-          <div style="display:flex;gap:8px;">
-            <button class="btn btn-edit" data-id="${p.id}">Edit</button>
-            <button class="btn btn-delete" data-id="${p.id}">Hapus</button>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <button class="btn btn-icon btn-edit" data-id="${p.id}" title="Edit"><i class="fas fa-pen"></i></button>
+            <button class="btn btn-icon btn-delete" data-id="${p.id}" title="Hapus"><i class="fas fa-trash"></i></button>
           </div>
         </div>
       `;

@@ -420,7 +420,10 @@
          * Add item to cart or increase quantity if exists
          */
         function addToCart(productId, productName, productPrice, maxStock) {
-            maxStock = maxStock === undefined ? 9999 : maxStock;
+            // Treat undefined, null or non-number maxStock as "unlimited" (large number)
+            if (typeof maxStock !== 'number' || isNaN(maxStock)) {
+                maxStock = 9999;
+            }
             
             // Check if item already exists in cart
             const existingItem = cartItems.find(item => item.id === productId);
@@ -1137,25 +1140,32 @@
                     const hasDiscount = !!discount;
                     const displayPrice = hasDiscount ? discount.discounted_price : product.price;
                     
-                    const stockQuantity = product.quantity || 0;
-                    const stockMin = product.min_stock || 0;
-                    
+                    // Treat missing quantity as "not managed" on POS — do not mark as out-of-stock
+                    const stockQuantity = (typeof product.quantity === 'number') ? product.quantity : null;
+                    const stockMin = (typeof product.min_stock === 'number') ? product.min_stock : null;
+
                     let stockClass = 'in-stock';
-                    if (stockQuantity <= 0) {
-                        stockClass = 'out-of-stock';
-                    } else if (stockQuantity <= stockMin) {
-                        stockClass = 'low-stock';
+                    if (stockQuantity !== null) {
+                        if (stockQuantity <= 0) {
+                            stockClass = 'out-of-stock';
+                        } else if (stockMin !== null && stockQuantity <= stockMin) {
+                            stockClass = 'low-stock';
+                        }
                     }
                     
+                    // helper to escape HTML in product name/alt
+                    function escapeHtml(s){ if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
                     const card = document.createElement('div');
                     card.className = `product-card ${stockClass}`;
-                    if (stockQuantity > 0) {
+                    // Allow adding to cart when stock is not managed (null) or when quantity > 0
+                    if (stockQuantity === null || stockQuantity > 0) {
                         card.onclick = () => addToCart(product.id, product.name, displayPrice, stockQuantity);
                     }
                     
                     // Build badge HTML
                     let badgeHTML = '';
-                    if (stockQuantity <= 0) {
+                    if (stockQuantity !== null && stockQuantity <= 0) {
                         badgeHTML = `<span class="product-badge out">Habis</span>`;
                     } else if (hasDiscount) {
                         const discountLabel = discount.discount_type === 'percentage' 
@@ -1179,20 +1189,20 @@
                         priceHTML = `<div class="product-price">Rp ${parseInt(displayPrice).toLocaleString('id-ID')}</div>`;
                     }
                     
+                    // Render product image if available and valid
+                    const imgUrl = (typeof product.image_url === 'string') ? product.image_url.trim() : '';
+                    const hasImage = imgUrl && imgUrl.toLowerCase() !== 'null' && imgUrl.toLowerCase() !== 'undefined';
+                    const imageHTML = hasImage ? `<div class="product-image"><img src="${imgUrl}" alt="${escapeHtml(product.name)}" /></div>` : `<div class="product-image-placeholder"><i class="fas fa-coffee"></i></div>`;
+
                     card.innerHTML = `
                         ${badgeHTML}
                         <div class="product-image-wrapper">
-                            <div class="product-image-placeholder">
-                                <i class="fas fa-coffee"></i>
-                            </div>
+                            ${imageHTML}
                         </div>
                         <div class="product-info">
-                            <div class="product-name">${product.name}</div>
+                            <div class="product-name">${escapeHtml(product.name)}</div>
                             ${priceHTML}
-                            <div class="product-stock ${stockClass}">
-                                <i class="fas fa-circle"></i>
-                                <span>Stok: ${stockQuantity}</span>
-                            </div>
+                            ${stockQuantity !== null ? `<div class="product-stock ${stockClass}"><i class="fas fa-circle"></i><span>Stok: ${stockQuantity}</span></div>` : ''}
                         </div>
                     `;
                     

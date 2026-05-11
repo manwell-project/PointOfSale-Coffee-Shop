@@ -148,7 +148,11 @@ router.post('/:id/image', async (req, res, next) => {
     let finalUrl = null;
 
     if (imageUrl) {
-      finalUrl = imageUrl;
+      // normalize incoming URL to be absolute from server root
+      if (typeof imageUrl === 'string' && imageUrl.trim().length) {
+        finalUrl = imageUrl.trim();
+        if (!finalUrl.startsWith('/')) finalUrl = '/' + finalUrl.replace(/^\.\//, '');
+      }
     } else if (imageBase64) {
       // Save base64 to public/uploads/products/<id>.png
       const uploadsDir = path.join(__dirname, '..', '..', 'Transaksi', 'images', 'uploads');
@@ -160,7 +164,8 @@ router.post('/:id/image', async (req, res, next) => {
       const filename = `product-${req.params.id}.${ext}`;
       const filepath = path.join(uploadsDir, filename);
       fs.writeFileSync(filepath, Buffer.from(data, 'base64'));
-      finalUrl = `./images/uploads/${filename}`;
+      // Use absolute path so browser can request `/Transaksi/images/uploads/...`
+      finalUrl = `/Transaksi/images/uploads/${filename}`;
     } else {
       return res.status(400).json({ error: 'No image provided' });
     }
