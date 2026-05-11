@@ -557,3 +557,24 @@ body.sidebar-visible.sidebar-collapsed {
     padding-left: 0 !important;
   }
 }
+
+/* Logout Button */
+.sidebar-logout-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-gray-500, #6b7280);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-logout-btn:hover {
+  color: var(--color-danger, #ef4444);
+  background: rgba(239, 68, 68, 0.1);
+}
+

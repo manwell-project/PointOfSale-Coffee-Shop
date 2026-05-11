@@ -188,12 +188,15 @@
 
         <!-- Sidebar Footer -->
         <div class="sidebar-footer">
-          <div class="sidebar-user">
+          <div class="sidebar-user" id="sidebarUserCard" title="Klik untuk Logout">
             <div class="sidebar-user-avatar">${userInitial}</div>
             <div class="sidebar-user-info">
               <div class="sidebar-user-name">${userName}</div>
               <div class="sidebar-user-role">${roleLabel}</div>
             </div>
+            <button class="sidebar-logout-btn" title="Logout">
+              <i class="fas fa-sign-out-alt"></i>
+            </button>
           </div>
         </div>
       </aside>
@@ -358,6 +361,27 @@
     const overlay = document.getElementById('sidebarOverlay');
     if (overlay) {
       overlay.addEventListener('click', closeMobileSidebar);
+    }
+
+    // Logout (Click on User Card or Button)
+    const userCard = document.getElementById('sidebarUserCard');
+    if (userCard) {
+      userCard.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
+          if (window.DigiCafAuth && typeof window.DigiCafAuth.logout === 'function') {
+            window.DigiCafAuth.logout();
+          } else {
+            // Fallback clear if DigiCafAuth missing
+            try {
+              localStorage.removeItem('digicaf.session.v1');
+              sessionStorage.removeItem('digicaf.session.v1');
+            } catch(err) {}
+            window.location.href = '../auth/login.html';
+          }
+        }
+      });
     }
 
     // Menu items with submenu
