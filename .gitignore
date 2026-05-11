@@ -5,3 +5,4 @@ node_modules/
 dist/
 build/
 .vscode/
+server/db/digicaf.db
