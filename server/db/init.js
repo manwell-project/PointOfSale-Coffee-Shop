@@ -1,6 +1,7 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
 
 const DB_PATH = path.join(__dirname, 'digicaf.db');
 
@@ -101,17 +102,22 @@ function seedInitialData() {
 }
 
 function seedEmployees() {
+  const adminHash = crypto.createHash('sha256').update('123456').digest('hex');
+  const kasirHash = crypto.createHash('sha256').update('123456').digest('hex');
+  
   const employees = [
-    { name: 'Budi Santoso', shift: 'Pagi', phone: '08123456789', email: 'budi@coffee.com' },
-    { name: 'Sari Dewi', shift: 'Siang', phone: '08123456790', email: 'sari@coffee.com' },
-    { name: 'Ahmad Fauzi', shift: 'Full Time', phone: '08123456791', email: 'ahmad@coffee.com' }
+    { name: 'Admin User', username: 'admin', email: 'admin@gmail.com', password_hash: adminHash, role: 'Admin', shift: 'Full Time', phone: '08123456700' },
+    { name: 'Kasir User', username: 'kasir', email: 'kasir@gmail.com', password_hash: kasirHash, role: 'Kasir', shift: 'Full Time', phone: '08123456701' },
+    { name: 'Budi Santoso', shift: 'Pagi', phone: '08123456789', email: 'budi@coffee.com', username: null, password_hash: null, role: 'Karyawan' },
+    { name: 'Sari Dewi', shift: 'Siang', phone: '08123456790', email: 'sari@coffee.com', username: null, password_hash: null, role: 'Karyawan' },
+    { name: 'Ahmad Fauzi', shift: 'Full Time', phone: '08123456791', email: 'ahmad@coffee.com', username: null, password_hash: null, role: 'Karyawan' }
   ];
 
   let employeesInserted = 0;
   employees.forEach((emp) => {
     db.run(
-      'INSERT INTO employees (name, shift, phone, email) VALUES (?, ?, ?, ?)',
-      [emp.name, emp.shift, emp.phone, emp.email],
+      'INSERT INTO employees (name, username, email, password_hash, role, shift, phone) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [emp.name, emp.username, emp.email, emp.password_hash, emp.role, emp.shift, emp.phone],
       (err) => {
         if (err) {
           console.error('Error inserting employee:', err.message);

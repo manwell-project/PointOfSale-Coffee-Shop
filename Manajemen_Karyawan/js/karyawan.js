@@ -185,6 +185,23 @@ function openAdd(){
   if(modalTitle) modalTitle.innerHTML = '<i class="fas fa-user-plus"></i> Tambah Karyawan Baru';
   if(saveBtn) saveBtn.innerHTML = '<i class="fas fa-check"></i> Simpan Karyawan';
   if(modal) modal.classList.add('active');
+  // Ensure credentials section hidden by default
+  const creds = document.getElementById('credentialsSection');
+  if (creds) {
+    creds.style.display = 'none';
+    creds.classList.remove('show');
+  }
+  const usernameInput = document.getElementById('employeeUsername');
+  const passwordInput = document.getElementById('employeePassword');
+  if (usernameInput) usernameInput.value = '';
+  if (passwordInput) passwordInput.value = '';
+  
+  // Attach position change listener and trigger handler to show/hide credentials
+  attachPositionListener();
+  const positionSelect = document.getElementById('employeePosition');
+  if (positionSelect) {
+    handlePositionChange.call(positionSelect);
+  }
 }
 
 function openEdit(id){
@@ -201,10 +218,22 @@ function openEdit(id){
   document.getElementById('employeeShift').value = emp.shift || '';
   document.getElementById('employeeStatus').value = emp.status || 'active';
   document.getElementById('employeeNotes').value = emp.notes || '';
+  // Prefill username if present
+  const usernameInput = document.getElementById('employeeUsername');
+  const passwordInput = document.getElementById('employeePassword');
+  if (usernameInput) usernameInput.value = emp.username || '';
+  if (passwordInput) passwordInput.value = '';
   
   if(modalTitle) modalTitle.innerHTML = '<i class="fas fa-user-edit"></i> Edit Karyawan';
   if(saveBtn) saveBtn.innerHTML = '<i class="fas fa-check"></i> Update Karyawan';
   if(modal) modal.classList.add('active');
+  
+  // Attach position change listener and trigger handler to show/hide credentials
+  attachPositionListener();
+  const positionSelect = document.getElementById('employeePosition');
+  if (positionSelect) {
+    handlePositionChange.call(positionSelect);
+  }
 }
 
 
@@ -219,10 +248,28 @@ async function saveEmployee(e){
   const shift = document.getElementById('employeeShift').value;
   const status = document.getElementById('employeeStatus').value;
   const notes = document.getElementById('employeeNotes').value.trim();
+  const username = (document.getElementById('employeeUsername')?.value || '').trim();
+  const password = (document.getElementById('employeePassword')?.value || '').trim();
   
   if(!name || !phone || !shift) { 
     window.showNotification('Nama, telepon, dan shift harus diisi', 'error'); 
     return; 
+  }
+
+  // If position is Kasir, require username, email, and password
+  if(position === 'Kasir'){
+    if(!username){
+      window.showNotification('Username wajib diisi untuk posisi Kasir', 'error');
+      return;
+    }
+    if(!email){
+      window.showNotification('Email wajib diisi untuk posisi Kasir (diperlukan untuk login)', 'error');
+      return;
+    }
+    if(!editingId && (!password || password.length < 6)){
+      window.showNotification('Password wajib diisi (min 6 karakter) untuk Kasir', 'error');
+      return;
+    }
   }
   
   const employeeData = {
@@ -236,6 +283,18 @@ async function saveEmployee(e){
     status,
     notes
   };
+
+  if(position === 'Kasir'){
+    employeeData.username = username || null;
+    // Only send password when provided (create requires it, edit optional)
+    if(password) employeeData.password = password;
+    employeeData.role = 'Kasir';
+  } else {
+    // Ensure credentials removed for non-kasir
+    employeeData.username = null;
+    employeeData.password = undefined;
+    employeeData.role = null;
+  }
   
   try {
     if(saveBtn) saveBtn.classList.add('loading');
@@ -344,3 +403,59 @@ tabs.forEach(t=>t.addEventListener('click', (e)=>{
   currentFilter = t.getAttribute('data-filter');
   renderEmployees();
 }));
+
+// Function to attach position change listener - simplified version
+function attachPositionListener() {
+  const positionSelect = document.getElementById('employeePosition');
+  if (!positionSelect) return;
+  
+  // Remove any existing listeners by cloning to reset
+  const newSelect = positionSelect.cloneNode(true);
+  positionSelect.parentNode.replaceChild(newSelect, positionSelect);
+  
+  // Add change event listener to the fresh element
+  newSelect.addEventListener('change', handlePositionChange);
+}
+
+// Handler function for position change
+function handlePositionChange() {
+    const creds = document.getElementById('credentialsSection');
+    const usernameInput = document.getElementById('employeeUsername');
+    const passwordInput = document.getElementById('employeePassword');
+    const emailInput = document.getElementById('employeeEmail');
+    const emailRequired = document.getElementById('emailRequired');
+    const emailHint = document.getElementById('emailHint');
+    const positionValue = this.value;
+  
+  if (!creds) return;
+  
+  if (positionValue === 'Kasir') {
+    // Show credentials section with smooth animation
+    creds.style.display = 'flex';
+    creds.classList.add('show');
+    // Make username and password required when showing
+    if (usernameInput) usernameInput.required = true;
+    if (passwordInput && !editingId) passwordInput.required = true;
+    // Make email required for Kasir
+    if (emailInput) emailInput.required = true;
+    if (emailRequired) emailRequired.style.display = 'inline';
+    if (emailHint) emailHint.style.display = 'block';
+  } else {
+    // Hide credentials section
+    creds.style.display = 'none';
+    creds.classList.remove('show');
+    // Clear and remove required when hiding
+    if (usernameInput) {
+      usernameInput.value = '';
+      usernameInput.required = false;
+    }
+    if (passwordInput) {
+      passwordInput.value = '';
+      passwordInput.required = false;
+    }
+    // Make email optional for non-Kasir
+    if (emailInput) emailInput.required = false;
+    if (emailRequired) emailRequired.style.display = 'none';
+    if (emailHint) emailHint.style.display = 'none';
+  }
+}

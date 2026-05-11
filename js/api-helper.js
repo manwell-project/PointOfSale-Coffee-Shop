@@ -148,4 +148,7 @@ function showNotification(message, type = 'success') {
   setTimeout(() => notification.remove(), 3000);
 }
 
+// Attach to window for global access
+window.showNotification = showNotification;
+
 console.log('✅ API Helper loaded - Access APIs with window.API');

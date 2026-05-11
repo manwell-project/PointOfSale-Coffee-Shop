@@ -10,6 +10,7 @@ require('./db/init');
 const productsRoutes = require('./routes/products');
 const stocksRoutes = require('./routes/stocks');
 const employeesRoutes = require('./routes/employees');
+const authRoutes = require('./routes/auth');
 const customersRoutes = require('./routes/customers');
 const transactionsRoutes = require('./routes/transactions');
 const reportsRoutes = require('./routes/reports');
@@ -44,6 +45,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/products', productsRoutes);
 app.use('/api/stocks', stocksRoutes);
 app.use('/api/employees', employeesRoutes);
+app.use('/api/auth', authRoutes);
 app.use('/api/customers', customersRoutes);
 app.use('/api/transactions', transactionsRoutes);
 app.use('/api/reports', reportsRoutes);

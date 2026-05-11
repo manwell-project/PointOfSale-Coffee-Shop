@@ -74,15 +74,11 @@
       e.preventDefault();
       clearError();
 
-      const email = normalizeEmail($('#email')?.value);
+      const identifier = normalizeEmail($('#email')?.value);
       const pass = ($('#password')?.value || '').trim();
 
-      if (!email) {
-        showError('Email wajib diisi.');
-        return;
-      }
-      if (!email.includes('@')) {
-        showError('Format email tidak valid.');
+      if (!identifier) {
+        showError('Username atau email wajib diisi.');
         return;
       }
       if (!pass) {
@@ -90,42 +86,56 @@
         return;
       }
 
-      const isAdmin = email === ADMIN_EMAIL;
-      const isKasir = email === KASIR_EMAIL;
-
-      if (!isAdmin && !isKasir) {
-        showError('Akun tidak terdaftar. Gunakan admin@gmail.com atau kasir@gmail.com');
-        return;
-      }
-
-      if (isAdmin && pass !== ADMIN_PASSWORD) {
-        showError('Email atau password Admin salah.');
-        return;
-      }
-
-      if (isKasir && pass !== KASIR_PASSWORD) {
-        showError('Email atau password Kasir salah.');
-        return;
-      }
-
       setLoading(true);
       try {
-        // Demo-only gate:
-        // - Admin/Kasir: fixed credential
-        const session = {
-          userName: isAdmin ? 'Admin' : 'Kasir',
-          role: isAdmin ? 'Admin' : 'Kasir',
-          email,
-          loginAt: new Date().toISOString()
-        };
-        if (window.DigiCafAuth && window.DigiCafAuth.setSession) {
-          window.DigiCafAuth.setSession(session);
-        } else {
-          localStorage.setItem('digicaf.session.v1', JSON.stringify(session));
+        // Try server-side auth first (username/email + password)
+        let resp;
+        try {
+          resp = await window.API.apiFetch('/auth/login', {
+            method: 'POST',
+            body: JSON.stringify({ identifier: identifier, password: pass })
+          });
+        } catch (apiError) {
+          // If the backend actively rejected it (401 etc), show that error!
+          if (apiError.message && (apiError.message.includes('salah') || apiError.message.includes('tidak ditemukan') || apiError.message.includes('terdaftar'))) {
+            throw apiError; 
+          }
+          // Otherwise, it might be a network error, so will use fallback below
+          resp = null;
         }
 
-        redirectAfterLogin();
+        if (resp && resp.success && resp.session) {
+          const session = resp.session;
+          if (window.DigiCafAuth && window.DigiCafAuth.setSession) {
+            window.DigiCafAuth.setSession(session);
+          } else {
+            localStorage.setItem('digicaf.session.v1', JSON.stringify(session));
+          }
+          redirectAfterLogin();
+          return;
+        }
+
+        // Fallback to legacy demo accounts if server returned unexpected response
+        const isAdmin = identifier === ADMIN_EMAIL;
+        const isKasir = identifier === KASIR_EMAIL;
+        if (isAdmin && pass === ADMIN_PASSWORD) {
+          const session = { userName: 'Admin', role: 'Admin', email: identifier, loginAt: new Date().toISOString() };
+          if (window.DigiCafAuth && window.DigiCafAuth.setSession) window.DigiCafAuth.setSession(session);
+          else localStorage.setItem('digicaf.session.v1', JSON.stringify(session));
+          redirectAfterLogin();
+          return;
+        }
+        if (isKasir && pass === KASIR_PASSWORD) {
+          const session = { userName: 'Kasir', role: 'Kasir', email: identifier, loginAt: new Date().toISOString() };
+          if (window.DigiCafAuth && window.DigiCafAuth.setSession) window.DigiCafAuth.setSession(session);
+          else localStorage.setItem('digicaf.session.v1', JSON.stringify(session));
+          redirectAfterLogin();
+          return;
+        }
+
+        showError('Username/email atau password salah.');
       } catch (err) {
+        // If API returns 401 or other error, show its message when available
         showError(err?.message || 'Gagal login. Coba lagi.');
       } finally {
         setLoading(false);

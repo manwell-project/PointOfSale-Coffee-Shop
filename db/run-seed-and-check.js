@@ -22,6 +22,11 @@ async function seed() {
   await models.stocks.add(p2.id, 2, 5);
 
   console.log('Seeding employees...');
+  // Add employees with credentials for login
+  await models.employees.addWithCredentials('Admin User', 'admin', 'admin@gmail.com', '123456', 'Admin');
+  await models.employees.addWithCredentials('Kasir User', 'kasir', 'kasir@gmail.com', '123456', 'Kasir');
+  
+  // Add regular employees
   await models.employees.add('Budi Santoso', 'Pagi', '08123456789', 'budi@coffee.com');
   await models.employees.add('Sari Dewi', 'Siang', '08123456790', 'sari@coffee.com');
 

@@ -767,7 +767,7 @@
                 customerName: customerName,
                 customerPhone: customerPhone,
                 timestamp: new Date().toISOString(),
-                cashier: 'Admin' // TODO: Get from auth system
+                cashier: (window.DigiCafAuth && window.DigiCafAuth.getSession()) ? window.DigiCafAuth.getSession().userName : 'Admin'
             };
             
             console.log('Processing payment:', transactionData);
@@ -800,7 +800,7 @@
                                         subtotal: it.subtotal
                                     })),
                                     customer_id: customerId,
-                                    employee_id: null,
+                                    employee_id: (window.DigiCafAuth && window.DigiCafAuth.getSession()) ? window.DigiCafAuth.getSession().id : null,
                                     payment_method: selectedPaymentMethod,
                                     total_amount: cartTotal
                                 });

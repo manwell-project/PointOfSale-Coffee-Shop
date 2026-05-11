@@ -32,6 +32,13 @@ CREATE TABLE IF NOT EXISTS employees (
   phone VARCHAR(15),
   email VARCHAR(100),
   status VARCHAR(20) DEFAULT 'aktif',
+  username VARCHAR(100),
+  password_hash VARCHAR(255),
+  role VARCHAR(50),
+  position VARCHAR(50),
+  address TEXT,
+  joinDate TEXT,
+  notes TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

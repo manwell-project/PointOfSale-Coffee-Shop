@@ -12,6 +12,11 @@ function seed() {
   models.stocks.add('Milk (liters)', 30, 5, p2.id);
 
   console.log('Seeding employees...');
+  // Add employees with credentials for login
+  models.employees.addWithCredentials('Admin User', 'admin', 'admin@gmail.com', '123456', 'Admin');
+  models.employees.addWithCredentials('Kasir User', 'kasir', 'kasir@gmail.com', '123456', 'Kasir');
+  
+  // Add regular employees
   models.employees.add('Budi Santoso', 'Pagi', '08123456789', 'budi@coffee.com');
   models.employees.add('Sari Dewi', 'Siang', '08123456790', 'sari@coffee.com');
 

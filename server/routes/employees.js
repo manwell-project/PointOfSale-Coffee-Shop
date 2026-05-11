@@ -1,6 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const { dbHelpers } = require('../db/connection');
+const crypto = require('crypto');
+
+function hashPassword(password) {
+  if (!password) return null;
+  return crypto.createHash('sha256').update(String(password)).digest('hex');
+}
 
 // GET all employees
 router.get('/', async (req, res, next) => {
@@ -46,15 +52,29 @@ router.get('/:id', async (req, res, next) => {
 // POST create new employee
 router.post('/', async (req, res, next) => {
   try {
-    const { name, shift, phone, email } = req.body;
-    
+    const { name, shift, phone, email, username, password, role, position, address, joinDate, status, notes } = req.body;
+
     if (!name || !shift) {
       return res.status(400).json({ error: 'Name and shift are required' });
     }
 
+    // If username provided, ensure it's unique
+    if (username) {
+      const existing = await dbHelpers.get('SELECT id FROM employees WHERE username = ?', [username]);
+      if (existing) {
+        return res.status(400).json({ error: 'Username sudah dipakai' });
+      }
+    }
+
+    const password_hash = password ? hashPassword(password) : null;
+
+    console.log('Attempting to insert employee with data:', {
+      name, shift, phone, email, status: status || 'aktif', username, role, position, address, joinDate, notes
+    });
+
     const result = await dbHelpers.run(
-      'INSERT INTO employees (name, shift, phone, email, status) VALUES (?, ?, ?, ?, ?)',
-      [name, shift, phone || null, email || null, 'aktif']
+      `INSERT INTO employees (name, shift, phone, email, status, username, password_hash, role, position, address, joinDate, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [name, shift, phone || null, email || null, status || 'aktif', username || null, password_hash, role || null, position || null, address || null, joinDate || null, notes || null]
     );
 
     res.status(201).json({ 
@@ -63,9 +83,16 @@ router.post('/', async (req, res, next) => {
       shift, 
       phone, 
       email,
-      status: 'aktif'
+      username: username || null,
+      role: role || null,
+      position: position || null,
+      address: address || null,
+      joinDate: joinDate || null,
+      notes: notes || null,
+      status: status || 'aktif'
     });
   } catch (err) {
+    console.error('Detailed error in POST /employees:', err.message, err.stack);
     next(err);
   }
 });
@@ -73,7 +100,7 @@ router.post('/', async (req, res, next) => {
 // PUT update employee
 router.put('/:id', async (req, res, next) => {
   try {
-    const { name, shift, phone, email, status } = req.body;
+    const { name, shift, phone, email, status, username, password, role, position, address, joinDate, notes } = req.body;
     
     const employee = await dbHelpers.get('SELECT id FROM employees WHERE id = ?', [req.params.id]);
     if (!employee) {
@@ -88,6 +115,13 @@ router.put('/:id', async (req, res, next) => {
     if (phone !== undefined) { updates.push('phone = ?'); values.push(phone); }
     if (email !== undefined) { updates.push('email = ?'); values.push(email); }
     if (status !== undefined) { updates.push('status = ?'); values.push(status); }
+    if (username !== undefined) { updates.push('username = ?'); values.push(username || null); }
+    if (role !== undefined) { updates.push('role = ?'); values.push(role || null); }
+    if (position !== undefined) { updates.push('position = ?'); values.push(position || null); }
+    if (address !== undefined) { updates.push('address = ?'); values.push(address || null); }
+    if (joinDate !== undefined) { updates.push('joinDate = ?'); values.push(joinDate || null); }
+    if (notes !== undefined) { updates.push('notes = ?'); values.push(notes || null); }
+    if (password !== undefined && password !== '') { updates.push('password_hash = ?'); values.push(hashPassword(password)); }
     
     if (updates.length === 0) {
       return res.status(400).json({ error: 'No fields to update' });

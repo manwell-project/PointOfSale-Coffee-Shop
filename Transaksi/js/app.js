@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', async function () {
           subtotal: it.harga * it.jumlah
         })),
         customer_id: customerId,
-        employee_id: null,
+        employee_id: (window.DigiCafAuth && window.DigiCafAuth.getSession()) ? window.DigiCafAuth.getSession().id : null,
         payment_method: 'cash',
         total_amount: total
       });

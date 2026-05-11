@@ -144,8 +144,8 @@
       existingSidebar.remove();
     }
 
-    const userName = currentUser?.username || 'Admin';
-    const userRole = currentUser?.role || 'admin';
+    const userName = currentUser?.userName || currentUser?.username || 'Admin';
+    const userRole = (currentUser?.role || 'admin').toLowerCase();
     const userInitial = userName.charAt(0).toUpperCase();
     const roleLabel = userRole === 'admin' ? 'Administrator' : 'Kasir';
 
