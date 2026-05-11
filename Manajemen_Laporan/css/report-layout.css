@@ -991,6 +991,68 @@ body.report-page .page-content {
   }
 }
 
+@media (max-width: 767px) {
+  .report-container {
+    padding-left: var(--spacing-md);
+    padding-right: var(--spacing-md);
+  }
+
+  .report-filters,
+  .report-content.card,
+  .chart-container,
+  .data-table-section {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .report-filters {
+    padding: var(--spacing-lg);
+  }
+
+  .filter-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+
+  .charts-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
+  }
+
+  .chart-container {
+    padding: var(--spacing-lg);
+    overflow: hidden;
+  }
+
+  .chart-header {
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+  }
+
+  .table-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .table-controls {
+    width: 100%;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+  }
+
+  .table-search input,
+  .table-search input:focus {
+    width: 100%;
+  }
+
+  .report-table-wrapper {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
 .chart-container {
   background: #ffffff;
   border: 1px solid #e2e8f0;
