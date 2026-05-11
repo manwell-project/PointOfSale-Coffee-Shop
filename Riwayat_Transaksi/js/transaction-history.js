@@ -389,32 +389,48 @@ function displayTransactionDetail() {
   const t = currentTransactionDetail;
   const items = t.items || [];
 
-  let itemsHTML = '';
-  if (items.length > 0) {
-    itemsHTML = `
-      <h3 style="margin-bottom: var(--spacing-md);">Barang-Barang Terjual</h3>
+  const itemCount = items.reduce((sum, item) => sum + (item.quantity || 0), 0);
+  const itemsHTML = items.length > 0
+    ? `
+      <h3 style="margin: var(--spacing-lg) 0 var(--spacing-sm);">Menu Dipesan</h3>
       <table class="items-table">
         <thead>
           <tr>
-            <th>Produk</th>
+            <th>Menu</th>
             <th style="text-align: center;">Qty</th>
             <th style="text-align: right;">Harga</th>
             <th style="text-align: right;">Subtotal</th>
           </tr>
         </thead>
         <tbody>
-          ${items.map(item => `
-            <tr>
-              <td>${item.product_name}</td>
-              <td style="text-align: center;">${item.quantity}</td>
-              <td style="text-align: right;">${formatCurrency(item.unit_price)}</td>
-              <td style="text-align: right;">${formatCurrency(item.subtotal)}</td>
-            </tr>
-          `).join('')}
+          ${items.map(item => {
+            const qty = item.quantity || 0;
+            const price = item.unit_price || 0;
+            const subtotal = item.subtotal != null ? item.subtotal : price * qty;
+            return `
+              <tr>
+                <td>${item.product_name}</td>
+                <td style="text-align: center;">${qty}</td>
+                <td style="text-align: right;">${formatCurrency(price)}</td>
+                <td style="text-align: right;">${formatCurrency(subtotal)}</td>
+              </tr>
+            `;
+          }).join('')}
         </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3" style="text-align: right; font-weight: bold;">Total</td>
+            <td style="text-align: right; font-weight: bold; color: #28A745;">
+              ${formatCurrency(t.total_amount)}
+            </td>
+          </tr>
+        </tfoot>
       </table>
+    `
+    : `
+      <h3 style="margin: var(--spacing-lg) 0 var(--spacing-sm);">Menu Dipesan</h3>
+      <div style="color: #64748b;">Tidak ada item tercatat</div>
     `;
-  }
 
   modalBody.innerHTML = `
     <div class="detail-grid">
@@ -446,20 +462,19 @@ function displayTransactionDetail() {
           </span>
         </div>
       </div>
+      <div class="detail-item">
+        <div class="detail-label">Jumlah Item</div>
+        <div class="detail-value">${itemCount} item</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">Total</div>
+        <div class="detail-value" style="color: #28A745; font-weight: bold;">
+          ${formatCurrency(t.total_amount)}
+        </div>
+      </div>
     </div>
 
     ${itemsHTML}
-
-    <div style="border-top: 2px solid #e2e8f0; padding-top: var(--spacing-lg); margin-top: var(--spacing-lg);">
-      <div style="display: flex; justify-content: space-between; margin-bottom: var(--spacing-2);">
-        <span style="color: #64748b;">Subtotal:</span>
-        <span style="color: #1e293b;">${formatCurrency(t.total_amount)}</span>
-      </div>
-      <div style="display: flex; justify-content: space-between; font-size: var(--font-size-lg); font-weight: bold;">
-        <span style="color: #1e293b;">Total:</span>
-        <span style="color: #28A745;">${formatCurrency(t.total_amount)}</span>
-      </div>
-    </div>
   `;
 }
 
@@ -473,159 +488,71 @@ function closeModal() {
 // PRINT & EXPORT
 // ============================================
 
-function printReceipt(transactionId = null) {
+async function printReceipt(transactionId = null) {
   if (transactionId === null && !currentTransactionDetail) {
     return;
   }
 
-  const transaction = transactionId ? 
-    allTransactions.find(t => t.id === transactionId) : 
-    currentTransactionDetail;
+  let transaction = transactionId
+    ? allTransactions.find(t => t.id === transactionId)
+    : currentTransactionDetail;
+
+  if (transactionId && (!transaction || !transaction.items)) {
+    try {
+      const response = await fetch(`/api/transactions/${transactionId}`);
+      if (response.ok) {
+        transaction = await response.json();
+      }
+    } catch (error) {
+      console.error('Error loading receipt transaction:', error);
+    }
+  }
 
   if (!transaction) {
     showError('Data transaksi tidak ditemukan');
     return;
   }
 
-  const printWindow = window.open('', '_blank');
-  const items = transaction.items || [];
+  if (typeof receiptManager === 'undefined' || !receiptManager) {
+    showError('Template struk belum tersedia');
+    return;
+  }
 
-  const itemsHTML = items.map(item => `
-    <tr>
-      <td>${item.product_name}</td>
-      <td style="text-align: center;">${item.quantity}</td>
-      <td style="text-align: right;">${formatCurrency(item.unit_price)}</td>
-      <td style="text-align: right;">${formatCurrency(item.subtotal)}</td>
-    </tr>
-  `).join('');
+  const items = Array.isArray(transaction.items) ? transaction.items : [];
+  const receiptItems = items.map((item) => {
+    const quantity = Number(item.quantity ?? item.qty ?? 0) || 0;
+    const price = Number(item.unit_price ?? item.price ?? 0) || 0;
+    const subtotal = Number(item.subtotal ?? (quantity * price)) || 0;
 
-  printWindow.document.write(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>Receipt - Transaction #${transaction.id}</title>
-      <style>
-        body {
-          font-family: Arial, sans-serif;
-          max-width: 400px;
-          margin: 0;
-          padding: 20px;
-        }
-        .receipt-header {
-          text-align: center;
-          margin-bottom: 20px;
-          border-bottom: 2px solid #000;
-          padding-bottom: 10px;
-        }
-        .receipt-title {
-          font-size: 24px;
-          font-weight: bold;
-          margin: 0;
-        }
-        .receipt-subtitle {
-          font-size: 12px;
-          color: #666;
-          margin: 5px 0 0 0;
-        }
-        .receipt-details {
-          font-size: 12px;
-          margin-bottom: 15px;
-        }
-        .detail-row {
-          display: flex;
-          justify-content: space-between;
-          margin: 5px 0;
-        }
-        table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-bottom: 15px;
-          font-size: 12px;
-        }
-        th {
-          border-bottom: 1px solid #000;
-          padding: 5px;
-          text-align: left;
-        }
-        td {
-          padding: 5px;
-          border-bottom: 1px solid #ddd;
-        }
-        .text-right {
-          text-align: right;
-        }
-        .receipt-total {
-          font-size: 14px;
-          font-weight: bold;
-          text-align: right;
-          margin-top: 10px;
-          padding-top: 10px;
-          border-top: 2px solid #000;
-        }
-        .receipt-footer {
-          text-align: center;
-          margin-top: 20px;
-          font-size: 10px;
-          color: #666;
-        }
-      </style>
-    </head>
-    <body>
-      <div class="receipt-header">
-        <h1 class="receipt-title">DigiCaf</h1>
-        <p class="receipt-subtitle">Struk Penjualan</p>
-      </div>
+    return {
+      name: item.product_name || item.name || 'Produk',
+      quantity,
+      price,
+      subtotal
+    };
+  });
 
-      <div class="receipt-details">
-        <div class="detail-row">
-          <span>No. Transaksi:</span>
-          <span>#${String(transaction.id).padStart(5, '0')}</span>
-        </div>
-        <div class="detail-row">
-          <span>Tanggal:</span>
-          <span>${formatDate(transaction.created_at || transaction.transaction_date)}</span>
-        </div>
-        <div class="detail-row">
-          <span>Waktu:</span>
-          <span>${formatTime(transaction.created_at || transaction.transaction_date)}</span>
-        </div>
-        <div class="detail-row">
-          <span>Customer:</span>
-          <span>${transaction.customer_name || 'Walk-in'}</span>
-        </div>
-        <div class="detail-row">
-          <span>Karyawan:</span>
-          <span>${transaction.employee_name || '-'}</span>
-        </div>
-      </div>
+  const subtotal = receiptItems.reduce((sum, item) => sum + (item.subtotal || 0), 0);
+  const total = Number(transaction.total_amount ?? subtotal) || subtotal;
+  const paymentMethodRaw = String(transaction.payment_method || 'cash');
+  const paymentMethod = paymentMethodRaw === 'e-wallet' ? 'ewallet' : paymentMethodRaw;
 
-      <table>
-        <thead>
-          <tr>
-            <th>Produk</th>
-            <th class="text-right">Qty</th>
-            <th class="text-right">Harga</th>
-            <th class="text-right">Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${itemsHTML}
-        </tbody>
-      </table>
+  const receiptPayload = {
+    transactionId: transaction.id,
+    items: receiptItems,
+    subtotal,
+    tax: 0,
+    discount: 0,
+    total,
+    paymentMethod,
+    paymentAmount: total,
+    changeAmount: 0,
+    customerName: transaction.customer_name || null,
+    timestamp: transaction.created_at || transaction.transaction_date || new Date(),
+    cashier: transaction.employee_name || 'Admin'
+  };
 
-      <div class="receipt-total">
-        TOTAL: ${formatCurrency(transaction.total_amount)}
-      </div>
-
-      <div class="receipt-footer">
-        <p>Terima kasih atas pembelian Anda!</p>
-        <p>${new Date().toLocaleString('id-ID')}</p>
-      </div>
-    </body>
-    </html>
-  `);
-  printWindow.document.close();
-  printWindow.print();
+  receiptManager.showReceipt(receiptPayload);
 }
 
 function exportTransactions() {

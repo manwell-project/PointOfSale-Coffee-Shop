@@ -612,10 +612,39 @@ body {
   display: none;
   align-items: center;
   justify-content: center;
+  width: 100%;
+  max-width: none;
+  max-height: none;
+  transform: none;
+  background: transparent;
+  padding: var(--spacing-lg);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .modal.show {
   display: flex;
+  opacity: 1;
+  visibility: visible;
+}
+
+#detailModal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100vh;
+  transform: none;
+}
+
+#detailModal.show {
+  display: flex;
+}
+
+.receipt-modal {
+  z-index: 2000;
 }
 
 .modal-overlay {
@@ -638,6 +667,15 @@ body {
   display: flex;
   flex-direction: column;
   z-index: 1001;
+  margin: auto;
+}
+
+#detailModal .modal-dialog {
+  position: relative;
+  margin: 0;
+  width: min(90vw, 700px);
+  max-height: 90vh;
+  transform: none;
 }
 
 .modal-content {

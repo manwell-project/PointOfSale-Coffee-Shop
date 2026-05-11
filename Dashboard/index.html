@@ -228,7 +228,11 @@
     <script src="../js/navbar.js?v=20260510-1"></script>
     <script src="../js/api-helper.js?v=1769014084"></script>
     <script src="./dashboard.js?v=1769014084"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+        let salesChart = null;
+        let currentChartPeriod = 'today';
+
         // Set current date with better formatting
         function setCurrentDate() {
             const options = { 
@@ -272,8 +276,8 @@
                     filterBtns.forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     const period = btn.dataset.period;
-                    console.log('Chart filter changed to:', period);
-                    // TODO: Implement chart filtering
+                    currentChartPeriod = period || 'today';
+                    loadSalesChart(currentChartPeriod);
                 });
             });
 
@@ -286,6 +290,9 @@
             try {
                 // Load stats
                 await loadStats();
+
+                // Load sales chart
+                await loadSalesChart(currentChartPeriod);
                 
                 // Load recent transactions
                 await loadRecentTransactions();
@@ -296,6 +303,159 @@
                 console.log('✅ Dashboard data loaded successfully');
             } catch (err) {
                 console.error('❌ Error loading dashboard data:', err);
+            }
+        }
+
+        function ensureChartCanvas() {
+            const wrapper = document.getElementById('chartWrapper');
+            if (!wrapper) return null;
+
+            let canvas = wrapper.querySelector('canvas');
+            if (!canvas) {
+                wrapper.innerHTML = '<canvas id="salesChartCanvas" height="300"></canvas>';
+                canvas = wrapper.querySelector('#salesChartCanvas');
+            }
+            return canvas;
+        }
+
+        function setChartEmptyState(message) {
+            const wrapper = document.getElementById('chartWrapper');
+            if (!wrapper) return;
+
+            if (salesChart) {
+                salesChart.destroy();
+                salesChart = null;
+            }
+
+            wrapper.innerHTML = `
+                <div class="chart-empty-state">
+                    <i class="fas fa-chart-line"></i>
+                    <p>${message || 'Belum ada data penjualan'}</p>
+                </div>
+            `;
+
+            const legend = document.querySelector('.chart-legend');
+            if (legend) legend.style.display = 'none';
+        }
+
+        function formatChartCurrency(value) {
+            if (typeof formatRupiah === 'function') return formatRupiah(value);
+            return new Intl.NumberFormat('id-ID').format(value);
+        }
+
+        function renderSalesChart(labels, data) {
+            const canvas = ensureChartCanvas();
+            if (!canvas) return;
+
+            const legend = document.querySelector('.chart-legend');
+            if (legend) legend.style.display = 'flex';
+
+            const dataset = {
+                label: 'Penjualan',
+                data,
+                borderColor: '#6B4423',
+                backgroundColor: 'rgba(107, 68, 35, 0.12)',
+                borderWidth: 2,
+                pointRadius: 3,
+                pointBackgroundColor: '#6B4423',
+                fill: true,
+                tension: 0.3
+            };
+
+            if (salesChart) {
+                salesChart.data.labels = labels;
+                salesChart.data.datasets = [dataset];
+                salesChart.update();
+                return;
+            }
+
+            salesChart = new Chart(canvas.getContext('2d'), {
+                type: 'line',
+                data: { labels, datasets: [dataset] },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => ` ${formatChartCurrency(ctx.parsed.y || 0)}`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: {
+                            beginAtZero: true,
+                            ticks: { callback: (value) => formatChartCurrency(value) }
+                        }
+                    }
+                }
+            });
+        }
+
+        function getLastNDates(days) {
+            const dates = [];
+            const today = new Date();
+            for (let i = days - 1; i >= 0; i--) {
+                const d = new Date(today);
+                d.setDate(today.getDate() - i);
+                dates.push(d.toISOString().split('T')[0]);
+            }
+            return dates;
+        }
+
+        function formatShortDate(dateStr) {
+            const d = new Date(`${dateStr}T00:00:00`);
+            return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
+        }
+
+        async function loadSalesChart(period = 'today') {
+            const wrapper = document.getElementById('chartWrapper');
+            if (!wrapper) return;
+
+            try {
+                if (period === 'today') {
+                    const todayStr = new Date().toISOString().split('T')[0];
+                    const transactions = await API.Transactions.getByDate(todayStr);
+                    const hourlyTotals = new Array(24).fill(0);
+
+                    (Array.isArray(transactions) ? transactions : []).forEach(tx => {
+                        if (String(tx.status || 'completed').toLowerCase() !== 'completed') return;
+                        const createdAt = new Date(tx.created_at || tx.transaction_date);
+                        if (Number.isNaN(createdAt.getTime())) return;
+                        const hour = createdAt.getHours();
+                        hourlyTotals[hour] += Number(tx.total_amount || 0);
+                    });
+
+                    if (!hourlyTotals.some(value => value > 0)) {
+                        setChartEmptyState('Belum ada penjualan hari ini');
+                        return;
+                    }
+
+                    const labels = hourlyTotals.map((_, idx) => `${String(idx).padStart(2, '0')}:00`);
+                    renderSalesChart(labels, hourlyTotals);
+                    return;
+                }
+
+                const summary = await API.Transactions.getDailySummary();
+                const days = period === 'week' ? 7 : 30;
+                const dateKeys = getLastNDates(days);
+                const totalsByDate = new Map(
+                    (Array.isArray(summary) ? summary : []).map(row => [row.date, Number(row.total_sales || 0)])
+                );
+                const totals = dateKeys.map(dateKey => totalsByDate.get(dateKey) || 0);
+
+                if (!totals.some(value => value > 0)) {
+                    setChartEmptyState('Belum ada penjualan');
+                    return;
+                }
+
+                const labels = dateKeys.map(formatShortDate);
+                renderSalesChart(labels, totals);
+            } catch (err) {
+                console.error('Error loading sales chart:', err);
+                setChartEmptyState('Gagal memuat grafik penjualan');
             }
         }
 
@@ -349,8 +509,9 @@
 
             try {
                 const transactions = await API.Transactions.getRecent(5);
+                const recentTransactions = Array.isArray(transactions) ? transactions.slice(0, 5) : [];
                 
-                if (!transactions || transactions.length === 0) {
+                if (recentTransactions.length === 0) {
                     listEl.innerHTML = `
                         <div class="transactions-empty">
                             <i class="fas fa-receipt"></i>
@@ -361,7 +522,7 @@
                     return;
                 }
 
-                listEl.innerHTML = transactions.map(tx => {
+                listEl.innerHTML = recentTransactions.map(tx => {
                     const timeAgo = getTimeAgo(tx.created_at);
                     const itemCount = tx.items?.length || 0;
                     

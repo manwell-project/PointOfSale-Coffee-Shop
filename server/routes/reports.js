@@ -13,24 +13,26 @@ router.get('/daily', async (req, res, next) => {
         COALESCE(SUM(total_amount), 0) as total_revenue,
         COALESCE(AVG(total_amount), 0) as avg_transaction
       FROM transactions
-      WHERE DATE(created_at) = ?
-    `, [today]);
+      WHERE DATE(created_at, 'localtime') = DATE('now', 'localtime')
+        AND status = 'completed'
+    `);
 
     const topProducts = await dbHelpers.all(`
       SELECT 
         p.id,
         p.name,
         p.category,
-        SUM(ti.quantity) as qty_sold,
-        SUM(ti.subtotal) as revenue
+        COALESCE(SUM(ti.quantity), 0) as qty_sold,
+        COALESCE(SUM(ti.quantity * ti.unit_price), 0) as revenue
       FROM transaction_items ti
       JOIN products p ON ti.product_id = p.id
       JOIN transactions t ON ti.transaction_id = t.id
-      WHERE DATE(t.created_at) = ?
+      WHERE DATE(t.created_at, 'localtime') = DATE('now', 'localtime')
+        AND t.status = 'completed'
       GROUP BY p.id
       ORDER BY qty_sold DESC
       LIMIT 10
-    `, [today]);
+    `);
 
     res.json({
       date: today,
@@ -55,6 +57,7 @@ router.get('/monthly', async (req, res, next) => {
         COALESCE(AVG(total_amount), 0) as avg_transaction
       FROM transactions
       WHERE strftime('%Y-%m', created_at) = ?
+        AND status = 'completed'
     `, [`${year}-${month}`]);
 
     const topProducts = await dbHelpers.all(`
@@ -62,12 +65,13 @@ router.get('/monthly', async (req, res, next) => {
         p.id,
         p.name,
         p.category,
-        SUM(ti.quantity) as qty_sold,
-        SUM(ti.subtotal) as revenue
+        COALESCE(SUM(ti.quantity), 0) as qty_sold,
+        COALESCE(SUM(ti.quantity * ti.unit_price), 0) as revenue
       FROM transaction_items ti
       JOIN products p ON ti.product_id = p.id
       JOIN transactions t ON ti.transaction_id = t.id
       WHERE strftime('%Y-%m', t.created_at) = ?
+        AND t.status = 'completed'
       GROUP BY p.id
       ORDER BY qty_sold DESC
     `, [`${year}-${month}`]);
