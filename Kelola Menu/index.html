@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Kelola Menu - DigiCaf</title>
+  <!-- Design system / base styles -->
+  <link rel="stylesheet" href="../css/design-tokens.css">
+  <link rel="stylesheet" href="../css/typography.css">
+  <link rel="stylesheet" href="../css/icons.css">
+  <link rel="stylesheet" href="../css/layout-system.css">
+  <link rel="stylesheet" href="../css/spacing-alignment.css">
+
+  <!-- Component CSS (shared) -->
+  <link rel="stylesheet" href="../css/components/buttons.css">
+  <link rel="stylesheet" href="../css/components/cards.css">
+  <link rel="stylesheet" href="../css/components/forms.css">
+  <link rel="stylesheet" href="../css/components/badges-labels.css">
+  <link rel="stylesheet" href="../css/components/top-navbar-simple.css?v=1769014084">
+  <link rel="stylesheet" href="../css/components/sidebar-nav.css?v=1769014084">
+
+  <!-- Responsive helpers -->
+  <link rel="stylesheet" href="../css/responsive.css">
+  <link rel="stylesheet" href="../css/mobile-optimizations.css">
+  <link rel="stylesheet" href="../css/tablet.css">
+
+  <!-- Page specific + shared UI -->
+  <link rel="stylesheet" href="css/kelola-menu.css?v=20260507-1">
+  <link rel="stylesheet" href="../css/shared-ui.css">
+  <link rel="stylesheet" href="../css/components/page-adjustments.css?v=20260510-1">
+  <!-- POS product grid styles -->
+  <link rel="stylesheet" href="../Transaksi/css/pos-layout.css">
+  <link rel="stylesheet" href="../Transaksi/css/app.css">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="no-top-navbar">
+
+  <div class="stock-wrapper">
+    <div class="stock-container">
+      <div class="stock-header">
+        <div class="stock-header-left">
+          <h1 class="stock-title"><i class="fas fa-utensils"></i> Kelola Menu</h1>
+          <p class="stock-subtitle">Tambah, edit, dan hapus item menu yang akan tampil di Point of Sale</p>
+        </div>
+        <div class="stock-header-actions">
+          <button id="btnAddProduct" class="btn-add-stock">Tambah Menu</button>
+        </div>
+      </div>
+
+      <div class="stock-filters" style="margin-bottom:16px;">
+        <div class="filter-row">
+          <div class="search-box" style="max-width:360px;">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Cari menu..." />
+          </div>
+        </div>
+      </div>
+
+      <section class="menu-list-section">
+        <div class="product-grid-wrapper">
+          <div class="product-grid" id="productGrid">
+            <!-- Daftar menu di-load lewat JS menggunakan product-grid/product-card structure -->
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+    <!-- Modal untuk Tambah / Edit dengan upload gambar -->
+    <div id="productModal" class="modal" aria-hidden="true">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div>
+            <h2 id="modalTitle"><i class="fas fa-utensils"></i> Tambah Menu</h2>
+            <p class="modal-subtitle">Lengkapi detail menu di bawah ini</p>
+          </div>
+          <button class="btn-close-modal" id="closeModalBtn"><i class="fas fa-times"></i></button>
+        </div>
+
+        <div class="modal-body">
+          <form id="productForm" class="form-basic">
+            <input type="hidden" id="productId" />
+
+            <div class="form-row">
+              <div class="form-group" style="flex:1">
+                <label class="form-label">Nama <span class="required">*</span></label>
+                <input id="productName" class="form-input" required />
+              </div>
+              <div class="form-group" style="width:140px;">
+                <label class="form-label">Harga (IDR) <span class="required">*</span></label>
+                <input id="productPrice" class="form-input" type="number" min="0" required />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Kategori</label>
+                <input id="productCategory" class="form-input" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Keterangan</label>
+              <textarea id="productDesc" class="form-textarea" rows="3"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Gambar Menu</label>
+              <div class="image-upload-area" id="imageUploadArea">
+                <div class="upload-placeholder">
+                  <i class="fas fa-image upload-icon"></i>
+                  <div class="upload-text">Klik atau tarik gambar ke sini</div>
+                  <div class="upload-hint">Format JPG/PNG. Maks 2MB</div>
+                </div>
+                <img id="imagePreview" class="image-preview" src="" alt="Preview" style="display:none;" />
+                <button type="button" id="removeImageBtn" class="btn-remove-image" style="display:none;"><i class="fas fa-trash"></i></button>
+                <input type="file" id="productImageInput" accept="image/*" hidden />
+              </div>
+            </div>
+
+            <div class="modal-actions">
+              <button type="submit" class="button primary">Simpan</button>
+              <button type="button" id="btnCancel" class="button">Batal</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="../js/sidebar-nav.js?v=20260507-1"></script>
+  <script src="../js/api-helper.js"></script>
+  <script src="js/kelola-menu.js"></script>
+  <!-- Performance & Nav scripts to ensure consistent layout injection -->
+  <script src="../js/performance.js" defer></script>
+  <script src="../js/performance-utilities.js" defer></script>
+  <script src="../js/cache.js" defer></script>
+  <script src="../js/auth.js?v=1769014084"></script>
+  <script src="../js/top-navbar.js?v=20260510-1"></script>
+</body>
+</html>

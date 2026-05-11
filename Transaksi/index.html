@@ -31,12 +31,12 @@
     <link rel="stylesheet" href="../css/shared-ui.css">
     
     <!-- Page Adjustments - MUST BE LAST to override local CSS -->
-    <link rel="stylesheet" href="../css/components/page-adjustments.css?v=1769015876">
+    <link rel="stylesheet" href="../css/components/page-adjustments.css?v=20260510-1">
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
+<body class="no-top-navbar">
     <!-- Top Navigation Bar will be injected by top-navbar.js -->
     <div class="pos-wrapper">
         <div class="pos-container">
@@ -419,22 +419,36 @@
         /**
          * Add item to cart or increase quantity if exists
          */
-        function addToCart(productId, productName, productPrice) {
+        function addToCart(productId, productName, productPrice, maxStock) {
+            // Treat undefined, null or non-number maxStock as "unlimited" (large number)
+            if (typeof maxStock !== 'number' || isNaN(maxStock)) {
+                maxStock = 9999;
+            }
+            
             // Check if item already exists in cart
             const existingItem = cartItems.find(item => item.id === productId);
             
             if (existingItem) {
+                if (existingItem.quantity >= maxStock) {
+                    showToast('🔴 Stok produk tidak mencukupi', 'error');
+                    return;
+                }
                 // Increase quantity
                 existingItem.quantity += 1;
                 existingItem.subtotal = existingItem.price * existingItem.quantity;
             } else {
+                if (maxStock <= 0) {
+                    showToast('🔴 Produk kehabisan stok', 'error');
+                    return;
+                }
                 // Add new item
                 cartItems.push({
                     id: productId,
                     name: productName,
                     price: productPrice,
                     quantity: 1,
-                    subtotal: productPrice
+                    subtotal: productPrice,
+                    maxStock: maxStock
                 });
             }
             
@@ -474,6 +488,11 @@
             if (item) {
                 const newQuantity = item.quantity + change;
                 
+                if (change > 0 && newQuantity > item.maxStock) {
+                    showToast('🔴 Stok produk tidak mencukupi', 'error');
+                    return;
+                }
+                
                 // Minimum quantity is 1
                 if (newQuantity >= 1) {
                     item.quantity = newQuantity;
@@ -485,7 +504,7 @@
                 }
                 
                 // If quantity becomes 0, remove item
-                if (newQuantity === 0) {
+                if (newQuantity <= 0) {
                     removeFromCart(productId);
                 }
             }
@@ -834,6 +853,9 @@
             cartItems = [];
             renderCart();
             updateCartSummary();
+            
+            // Refresh products to show updated stock
+            loadProductsWithDiscounts();
         }
         
         // ==========================================
@@ -1118,13 +1140,34 @@
                     const hasDiscount = !!discount;
                     const displayPrice = hasDiscount ? discount.discounted_price : product.price;
                     
+                    // Treat missing quantity as "not managed" on POS — do not mark as out-of-stock
+                    const stockQuantity = (typeof product.quantity === 'number') ? product.quantity : null;
+                    const stockMin = (typeof product.min_stock === 'number') ? product.min_stock : null;
+
+                    let stockClass = 'in-stock';
+                    if (stockQuantity !== null) {
+                        if (stockQuantity <= 0) {
+                            stockClass = 'out-of-stock';
+                        } else if (stockMin !== null && stockQuantity <= stockMin) {
+                            stockClass = 'low-stock';
+                        }
+                    }
+                    
+                    // helper to escape HTML in product name/alt
+                    function escapeHtml(s){ if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
                     const card = document.createElement('div');
-                    card.className = 'product-card';
-                    card.onclick = () => addToCart(product.id, product.name, displayPrice);
+                    card.className = `product-card ${stockClass}`;
+                    // Allow adding to cart when stock is not managed (null) or when quantity > 0
+                    if (stockQuantity === null || stockQuantity > 0) {
+                        card.onclick = () => addToCart(product.id, product.name, displayPrice, stockQuantity);
+                    }
                     
                     // Build badge HTML
                     let badgeHTML = '';
-                    if (hasDiscount) {
+                    if (stockQuantity !== null && stockQuantity <= 0) {
+                        badgeHTML = `<span class="product-badge out">Habis</span>`;
+                    } else if (hasDiscount) {
                         const discountLabel = discount.discount_type === 'percentage' 
                             ? `${discount.discount_value}%` 
                             : `Rp ${parseInt(discount.discount_value).toLocaleString('id-ID')}`;
@@ -1146,20 +1189,20 @@
                         priceHTML = `<div class="product-price">Rp ${parseInt(displayPrice).toLocaleString('id-ID')}</div>`;
                     }
                     
+                    // Render product image if available and valid
+                    const imgUrl = (typeof product.image_url === 'string') ? product.image_url.trim() : '';
+                    const hasImage = imgUrl && imgUrl.toLowerCase() !== 'null' && imgUrl.toLowerCase() !== 'undefined';
+                    const imageHTML = hasImage ? `<div class="product-image"><img src="${imgUrl}" alt="${escapeHtml(product.name)}" /></div>` : `<div class="product-image-placeholder"><i class="fas fa-coffee"></i></div>`;
+
                     card.innerHTML = `
                         ${badgeHTML}
                         <div class="product-image-wrapper">
-                            <div class="product-image-placeholder">
-                                <i class="fas fa-coffee"></i>
-                            </div>
+                            ${imageHTML}
                         </div>
                         <div class="product-info">
-                            <div class="product-name">${product.name}</div>
+                            <div class="product-name">${escapeHtml(product.name)}</div>
                             ${priceHTML}
-                            <div class="product-stock in-stock">
-                                <i class="fas fa-circle"></i>
-                                <span>Stok: ${product.stock || 0}</span>
-                            </div>
+                            ${stockQuantity !== null ? `<div class="product-stock ${stockClass}"><i class="fas fa-circle"></i><span>Stok: ${stockQuantity}</span></div>` : ''}
                         </div>
                     `;
                     
@@ -1191,6 +1234,30 @@
             
             // Load products with discount info
             loadProductsWithDiscounts();
+            
+            // Auto-convert leading 0 to country code 62 for customer phone
+            const customerPhoneEl = document.getElementById('customerPhone');
+            if (customerPhoneEl) {
+                const normalizePhone = () => {
+                    let v = customerPhoneEl.value || '';
+                    v = v.trim();
+                    // If starts with '0' and not already '62' or '+62', replace leading 0 with 62
+                    if (/^0/.test(v) && !/^\+?62/.test(v)) {
+                        const rest = v.slice(1).replace(/\D/g, '');
+                        customerPhoneEl.value = '62' + rest;
+                    }
+                };
+
+                customerPhoneEl.addEventListener('input', normalizePhone);
+                customerPhoneEl.addEventListener('blur', normalizePhone);
+                customerPhoneEl.addEventListener('paste', () => setTimeout(normalizePhone, 0));
+            }
+        });
+
+        // Listen for external product updates (e.g., from Kelola Menu)
+        window.addEventListener('products-updated', () => {
+            console.log('[POS] products-updated event received — reloading products');
+            try { loadProductsWithDiscounts(); } catch(e){ console.error('Failed reloading products after update', e); }
         });
     </script>
 
@@ -1201,8 +1268,8 @@
 
     <!-- Auth & Navigation Scripts -->
     <script src="../js/auth.js?v=1769014084"></script>
-    <script src="../js/top-navbar.js?v=1769014084"></script>
-    <script src="../js/sidebar-nav.js?v=1769020001"></script>
+    <script src="../js/top-navbar.js?v=20260510-1"></script>
+    <script src="../js/sidebar-nav.js?v=20260507-1"></script>
     <script src="../js/navbar.js?v=1769014084"></script>
 </body>
 </html>

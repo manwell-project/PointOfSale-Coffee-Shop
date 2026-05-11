@@ -362,6 +362,7 @@ function createCustomerRow(customer) {
             </td>
             <td>
                 <div class="customer-actions">
+                    ${customer.phone ? `<a class="btn-action wa" href="https://wa.me/${sanitizePhoneForWa(customer.phone)}" target="_blank" rel="noopener noreferrer" title="Chat via WhatsApp"><i class="fab fa-whatsapp"></i></a>` : ''}
                     <button class="btn-action view" data-action="view" data-id="${customer.id}" title="Lihat Detail">
                         <i class="fas fa-eye"></i>
                     </button>
@@ -805,4 +806,11 @@ function formatDate(date) {
 function formatTime(date) {
     const options = { hour: '2-digit', minute: '2-digit' };
     return new Intl.DateTimeFormat('id-ID', options).format(date);
+}
+
+// Sanitize phone number for use in wa.me links
+function sanitizePhoneForWa(phone) {
+    if (!phone) return '';
+    // Remove all non-digit characters
+    return String(phone).replace(/\D/g, '');
 }

@@ -13,6 +13,26 @@
     notificationCheckInterval: 60000, // Check every minute
   };
 
+  function shouldSkipInjection() {
+    try {
+      // Optional global opt-out
+      if (typeof window !== 'undefined' && window.__DIGICAF_HIDE_TOP_NAVBAR === true) return true;
+
+      // Per-page opt-out (used to match Reports style: no search/top nav)
+      if (document.body && document.body.classList.contains('no-top-navbar')) return true;
+      if (document.documentElement && String(document.documentElement.getAttribute('data-top-navbar')).toLowerCase() === 'off') return true;
+      if (document.querySelector && document.querySelector('[data-top-navbar="off"]')) return true;
+    } catch (e) {
+      // If checks fail, default to not skipping.
+    }
+    return false;
+  }
+
+  if (shouldSkipInjection()) {
+    console.log('[TopNavbar] Injection skipped (disabled for this page)');
+    return;
+  }
+
   // State
   let searchTimeout = null;
   let currentUser = null;
@@ -105,28 +125,8 @@
             </div>
           </div>
 
-          <!-- Right Section - Notifications + User Menu -->
+          <!-- Right Section - User Menu -->
           <div class="top-navbar-right">
-            <!-- Notifications -->
-            <div style="position: relative;">
-              <button class="top-navbar-notification-btn" id="notificationBtn" aria-label="Notifications">
-                <i class="fas fa-bell"></i>
-                <span class="top-navbar-notification-badge" id="notificationBadge" style="display: none;">0</span>
-              </button>
-              <div class="top-navbar-dropdown top-navbar-notification-dropdown" id="notificationDropdown">
-                <div class="top-navbar-dropdown-header">
-                  <h4>Notifikasi</h4>
-                  <button class="top-navbar-dropdown-header-action" id="markAllReadBtn">Tandai Semua Dibaca</button>
-                </div>
-                <div class="top-navbar-dropdown-body" id="notificationList">
-                  <div class="top-navbar-notification-empty">
-                    <i class="fas fa-bell-slash"></i>
-                    <p>Tidak ada notifikasi</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
             <!-- User Menu -->
             <div style="position: relative;">
               <button class="top-navbar-user-btn" id="userMenuBtn">
@@ -191,17 +191,8 @@
       logoutBtn.addEventListener('click', handleLogout);
     }
     
-    // Mark all read button
-    const markAllReadBtn = document.getElementById('markAllReadBtn');
-    if (markAllReadBtn) {
-      markAllReadBtn.addEventListener('click', handleMarkAllRead);
-    }
-
     // Initialize search
     initializeSearch();
-
-    // Initialize notifications
-    initializeNotifications();
   }
 
   /**

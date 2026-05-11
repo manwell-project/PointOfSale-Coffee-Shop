@@ -26,7 +26,7 @@
 }
 
 /* Mobile and Tablet hidden by default */
-@media (max-width: 1024px) {
+@media (max-width: 767px) {
   .sidebar-nav {
     display: none !important;
   }
@@ -325,6 +325,39 @@
   opacity: 0.5;
 }
 
+.sidebar-submenu-empty {
+  padding: var(--spacing-3) var(--spacing-4);
+  padding-left: calc(var(--spacing-4) + 32px);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}
+
+.sidebar-notification-item {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.sidebar-notification-item::before {
+  margin-top: 6px;
+}
+
+.sidebar-notification-item.unread {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.sidebar-notification-title {
+  font-size: var(--font-size-sm);
+  color: inherit;
+}
+
+.sidebar-notification-message,
+.sidebar-notification-time {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}
+
 .sidebar-nav.collapsed .sidebar-submenu {
   display: none;
 }
@@ -467,20 +500,18 @@
    CONTENT OFFSET
    ============================================ */
 
-/* Offset main content when sidebar is visible */
+/*
+  NOTE:
+  Content positioning is handled by page wrappers (see css/components/page-adjustments.css)
+  using margin-left on .stock-wrapper/.dashboard-container/etc.
+  Avoid applying padding-left here to prevent double-offset (content too far right).
+*/
 body.sidebar-visible {
-  padding-left: var(--sidebar-width, 260px);
-  transition: padding-left 0.3s ease;
+  padding-left: 0;
 }
 
 body.sidebar-visible.sidebar-collapsed {
-  padding-left: var(--sidebar-width-collapsed, 64px);
-}
-
-@media (max-width: 1024px) {
-  body.sidebar-visible {
-    padding-left: 0 !important;
-  }
+  padding-left: 0;
 }
 
 /* ============================================
@@ -491,10 +522,6 @@ body.sidebar-visible.sidebar-collapsed {
 @media (max-width: 1024px) {
   .sidebar-nav {
     width: 220px;
-  }
-  
-  body.sidebar-visible {
-    padding-left: 220px;
   }
 }
 

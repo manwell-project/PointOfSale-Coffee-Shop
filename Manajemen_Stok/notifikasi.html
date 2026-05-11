@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0ea5e9">
+  <title>Notifikasi Stok - DigiCaf</title>
+
+  <!-- Design System CSS -->
+  <link rel="stylesheet" href="../css/design-tokens.css">
+  <link rel="stylesheet" href="../css/typography.css">
+  <link rel="stylesheet" href="../css/icons.css">
+  <link rel="stylesheet" href="../css/layout-system.css">
+  <link rel="stylesheet" href="../css/spacing-alignment.css">
+
+  <!-- Component CSS -->
+  <link rel="stylesheet" href="../css/components/buttons.css">
+  <link rel="stylesheet" href="../css/components/cards.css">
+  <link rel="stylesheet" href="../css/components/forms.css">
+  <link rel="stylesheet" href="../css/components/badges-labels.css">
+  <link rel="stylesheet" href="../css/components/top-navbar-simple.css?v=1769014084">
+  <link rel="stylesheet" href="../css/components/sidebar-nav.css?v=1769014084">
+
+  <!-- Responsive Design CSS -->
+  <link rel="stylesheet" href="../css/responsive.css">
+  <link rel="stylesheet" href="../css/mobile-optimizations.css">
+  <link rel="stylesheet" href="../css/tablet.css">
+
+  <!-- Page Specific CSS -->
+  <link rel="stylesheet" href="css/stock-layout.css">
+  <link rel="stylesheet" href="../css/shared-ui.css">
+
+  <!-- Page Adjustments - MUST BE LAST to override local CSS -->
+  <link rel="stylesheet" href="../css/components/page-adjustments.css?v=20260510-1">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="no-top-navbar">
+  <div class="stock-wrapper">
+    <div class="stock-container">
+      <div class="stock-header">
+        <div class="stock-header-left">
+          <h1 class="stock-title">
+            <i class="fas fa-bell"></i>
+            Notifikasi Stok
+          </h1>
+          <p class="stock-subtitle">Daftar notifikasi stok rendah dan stok habis</p>
+        </div>
+        <div class="stock-header-actions">
+          <button class="btn-export" id="refreshAlertsBtn" type="button">
+            <i class="fas fa-rotate"></i>
+            Refresh
+          </button>
+          <button class="btn-add-stock" id="backToStockBtn" type="button">
+            <i class="fas fa-arrow-left"></i>
+            Kembali
+          </button>
+        </div>
+      </div>
+
+      <div class="alerts-page">
+        <div class="alerts-header">
+          <h3 class="alerts-title">
+            <i class="fas fa-bell"></i>
+            Notifikasi Stok
+            <span class="alerts-badge" id="alertsBadgePage">0</span>
+          </h3>
+          <div class="alerts-actions">
+            <button class="btn-alert-filter active" data-filter="all" type="button">Semua</button>
+            <button class="btn-alert-filter" data-filter="critical" type="button">Kritis</button>
+            <button class="btn-alert-filter" data-filter="warning" type="button">Peringatan</button>
+          </div>
+        </div>
+
+        <div class="alerts-list alerts-list-page" id="alertsPageList">
+          <div class="alerts-empty">
+            <div class="empty-alert-icon"><i class="fas fa-spinner fa-spin"></i></div>
+            <div class="empty-alert-title">Memuat notifikasi...</div>
+            <div class="empty-alert-text">Mohon tunggu sebentar</div>
+          </div>
+        </div>
+
+        <div class="alerts-footer">
+          <button class="btn-mark-read" id="markAllReadPage" type="button">Tandai Sudah Dibaca</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Performance Optimizations -->
+  <script src="../js/performance.js" defer></script>
+  <script src="../js/performance-utilities.js" defer></script>
+  <script src="../js/cache.js" defer></script>
+
+  <script src="../js/auth.js?v=1769014084"></script>
+  <script src="../js/api-helper.js?v=1769014085"></script>
+  <script src="../js/top-navbar.js?v=20260510-1"></script>
+  <script src="../js/sidebar-nav.js?v=20260507-1"></script>
+  <script src="../js/navbar.js?v=1769014084"></script>
+
+  <script src="stock-notifications.js"></script>
+</body>
+</html>

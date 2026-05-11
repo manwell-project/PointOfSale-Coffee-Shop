@@ -3,6 +3,14 @@
  * Handles report page initialization and report core features
  */
 
+if (window.Framework7 && document.getElementById('app')) {
+    window.reportF7App = new Framework7({
+        el: '#app',
+        name: 'DigiCaf',
+        theme: 'auto'
+    });
+}
+
 // ============================================
 // DOM ELEMENT REFERENCES
 // ============================================
@@ -13,6 +21,7 @@ const reportTitleEl = document.getElementById('reportContentTitle');
 const reportPeriodEl = document.getElementById('reportPeriod');
 const reportTable = document.getElementById('reportTable');
 const reportTableBody = document.getElementById('reportTableBody');
+const reportGridView = document.getElementById('reportGridView');
 const tableTotalEl = document.getElementById('tableTotal');
 const tableTitleEl = document.querySelector('.table-title');
 const tableLoadingEl = document.getElementById('tableLoading');
@@ -51,6 +60,17 @@ const exportExcelBtn = document.getElementById('exportExcelBtn');
 const exportCsvBtn = document.getElementById('exportCsvBtn');
 const printReportBtn = document.getElementById('printReportBtn');
 
+const profitRevenueEl = document.getElementById('profitRevenue');
+const profitExpenseEl = document.getElementById('profitExpense');
+const profitHPPEl = document.getElementById('profitHPP');
+const profitGrossEl = document.getElementById('profitGross');
+const profitOperationalEl = document.getElementById('profitOperational');
+const profitEmployeeEl = document.getElementById('profitEmployee');
+const profitOtherEl = document.getElementById('profitOther');
+const profitNetEl = document.getElementById('profitNet');
+const profitMarginEl = document.getElementById('profitMargin');
+const profitStatusEl = document.getElementById('profitStatus');
+
 // ============================================
 // STATE MANAGEMENT
 // ============================================
@@ -58,7 +78,10 @@ const printReportBtn = document.getElementById('printReportBtn');
 let transactions = [];
 let filteredTransactions = [];
 let currentRows = [];
+let rawStockHistory = [];
+let rawMaterialPrices = new Map();
 let currentReport = 'sales';
+let currentViewMode = 'table';
 let currentPage = 1;
 const pageSize = 10;
 let sortColumn = 'date';
@@ -128,6 +151,31 @@ function initializeEventListeners() {
         tableSearchInput.addEventListener('input', handleSearchInput);
     }
 
+    // Compact table toggle: add button dynamically to avoid editing HTML template
+    const tableControls = document.querySelector('.table-controls');
+    if (tableControls) {
+        const compactBtn = document.createElement('button');
+        compactBtn.type = 'button';
+        compactBtn.className = 'btn-compact-toggle button button-small';
+        compactBtn.title = 'Mode ringkas (compact)';
+        compactBtn.innerHTML = '<i class="fas fa-compress"></i>';
+        tableControls.appendChild(compactBtn);
+
+        // initialize state from localStorage
+        const compactKey = 'report_table_compact';
+        const saved = localStorage.getItem(compactKey);
+        if (saved === 'true') {
+            reportTable && reportTable.classList.add('compact');
+            compactBtn.classList.add('active');
+        }
+
+        compactBtn.addEventListener('click', () => {
+            const isCompact = reportTable.classList.toggle('compact');
+            compactBtn.classList.toggle('active', isCompact);
+            localStorage.setItem(compactKey, isCompact ? 'true' : 'false');
+        });
+    }
+
     if (btnPrevPage) {
         btnPrevPage.addEventListener('click', () => changePage(currentPage - 1));
     }
@@ -165,8 +213,9 @@ function initializeEventListeners() {
             button.classList.add('active');
 
             const viewMode = button.getAttribute('data-view');
-            if (viewMode === 'grid') {
-                showReportMessage('Mode grid akan menyusul. Saat ini data tetap tampil dalam tabel.', 'info');
+            if (viewMode === 'grid' || viewMode === 'table') {
+                currentViewMode = viewMode;
+                renderTable();
             }
         });
     });
@@ -196,7 +245,24 @@ async function loadReportData() {
     showLoading(true);
 
     try {
-        const rawTransactions = await window.API.Transactions.getAll();
+        const [transactionsResult, historyResult, rawStocksResult] = await Promise.allSettled([
+            window.API.Transactions.getAll(),
+            window.API.Stocks.getHistoryAll({ limit: 1000 }),
+            window.API.Stocks.getAll()
+        ]);
+
+        const rawTransactions = transactionsResult.status === 'fulfilled' ? transactionsResult.value : [];
+        rawStockHistory = historyResult.status === 'fulfilled' ? historyResult.value : [];
+        rawMaterialPrices = buildRawMaterialPriceMap(rawStocksResult.status === 'fulfilled' ? rawStocksResult.value : []);
+
+        if (historyResult.status === 'rejected') {
+            console.warn('Stock history unavailable for profit/loss:', historyResult.reason);
+        }
+
+        if (rawStocksResult.status === 'rejected') {
+            console.warn('Raw stock prices unavailable for profit/loss:', rawStocksResult.reason);
+        }
+
         transactions = await enrichTransactionsWithItems(rawTransactions || []);
         renderReport();
     } catch (error) {
@@ -204,6 +270,8 @@ async function loadReportData() {
         transactions = [];
         filteredTransactions = [];
         currentRows = [];
+        rawStockHistory = [];
+        rawMaterialPrices = new Map();
         renderReport();
         showReportMessage('Gagal memuat data laporan dari server.', 'error');
     } finally {
@@ -222,7 +290,7 @@ async function enrichTransactionsWithItems(rawTransactions) {
 }
 
 function mergeTransactionDetail(transaction, detail) {
-    const txItems = Array.isArray(detail?.items) ? detail.items : [];
+    const txItems = normalizeTransactionItems(detail?.items);
     const itemCount = txItems.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
 
     return {
@@ -246,10 +314,8 @@ function setDefaultDateRange() {
     if (!dateFromInput || !dateToInput) return;
 
     const today = new Date();
-    const lastMonth = new Date(today);
-    lastMonth.setDate(today.getDate() - 30);
-
-    dateFromInput.valueAsDate = lastMonth;
+    // default range: 1 Jan 2025 to today
+    dateFromInput.value = '2025-01-01';
     dateToInput.valueAsDate = today;
 }
 
@@ -386,7 +452,7 @@ function updateFilterVisibility() {
 }
 
 function configureTableHeaders() {
-    if (tableHeaderCells.length !== 8) return;
+    if (tableHeaderCells.length !== 7) return;
 
     const headerConfigByReport = {
         sales: [
@@ -396,8 +462,7 @@ function configureTableHeaders() {
             { label: 'Item', sort: 'items', sortable: true, number: false },
             { label: 'Total', sort: 'amount', sortable: true, number: true },
             { label: 'Pembayaran', sort: 'payment', sortable: true, number: false },
-            { label: 'Status', sort: '', sortable: false, number: false },
-            { label: 'Aksi', sort: '', sortable: false, number: false }
+            { label: 'Status', sort: '', sortable: false, number: false }
         ],
         products: [
             { label: 'ID', sort: 'id', sortable: true, number: false },
@@ -406,8 +471,7 @@ function configureTableHeaders() {
             { label: 'Terjual', sort: 'quantity', sortable: true, number: true },
             { label: 'Pendapatan', sort: 'amount', sortable: true, number: true },
             { label: 'Kontribusi', sort: 'share', sortable: true, number: false },
-            { label: 'Status', sort: '', sortable: false, number: false },
-            { label: 'Aksi', sort: '', sortable: false, number: false }
+            { label: 'Status', sort: '', sortable: false, number: false }
         ],
         employees: [
             { label: 'ID', sort: 'id', sortable: true, number: false },
@@ -416,8 +480,7 @@ function configureTableHeaders() {
             { label: 'Transaksi', sort: 'transactions', sortable: true, number: true },
             { label: 'Total', sort: 'amount', sortable: true, number: true },
             { label: 'Rata-rata', sort: 'average', sortable: true, number: false },
-            { label: 'Status', sort: '', sortable: false, number: false },
-            { label: 'Aksi', sort: '', sortable: false, number: false }
+            { label: 'Status', sort: '', sortable: false, number: false }
         ]
     };
 
@@ -453,10 +516,11 @@ function renderReport() {
     updateFilterVisibility();
 
     filteredTransactions = getFilteredTransactions();
+    const completedTransactions = getCompletedTransactions(filteredTransactions);
 
     const salesRows = buildSalesRows(filteredTransactions);
-    const productRows = buildProductRows(filteredTransactions);
-    const employeeRows = buildEmployeeRows(filteredTransactions);
+    const productRows = buildProductRows(completedTransactions);
+    const employeeRows = buildEmployeeRows(completedTransactions);
 
     updateTabBadges(salesRows.length, productRows.length, employeeRows.length);
 
@@ -469,9 +533,202 @@ function renderReport() {
     }
 
     currentRows = sortRows(currentRows);
-    updateSummaryCards(filteredTransactions, productRows, employeeRows);
+    updateSummaryCards(completedTransactions, productRows, employeeRows);
+    updateProfitLoss(completedTransactions);
+    // Render product trend (Top 5) chart
+    try { renderProductTrendChart(productRows); } catch (e) { console.warn('Product chart render failed', e); }
     updateReportMeta();
     renderTable();
+}
+
+function updateProfitLoss(salesData) {
+    if (!profitRevenueEl || !profitHPPEl || !profitGrossEl || !profitNetEl || !profitMarginEl) return;
+
+    const revenue = (Array.isArray(salesData) ? salesData : []).reduce((sum, tx) => sum + (Number(tx.totalAmount) || 0), 0);
+    const hpp = calculateStockExpense();
+    const gross = revenue - hpp;
+
+    // placeholders for costs: to be integrated with expenses/HR module if available
+    const operational = 0;
+    const employee = 0;
+    const other = 0;
+
+    const net = gross - operational - employee - other;
+    const margin = revenue > 0 ? (net / revenue) * 100 : 0;
+
+    setElementText(profitRevenueEl, formatCurrency(revenue));
+    setElementText(profitHPPEl, formatCurrency(hpp));
+    setElementText(profitGrossEl, formatCurrency(gross));
+    setElementText(profitOperationalEl, formatCurrency(operational));
+    setElementText(profitEmployeeEl, formatCurrency(employee));
+    setElementText(profitOtherEl, formatCurrency(other));
+    setElementText(profitNetEl, formatCurrency(net));
+    setElementText(profitMarginEl, `${margin.toFixed(1)}%`);
+
+    if (profitStatusEl) {
+        profitStatusEl.textContent = net >= 0 ? 'Laba' : 'Rugi';
+        profitStatusEl.classList.toggle('negative', net < 0);
+    }
+}
+
+function calculateStockExpense() {
+    if (!Array.isArray(rawStockHistory) || rawStockHistory.length === 0) return 0;
+
+    const dateFrom = appliedFilters.dateFrom ? new Date(`${appliedFilters.dateFrom}T00:00:00`) : null;
+    const dateTo = appliedFilters.dateTo ? new Date(`${appliedFilters.dateTo}T23:59:59`) : null;
+
+    return rawStockHistory.reduce((sum, row) => {
+        const changedAtRaw = row.changed_at || row.changedAt;
+        if (!changedAtRaw) return sum;
+        const changedAt = new Date(changedAtRaw);
+        if (Number.isNaN(changedAt.getTime())) return sum;
+        if (dateFrom && changedAt < dateFrom) return sum;
+        if (dateTo && changedAt > dateTo) return sum;
+
+        const delta = Number(row.delta ?? (Number(row.quantity_after) - Number(row.quantity_before)));
+        if (!Number.isFinite(delta) || delta <= 0) return sum;
+
+        if (!isPurchaseLikeStockChange(row.change_reason)) return sum;
+
+        const rawId = Number(row.raw_material_id ?? row.rawMaterialId ?? row.material_id ?? row.materialId);
+        const price = rawMaterialPrices.get(rawId) ?? Number(row.price) ?? 0;
+        if (!Number.isFinite(price) || price <= 0) return sum;
+
+        return sum + (delta * price);
+    }, 0);
+}
+
+function buildRawMaterialPriceMap(rawStocks) {
+    const map = new Map();
+    if (!Array.isArray(rawStocks)) return map;
+
+    rawStocks.forEach((row) => {
+        const rawId = Number(row.raw_material_id ?? row.rawMaterialId ?? row.id);
+        const price = Number(row.price ?? row.costPrice ?? 0);
+        if (Number.isFinite(rawId) && Number.isFinite(price)) {
+            map.set(rawId, price);
+        }
+    });
+
+    return map;
+}
+
+// Product Trend Chart (Top 5) using Chart.js
+let _productTrendChart = null;
+function renderProductTrendChart(productRows) {
+    if (!productRows) return;
+    // productRows expected shape from buildProductRows -> uses sortValues and cells
+    const normalized = productRows.map((r) => ({
+        product_name: (r.sortValues && r.sortValues.name) || (r.cells && r.cells[1]) || 'Unknown',
+        qty: Number(r.sortValues?.quantity || 0)
+    }));
+
+    const rows = normalized.slice().sort((a, b) => b.qty - a.qty).slice(0, 5);
+    const labels = rows.map((r) => String(r.product_name).replace(/<[^>]*>/g, '').trim());
+    const data = rows.map((r) => r.qty);
+
+    const canvas = document.getElementById('productTrendChart');
+    if (!canvas) return;
+
+    // replace placeholder content if canvas is not an actual <canvas>
+    if (canvas.tagName.toLowerCase() !== 'canvas') {
+        // try to find inner canvas
+        const inner = canvas.querySelector('canvas');
+        if (inner) {
+            _renderChartOnCanvas(inner, labels, data);
+            return;
+        }
+        // create canvas inside
+        canvas.innerHTML = '<canvas id="productTrendChartCanvas" height="260"></canvas>';
+        const newCanvas = canvas.querySelector('#productTrendChartCanvas');
+        if (newCanvas) {
+            _renderChartOnCanvas(newCanvas, labels, data);
+        }
+        return;
+    }
+
+    _renderChartOnCanvas(canvas, labels, data);
+}
+
+function _renderChartOnCanvas(ctxEl, labels, data) {
+    try {
+        if (_productTrendChart) {
+            _productTrendChart.data.labels = labels;
+            _productTrendChart.data.datasets[0].data = data;
+            _productTrendChart.update();
+            return;
+        }
+
+        _productTrendChart = new Chart(ctxEl.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Unit Terjual',
+                    data,
+                    backgroundColor: '#6B4423',
+                    borderColor: '#51331a',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                plugins: {legend: {display: false}},
+                scales: { x: { grid: { display: false } }, y: { beginAtZero: true } }
+            }
+        });
+    } catch (err) {
+        console.warn('Chart render error', err);
+    }
+}
+
+function normalizeTransactionItems(items) {
+    if (!Array.isArray(items)) return [];
+
+    return items.map((item) => {
+        const quantity = Number(item.quantity ?? item.qty ?? 0) || 0;
+        const unitPrice = Number(item.unit_price ?? item.price ?? 0) || 0;
+
+        return {
+            ...item,
+            product_id: Number(item.product_id ?? item.productId ?? 0) || 0,
+            product_name: item.product_name || item.productName || 'Produk Tidak Dikenal',
+            category: item.category || item.product_category || item.productCategory || '',
+            quantity,
+            unit_price: unitPrice,
+            subtotal: Number(item.subtotal ?? (quantity * unitPrice)) || 0
+        };
+    }).filter((item) => Number.isFinite(Number(item.quantity)));
+}
+
+function getCompletedTransactions(transactionsList) {
+    return (Array.isArray(transactionsList) ? transactionsList : []).filter((transaction) => isCompletedTransaction(transaction));
+}
+
+function isCompletedTransaction(transaction) {
+    return String(transaction?.status || '').toLowerCase() === 'completed';
+}
+
+function isPurchaseLikeStockChange(reason) {
+    const normalized = String(reason || '').toLowerCase().trim();
+    if (!normalized) return true;
+
+    if (normalized.includes('keluar') || normalized.includes('out') || normalized.includes('jual') || normalized.includes('sold')) {
+        return false;
+    }
+
+    if (normalized.includes('stock out') || normalized.includes('barang keluar') || normalized.includes('pengurangan')) {
+        return false;
+    }
+
+    return normalized.includes('masuk')
+        || normalized.includes('beli')
+        || normalized.includes('restock')
+        || normalized.includes('purchase')
+        || normalized.includes('in')
+        || normalized.includes('penambahan')
+        || normalized.includes('pembelian')
+        || normalized.includes('pemasukan')
+        || normalized.includes('manual adjustment');
 }
 
 function getFilteredTransactions() {
@@ -537,8 +794,7 @@ function buildSalesRows(data) {
                 `${escapeHtml(itemLabel)}`,
                 `${formatCurrency(transaction.totalAmount)}`,
                 `${paymentLabel(transaction.paymentMethod)}`,
-                `<span class="table-badge ${statusBadgeClass(transaction.status)}">${statusLabel(transaction.status)}</span>`,
-                `<div class="table-actions"><button class="table-action-btn view" data-id="${transaction.id}" data-label="Transaksi" title="Lihat"><i class="fas fa-eye"></i></button></div>`
+                `<span class="table-badge ${statusBadgeClass(transaction.status)}">${statusLabel(transaction.status)}</span>`
             ]
         };
     });
@@ -599,8 +855,7 @@ function buildProductRows(data) {
                 `${product.quantity}`,
                 `${formatCurrency(product.amount)}`,
                 `${share.toFixed(1)}%`,
-                `<span class="table-badge ${statusClass}">${statusText}</span>`,
-                `<div class="table-actions"><button class="table-action-btn view" data-id="${escapeHtml(String(product.id))}" data-label="Produk" title="Lihat"><i class="fas fa-eye"></i></button></div>`
+                `<span class="table-badge ${statusClass}">${statusText}</span>`
             ]
         };
     });
@@ -648,8 +903,7 @@ function buildEmployeeRows(data) {
                 `${employee.transactions}`,
                 `${formatCurrency(employee.amount)}`,
                 `${formatCurrency(average)}`,
-                `<span class="table-badge ${statusClass}">${statusText}</span>`,
-                `<div class="table-actions"><button class="table-action-btn view" data-id="${escapeHtml(String(employee.id))}" data-label="Karyawan" title="Lihat"><i class="fas fa-eye"></i></button></div>`
+                `<span class="table-badge ${statusClass}">${statusText}</span>`
             ]
         };
     });
@@ -768,30 +1022,46 @@ function updateTabBadges(salesCount, productCount, employeeCount) {
 }
 
 function renderTable() {
-    const totalRows = currentRows.length;
+    const normalizedRows = (Array.isArray(currentRows) ? currentRows : []).filter(isRenderableRow);
+    const totalRows = normalizedRows.length;
     const totalPages = Math.max(1, Math.ceil(totalRows / pageSize));
     if (currentPage > totalPages) currentPage = totalPages;
 
     const startIndex = (currentPage - 1) * pageSize;
     const endIndex = startIndex + pageSize;
-    const pageRows = currentRows.slice(startIndex, endIndex);
+    const pageRows = normalizedRows.slice(startIndex, endIndex);
 
-    if (reportTableBody) {
-        reportTableBody.innerHTML = pageRows.map((row) => `
-            <tr>
-                <td>${row.cells[0]}</td>
-                <td>${row.cells[1]}</td>
-                <td>${row.cells[2]}</td>
-                <td>${row.cells[3]}</td>
-                <td class="currency">${row.cells[4]}</td>
-                <td>${row.cells[5]}</td>
-                <td class="status">${row.cells[6]}</td>
-                <td>${row.cells[7]}</td>
-            </tr>
-        `).join('');
+    if (currentViewMode === 'grid') {
+        if (reportTableBody) {
+            reportTableBody.innerHTML = '';
+        }
+        renderGridCards(pageRows);
+        if (reportTable) reportTable.style.display = 'none';
+        if (reportGridView) reportGridView.style.display = totalRows === 0 ? 'none' : 'grid';
+    } else {
+        if (reportGridView) {
+            reportGridView.style.display = 'none';
+            reportGridView.innerHTML = '';
+        }
+
+        if (reportTableBody) {
+            reportTableBody.innerHTML = pageRows.map((row) => `
+                <tr>
+                    <td>${row.cells[0]}</td>
+                    <td>${row.cells[1]}</td>
+                    <td>${row.cells[2]}</td>
+                    <td>${row.cells[3]}</td>
+                    <td class="currency">${row.cells[4]}</td>
+                    <td>${row.cells[5]}</td>
+                    <td class="status">${row.cells[6]}</td>
+                </tr>
+            `).join('');
+        }
+
+        if (reportTable) reportTable.style.display = totalRows === 0 ? 'none' : 'table';
     }
 
-    const tableTotal = currentRows.reduce((sum, row) => sum + (Number(row.sortValues?.amount) || 0), 0);
+    const tableTotal = normalizedRows.reduce((sum, row) => sum + (Number(row.sortValues?.amount) || 0), 0);
     if (tableTotalEl) {
         tableTotalEl.textContent = formatCurrency(tableTotal);
     }
@@ -800,16 +1070,41 @@ function renderTable() {
         tableEmptyEl.style.display = totalRows === 0 ? 'flex' : 'none';
     }
 
-    if (reportTable) {
-        reportTable.style.display = totalRows === 0 ? 'none' : 'table';
-    }
-
     if (tablePaginationEl) {
         tablePaginationEl.style.display = totalRows === 0 ? 'none' : 'flex';
     }
 
     updatePagination(totalRows, totalPages, startIndex, endIndex);
     updateSortableHeaderState();
+}
+
+function isRenderableRow(row) {
+    return !!(row && Array.isArray(row.cells) && row.cells.length >= 7);
+}
+
+function renderGridCards(rows) {
+    if (!reportGridView) return;
+
+    if (rows.length === 0) {
+        reportGridView.innerHTML = '';
+        return;
+    }
+
+    reportGridView.innerHTML = rows.map((row) => `
+        <article class="report-grid-card">
+            <div class="report-grid-card-head">
+                <div class="report-grid-title">${row.cells[2]}</div>
+                <div class="report-grid-id">${row.cells[0]}</div>
+            </div>
+            <div class="report-grid-meta">
+                <div><span>Tanggal</span><strong>${row.cells[1]}</strong></div>
+                <div><span>Item</span><strong>${row.cells[3]}</strong></div>
+                <div><span>Total</span><strong class="currency">${row.cells[4]}</strong></div>
+                <div><span>Pembayaran</span><strong>${row.cells[5]}</strong></div>
+                <div><span>Status</span><strong>${row.cells[6]}</strong></div>
+            </div>
+        </article>
+    `).join('');
 }
 
 function updatePagination(totalRows, totalPages, startIndex, endIndex) {
@@ -885,93 +1180,151 @@ async function handleExportPdf() {
     const titleText = reportTitleEl ? reportTitleEl.textContent.trim() : 'Laporan';
     const periodText = reportPeriodEl ? reportPeriodEl.textContent.replace(/\s+/g, ' ').trim() : '-';
     const headers = getTableHeaders();
-    const bodyRows = getTableRows();
+    const bodyRows = getExportRows();
+    const totalText = formatCurrency(getExportTotal());
+
+    let exportRoot = null;
 
     try {
-        const JsPdf = await ensureJsPdfLoaded();
-        const pdf = new JsPdf({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+        const [JsPdf, html2canvas] = await Promise.all([
+            ensureJsPdfLoaded(),
+            ensureHtml2CanvasLoaded()
+        ]);
 
-        pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(16);
-        pdf.text(titleText, 40, 40);
+        exportRoot = buildExportElement({
+            titleText,
+            periodText,
+            headers,
+            bodyRows,
+            totalText,
+            headingLabel: 'Export PDF Laporan'
+        });
 
-        pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(10);
-        pdf.text(`Periode: ${periodText}`, 40, 58);
-        pdf.text(`Dibuat: ${new Date().toLocaleString('id-ID')}`, 40, 74);
+        const canvas = await html2canvas(exportRoot, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: '#fff7ef'
+        });
 
-        let currentY = 100;
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new JsPdf({ orientation: 'portrait', unit: 'pt', format: 'a4' });
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const margin = 20;
+        const imgWidth = pageWidth - (margin * 2);
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-        if (headers.length > 0) {
-            const headerLine = headers.join(' | ');
-            pdf.setFont('helvetica', 'bold');
-            pdf.setFontSize(9);
-            const wrappedHeaders = pdf.splitTextToSize(headerLine, 760);
-            pdf.text(wrappedHeaders, 40, currentY);
-            currentY += (wrappedHeaders.length * 12) + 6;
-        }
+        let heightLeft = imgHeight;
+        let position = margin;
 
-        pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(9);
+        pdf.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
+        heightLeft -= (pageHeight - (margin * 2));
 
-        if (bodyRows.length === 0) {
-            pdf.text('Tidak ada data transaksi untuk ditampilkan.', 40, currentY);
-        } else {
-            bodyRows.forEach((row) => {
-                const rowLine = row.join(' | ');
-                const wrappedRow = pdf.splitTextToSize(rowLine, 760);
-
-                if (currentY > 530) {
-                    pdf.addPage();
-                    currentY = 40;
-                }
-
-                pdf.text(wrappedRow, 40, currentY);
-                currentY += (wrappedRow.length * 11) + 4;
-            });
-        }
-
-        if (tableTotalEl && tableTotalEl.textContent.trim()) {
-            if (currentY > 560) {
-                pdf.addPage();
-                currentY = 40;
-            }
-
-            pdf.setFont('helvetica', 'bold');
-            pdf.text(`Total: ${tableTotalEl.textContent.trim()}`, 40, currentY + 8);
+        while (heightLeft > 0) {
+            pdf.addPage();
+            position = margin - heightLeft;
+            pdf.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
+            heightLeft -= (pageHeight - (margin * 2));
         }
 
         pdf.save(`laporan-${generateFileDate()}.pdf`);
         showReportMessage('Export PDF berhasil.', 'success');
     } catch (error) {
         console.error('Export PDF error:', error);
-        showReportMessage('Export PDF menggunakan mode print karena library PDF tidak tersedia.', 'warning');
-        openPrintWindow('pdf');
+        showReportMessage('Gagal export PDF. Coba lagi beberapa saat.', 'error');
+    } finally {
+        if (exportRoot && exportRoot.parentNode) {
+            exportRoot.parentNode.removeChild(exportRoot);
+        }
     }
 }
 
 function handleExportExcel() {
-    if (!reportTable) {
-        showReportMessage('Tabel laporan tidak ditemukan.', 'error');
-        return;
-    }
+    const headers = getTableHeaders();
+    const bodyRows = getExportRows();
+    const totalText = formatCurrency(getExportTotal());
+    const periodText = reportPeriodEl ? reportPeriodEl.textContent.replace(/\s+/g, ' ').trim() : '-';
+    const titleText = reportTitleEl ? reportTitleEl.textContent.trim() : 'Laporan';
 
-    const htmlContent = buildExcelDocument();
-    const blob = new Blob([htmlContent], { type: 'application/vnd.ms-excel;charset=utf-8;' });
-    const filename = `laporan-${generateFileDate()}.xls`;
-    downloadBlob(blob, filename);
-    showReportMessage('Export Excel berhasil.', 'success');
+    ensureExcelJsLoaded()
+        .then((ExcelJS) => {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Laporan');
+
+            worksheet.columns = [
+                { width: 8 },
+                { width: 22 },
+                { width: 20 },
+                { width: 10 },
+                { width: 14 },
+                { width: 14 },
+                { width: 12 }
+            ];
+
+            const titleRow = worksheet.addRow([titleText]);
+            const periodRow = worksheet.addRow([`Periode: ${periodText}`]);
+            const createdRow = worksheet.addRow([`Dibuat: ${new Date().toLocaleString('id-ID')}`]);
+            worksheet.addRow([]);
+
+            const headerRow = worksheet.addRow(headers);
+            bodyRows.forEach((row) => worksheet.addRow(row));
+
+            if (totalText) {
+                worksheet.addRow(['', '', '', 'Total', totalText, '', '']);
+            }
+
+            const lastColumn = headers.length || 7;
+            worksheet.mergeCells(1, 1, 1, lastColumn);
+            worksheet.mergeCells(2, 1, 2, lastColumn);
+            worksheet.mergeCells(3, 1, 3, lastColumn);
+
+            titleRow.font = { bold: true, size: 14, color: { argb: 'FF3F2A1D' } };
+            titleRow.alignment = { horizontal: 'center', vertical: 'middle' };
+            periodRow.font = { color: { argb: 'FF6B4B35' } };
+            createdRow.font = { color: { argb: 'FF6B4B35' } };
+
+            headerRow.eachCell((cell) => {
+                cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF8B5E3C' } };
+                cell.alignment = { horizontal: 'center', vertical: 'middle' };
+            });
+
+            const borderStyle = { style: 'thin', color: { argb: 'FFE0CBB8' } };
+            worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
+                row.eachCell({ includeEmpty: false }, (cell) => {
+                    cell.border = {
+                        top: borderStyle,
+                        left: borderStyle,
+                        bottom: borderStyle,
+                        right: borderStyle
+                    };
+                    if (rowNumber > headerRow.number) {
+                        cell.alignment = cell.alignment || { horizontal: 'left', vertical: 'middle' };
+                    }
+                });
+            });
+
+            return workbook.xlsx.writeBuffer();
+        })
+        .then((buffer) => {
+            const blob = new Blob([buffer], {
+                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            });
+            const filename = `laporan-${generateFileDate()}.xlsx`;
+            downloadBlob(blob, filename);
+            showReportMessage('Export Excel berhasil.', 'success');
+        })
+        .catch((error) => {
+            console.error('Export Excel error:', error);
+            showReportMessage('Gagal export Excel. Coba lagi beberapa saat.', 'error');
+        });
 }
 
 function handleExportCsv() {
-    if (!reportTable) {
-        showReportMessage('Tabel laporan tidak ditemukan.', 'error');
-        return;
-    }
-
     const csvRows = [];
     const headers = getTableHeaders();
-    const bodyRows = getTableRows();
+    const bodyRows = getExportRows();
+    const totalText = formatCurrency(getExportTotal());
 
     if (headers.length > 0) {
         csvRows.push(convertToCsvRow(headers));
@@ -981,8 +1334,8 @@ function handleExportCsv() {
         csvRows.push(convertToCsvRow(row));
     });
 
-    if (tableTotalEl) {
-        csvRows.push(convertToCsvRow(['', '', '', 'Total', tableTotalEl.textContent.trim(), '', '', '']));
+    if (totalText) {
+        csvRows.push(convertToCsvRow(['', '', '', 'Total', totalText, '', '']));
     }
 
     const csvContent = `\uFEFF${csvRows.join('\n')}`;
@@ -1017,9 +1370,20 @@ function openPrintWindow(mode) {
 function buildPrintableDocument(mode) {
     const titleText = reportTitleEl ? reportTitleEl.textContent.trim() : 'Laporan';
     const periodText = reportPeriodEl ? reportPeriodEl.textContent.replace(/\s+/g, ' ').trim() : '-';
-    const tableHtml = reportTable ? reportTable.outerHTML : '<p>Tabel laporan tidak tersedia.</p>';
+    const headers = getTableHeaders();
+    const bodyRows = getExportRows();
+    const totalText = formatCurrency(getExportTotal());
+    const tableHtml = buildExportTableHtml(headers, bodyRows, totalText);
     const generatedAt = new Date().toLocaleString('id-ID');
     const printHeading = mode === 'pdf' ? 'Export PDF Laporan' : 'Print View Laporan';
+    const styles = buildExportStyles();
+    const contentHtml = buildExportContentHtml({
+        titleText,
+        periodText,
+        generatedAt,
+        headingLabel: printHeading,
+        tableHtml
+    });
 
     return `<!DOCTYPE html>
 <html lang="id">
@@ -1028,89 +1392,11 @@ function buildPrintableDocument(mode) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${escapeHtml(titleText)}</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 24px;
-            color: #1e293b;
-        }
-        .report-print-header {
-            margin-bottom: 16px;
-        }
-        .report-print-title {
-            font-size: 24px;
-            margin: 0 0 4px;
-        }
-        .report-print-subtitle {
-            font-size: 14px;
-            color: #475569;
-            margin: 0;
-        }
-        .report-print-meta {
-            margin: 16px 0;
-            font-size: 12px;
-            color: #64748b;
-            display: flex;
-            justify-content: space-between;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
-        }
-        th,
-        td {
-            border: 1px solid #cbd5e1;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background: #f1f5f9;
-            font-weight: 700;
-        }
-        tfoot td {
-            background: #f8fafc;
-            font-weight: 700;
-        }
+        ${styles}
     </style>
 </head>
 <body>
-    <header class="report-print-header">
-        <h1 class="report-print-title">${escapeHtml(titleText)}</h1>
-        <p class="report-print-subtitle">${escapeHtml(periodText)}</p>
-    </header>
-    <div class="report-print-meta">
-        <span>${escapeHtml(printHeading)}</span>
-        <span>Dibuat: ${escapeHtml(generatedAt)}</span>
-    </div>
-    ${tableHtml}
-</body>
-</html>`;
-}
-
-function buildExcelDocument() {
-    const titleText = reportTitleEl ? reportTitleEl.textContent.trim() : 'Laporan';
-    const periodText = reportPeriodEl ? reportPeriodEl.textContent.replace(/\s+/g, ' ').trim() : '-';
-    const tableHtml = reportTable ? reportTable.outerHTML : '';
-
-    return `
-<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-<head>
-    <meta charset="UTF-8">
-    <style>
-        body { font-family: Arial, sans-serif; }
-        h2 { margin-bottom: 4px; }
-        p { margin-top: 0; color: #475569; }
-        table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1px solid #cbd5e1; padding: 8px; }
-        th { background: #f1f5f9; }
-    </style>
-</head>
-<body>
-    <h2>${escapeHtml(titleText)}</h2>
-    <p>${escapeHtml(periodText)}</p>
-    ${tableHtml}
+    ${contentHtml}
 </body>
 </html>`;
 }
@@ -1122,19 +1408,168 @@ function getTableHeaders() {
     return Array.from(headerElements).map((header) => header.textContent.trim());
 }
 
-function getTableRows() {
-    if (!reportTable) return [];
+function getExportRows() {
+    if (!Array.isArray(currentRows)) return [];
 
-    const sourceRows = reportTableBody && reportTableBody.querySelectorAll('tr').length > 0
-        ? reportTableBody.querySelectorAll('tr')
-        : reportTable.querySelectorAll('tbody tr');
+    return currentRows
+        .filter(isRenderableRow)
+        .map((row) => row.cells.map((cell) => stripHtml(cell)));
+}
 
-    return Array.from(sourceRows)
-        .map((row) => {
-            const cells = row.querySelectorAll('td');
-            return Array.from(cells).map((cell) => cell.textContent.replace(/\s+/g, ' ').trim());
-        })
-        .filter((row) => row.length > 0 && row.some((cell) => cell !== ''));
+function getExportTotal() {
+    if (!Array.isArray(currentRows)) return 0;
+    return currentRows.reduce((sum, row) => sum + (Number(row.sortValues?.amount) || 0), 0);
+}
+
+function buildExportTableHtml(headers, rows, totalText) {
+    if (!headers || headers.length === 0) return '<p>Tabel laporan tidak tersedia.</p>';
+
+    const headerHtml = headers.map((header) => `<th>${escapeHtml(header)}</th>`).join('');
+    const bodyHtml = (rows || []).map((row) => {
+        const rowCells = row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join('');
+        return `<tr>${rowCells}</tr>`;
+    }).join('');
+
+    const totalRow = totalText
+        ? `<tr><td colspan="4">Total</td><td>${escapeHtml(totalText)}</td><td colspan="2"></td></tr>`
+        : '';
+
+    return `
+<table>
+    <thead>
+        <tr>${headerHtml}</tr>
+    </thead>
+    <tbody>
+        ${bodyHtml}
+    </tbody>
+    <tfoot>
+        ${totalRow}
+    </tfoot>
+</table>`;
+}
+
+function buildExportStyles() {
+    return `
+        :root {
+            color-scheme: light;
+        }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 28px;
+            color: #2b1e16;
+            background: #fff7ef;
+        }
+        .report-print-header {
+            background: linear-gradient(135deg, #c48a5a, #8b5e3c);
+            color: #ffffff;
+            padding: 18px 22px;
+            border-radius: 14px;
+            margin-bottom: 18px;
+        }
+        .report-print-title {
+            font-size: 22px;
+            margin: 0 0 6px;
+            letter-spacing: 0.3px;
+        }
+        .report-print-subtitle {
+            font-size: 13px;
+            color: #fef3e6;
+            margin: 0;
+        }
+        .report-print-meta {
+            margin: 14px 0 18px;
+            font-size: 12px;
+            color: #6b4b35;
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .report-table-wrap {
+            background: #ffffff;
+            border: 1px solid #ead8c5;
+            border-radius: 12px;
+            padding: 12px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        th,
+        td {
+            border: 1px solid #ead8c5;
+            padding: 8px 10px;
+            text-align: left;
+        }
+        th {
+            background: #8b5e3c;
+            color: #ffffff;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        tbody tr:nth-child(even) td {
+            background: #fef5ea;
+        }
+        tfoot td {
+            background: #f5e2cf;
+            font-weight: 700;
+            color: #2b1e16;
+        }
+        .export-root {
+            width: 900px;
+            padding: 24px;
+            background: #fff7ef;
+        }
+    `;
+}
+
+function buildExportContentHtml({ titleText, periodText, generatedAt, headingLabel, tableHtml }) {
+    return `
+    <header class="report-print-header">
+        <h1 class="report-print-title">${escapeHtml(titleText)}</h1>
+        <p class="report-print-subtitle">${escapeHtml(periodText)}</p>
+    </header>
+    <div class="report-print-meta">
+        <span>${escapeHtml(headingLabel)}</span>
+        <span>Dibuat: ${escapeHtml(generatedAt)}</span>
+    </div>
+    <div class="report-table-wrap">
+        ${tableHtml}
+    </div>
+    `;
+}
+
+function buildExportElement({ titleText, periodText, headers, bodyRows, totalText, headingLabel }) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'export-root';
+    wrapper.style.position = 'fixed';
+    wrapper.style.left = '-10000px';
+    wrapper.style.top = '0';
+    wrapper.style.zIndex = '-1';
+    wrapper.style.background = '#fff7ef';
+
+    const styleTag = document.createElement('style');
+    styleTag.textContent = buildExportStyles();
+
+    const tableHtml = buildExportTableHtml(headers, bodyRows, totalText);
+    const contentHtml = buildExportContentHtml({
+        titleText,
+        periodText,
+        generatedAt: new Date().toLocaleString('id-ID'),
+        headingLabel,
+        tableHtml
+    });
+
+    const contentWrapper = document.createElement('div');
+    contentWrapper.innerHTML = contentHtml;
+
+    wrapper.appendChild(styleTag);
+    wrapper.appendChild(contentWrapper);
+    document.body.appendChild(wrapper);
+
+    return wrapper;
 }
 
 function convertToCsvRow(rowData) {
@@ -1156,6 +1591,42 @@ function downloadBlob(blob, filename) {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+}
+
+function ensureXlsxLoaded() {
+    return new Promise((resolve, reject) => {
+        if (window.XLSX) {
+            resolve(window.XLSX);
+            return;
+        }
+
+        const existingScript = document.querySelector('script[data-lib="xlsx"]');
+        if (existingScript) {
+            existingScript.addEventListener('load', () => {
+                if (window.XLSX) {
+                    resolve(window.XLSX);
+                } else {
+                    reject(new Error('XLSX loaded but unavailable in window scope'));
+                }
+            });
+            existingScript.addEventListener('error', () => reject(new Error('Failed to load XLSX script')));
+            return;
+        }
+
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+        script.async = true;
+        script.setAttribute('data-lib', 'xlsx');
+        script.onload = () => {
+            if (window.XLSX) {
+                resolve(window.XLSX);
+                return;
+            }
+            reject(new Error('XLSX loaded but unavailable in window scope'));
+        };
+        script.onerror = () => reject(new Error('Failed to load XLSX script'));
+        document.head.appendChild(script);
+    });
 }
 
 function ensureJsPdfLoaded() {
@@ -1191,6 +1662,78 @@ function ensureJsPdfLoaded() {
             reject(new Error('jsPDF loaded but unavailable in window scope'));
         };
         script.onerror = () => reject(new Error('Failed to load jsPDF script'));
+        document.head.appendChild(script);
+    });
+}
+
+function ensureHtml2CanvasLoaded() {
+    return new Promise((resolve, reject) => {
+        if (window.html2canvas) {
+            resolve(window.html2canvas);
+            return;
+        }
+
+        const existingScript = document.querySelector('script[data-lib="html2canvas"]');
+        if (existingScript) {
+            existingScript.addEventListener('load', () => {
+                if (window.html2canvas) {
+                    resolve(window.html2canvas);
+                } else {
+                    reject(new Error('html2canvas loaded but unavailable in window scope'));
+                }
+            });
+            existingScript.addEventListener('error', () => reject(new Error('Failed to load html2canvas script')));
+            return;
+        }
+
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+        script.async = true;
+        script.setAttribute('data-lib', 'html2canvas');
+        script.onload = () => {
+            if (window.html2canvas) {
+                resolve(window.html2canvas);
+                return;
+            }
+            reject(new Error('html2canvas loaded but unavailable in window scope'));
+        };
+        script.onerror = () => reject(new Error('Failed to load html2canvas script'));
+        document.head.appendChild(script);
+    });
+}
+
+function ensureExcelJsLoaded() {
+    return new Promise((resolve, reject) => {
+        if (window.ExcelJS) {
+            resolve(window.ExcelJS);
+            return;
+        }
+
+        const existingScript = document.querySelector('script[data-lib="exceljs"]');
+        if (existingScript) {
+            existingScript.addEventListener('load', () => {
+                if (window.ExcelJS) {
+                    resolve(window.ExcelJS);
+                } else {
+                    reject(new Error('ExcelJS loaded but unavailable in window scope'));
+                }
+            });
+            existingScript.addEventListener('error', () => reject(new Error('Failed to load ExcelJS script')));
+            return;
+        }
+
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js';
+        script.async = true;
+        script.setAttribute('data-lib', 'exceljs');
+        script.onload = () => {
+            if (window.ExcelJS) {
+                resolve(window.ExcelJS);
+                return;
+            }
+            reject(new Error('ExcelJS loaded but unavailable in window scope'));
+        };
+        script.onerror = () => reject(new Error('Failed to load ExcelJS script'));
         document.head.appendChild(script);
     });
 }
@@ -1339,6 +1882,13 @@ function escapeHtml(value) {
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
 }
+
+    function stripHtml(value) {
+        return String(value || '')
+        .replace(/<[^>]*>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
 
 function showReportMessage(message, type = 'info') {
     if (typeof window.showNotification === 'function') {

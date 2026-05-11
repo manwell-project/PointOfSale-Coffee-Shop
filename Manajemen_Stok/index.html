@@ -27,16 +27,16 @@
     <link rel="stylesheet" href="../css/tablet.css">
     
     <!-- Page Specific CSS -->
-    <link rel="stylesheet" href="css/stock-layout.css">
+    <link rel="stylesheet" href="css/stock-layout.css?v=20260506-1">
     <link rel="stylesheet" href="../css/shared-ui.css">
     
     <!-- Page Adjustments - MUST BE LAST to override local CSS -->
-    <link rel="stylesheet" href="../css/components/page-adjustments.css?v=1769015876">
+    <link rel="stylesheet" href="../css/components/page-adjustments.css?v=20260510-1">
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
-<body>
+<body class="no-top-navbar">
     <!-- Top Navigation Bar will be injected by top-navbar.js -->
     <!-- Stock Wrapper -->
         <div class="stock-wrapper">
@@ -51,6 +51,47 @@
                         <p class="stock-subtitle">Kelola inventori dan stok produk</p>
                     </div>
                     <div class="stock-header-actions">
+                        <button class="btn-export" id="historyBtn" type="button" onclick="window.location.href='riwayat.html'">
+                            <i class="fas fa-clock-rotate-left"></i>
+                            Riwayat
+                        </button>
+
+                        <!-- Alerts toggle (opens notification window) -->
+                        <div class="alerts-popover" id="alertsPopover">
+                            <button class="btn-export btn-alerts-toggle" id="alertsToggleBtn" type="button" aria-haspopup="true" aria-expanded="false" title="Notifikasi Stok">
+                                <i class="fas fa-bell"></i>
+                                <span class="alerts-badge" id="alertsBadge">0</span>
+                            </button>
+
+                            <!-- Stock Alert Widget (popover window) -->
+                            <div class="stock-alerts-widget" id="alertsWidget" style="display: none;">
+                                <div class="alerts-header">
+                                    <h3 class="alerts-title">
+                                        <i class="fas fa-bell"></i>
+                                        Notifikasi Stok
+                                        <span class="alerts-badge" id="alertsBadgeWidget">0</span>
+                                    </h3>
+                                    <div class="alerts-actions">
+                                        <button class="btn-alert-filter active" data-filter="all">Semua</button>
+                                        <button class="btn-alert-filter" data-filter="critical">Kritis</button>
+                                        <button class="btn-alert-filter" data-filter="warning">Peringatan</button>
+                                    </div>
+                                </div>
+                                <div class="alerts-list" id="alertsList">
+                                    <!-- Alerts will be rendered here -->
+                                </div>
+                                <div class="alerts-footer">
+                                    <a class="btn-view-all" id="viewAllAlerts" href="notifikasi.html">
+                                        Lihat Semua
+                                        <i class="fas fa-arrow-right"></i>
+                                    </a>
+                                    <button class="btn-mark-read" id="markAllRead">
+                                        Tandai Sudah Dibaca
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
                         <button class="btn-export" id="exportBtn">
                             <i class="fas fa-download"></i>
                             Export
@@ -58,6 +99,10 @@
                         <button class="btn-add-stock" id="addStockBtn">
                             <i class="fas fa-plus"></i>
                             Tambah Stok
+                        </button>
+                        <button class="btn-export" id="stockOutBtn" type="button">
+                            <i class="fas fa-arrow-up"></i>
+                            Barang Keluar
                         </button>
                     </div>
                 </div>
@@ -103,34 +148,6 @@
                             <div class="stat-value" id="totalStockQty">0</div>
                             <div class="stat-change">Total unit</div>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Stock Alert Widget -->
-                <div class="stock-alerts-widget" id="alertsWidget" style="display: none;">
-                    <div class="alerts-header">
-                        <h3 class="alerts-title">
-                            <i class="fas fa-bell"></i>
-                            Notifikasi Stok
-                            <span class="alerts-badge" id="alertsBadge">0</span>
-                        </h3>
-                        <div class="alerts-actions">
-                            <button class="btn-alert-filter active" data-filter="all">Semua</button>
-                            <button class="btn-alert-filter" data-filter="critical">Kritis</button>
-                            <button class="btn-alert-filter" data-filter="warning">Peringatan</button>
-                        </div>
-                    </div>
-                    <div class="alerts-list" id="alertsList">
-                        <!-- Alerts will be rendered here -->
-                    </div>
-                    <div class="alerts-footer">
-                        <a href="#" class="btn-view-all" id="viewAllAlerts">
-                            Lihat Semua
-                            <i class="fas fa-arrow-right"></i>
-                        </a>
-                        <button class="btn-mark-read" id="markAllRead">
-                            Tandai Sudah Dibaca
-                        </button>
                     </div>
                 </div>
 
@@ -213,30 +230,6 @@
                 </div>
             </div>
         </div>
-
-    <!-- Bottom Navigation Bar -->
-    <nav class="bottom-nav">
-        <a href="../Dashboard/index.html" class="nav-item">
-            <i class="fas fa-home"></i>
-            <span>Dashboard</span>
-        </a>
-        <a href="../Transaksi/index.html" class="nav-item">
-            <i class="fas fa-shopping-cart"></i>
-            <span>Transaksi</span>
-        </a>
-        <a href="../Manajemen_Stok/index.html" class="nav-item active">
-            <i class="fas fa-boxes"></i>
-            <span>Stok</span>
-        </a>
-        <a href="../Manajemen_Pelanggan/index.html" class="nav-item">
-            <i class="fas fa-users"></i>
-            <span>Pelanggan</span>
-        </a>
-        <a href="../Manajemen_Laporan/index.html" class="nav-item">
-            <i class="fas fa-chart-bar"></i>
-            <span>Laporan</span>
-        </a>
-    </nav>
 
     <!-- Add/Edit Stock Modal -->
     <div class="stock-modal-overlay" id="stockModal">
@@ -415,16 +408,114 @@
         </div>
     </div>
 
+    <!-- Stock Out Modal (Barang Keluar) -->
+    <div class="stock-modal-overlay" id="stockOutModal">
+        <div class="stock-modal">
+            <div class="modal-header">
+                <div>
+                    <h2 class="modal-title" id="stockOutModalTitle">
+                        <i class="fas fa-arrow-up"></i>
+                        Barang Keluar
+                    </h2>
+                    <p class="modal-subtitle" id="stockOutModalSubtitle">Kurangi stok dari barang yang sudah ada</p>
+                </div>
+                <button class="btn-close-modal" id="stockOutCloseModalBtn" type="button">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <form id="stockOutForm" class="stock-form">
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-box"></i>
+                            Pilih Barang
+                        </h3>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Barang <span class="required">*</span>
+                                </label>
+                                <select class="form-select" id="stockOutStockId" required>
+                                    <option value="" selected disabled>Memuat daftar barang...</option>
+                                </select>
+                                <span class="form-hint">Daftar diambil dari stok yang sudah ada</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Stok Saat Ini</label>
+                                <div class="input-with-unit">
+                                    <input type="number" class="form-input" id="stockOutCurrentQty" readonly value="0">
+                                    <span class="input-unit">Unit</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-divider"></div>
+
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-arrow-up"></i>
+                            Informasi Barang Keluar
+                        </h3>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Jumlah Keluar <span class="required">*</span>
+                                </label>
+                                <div class="input-with-unit">
+                                    <input type="number" class="form-input" id="stockOutQty" required min="1" value="1">
+                                    <span class="input-unit">Unit</span>
+                                </div>
+                                <span class="form-hint">Tidak boleh melebihi stok saat ini</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">ID Karyawan (Opsional)</label>
+                                <div class="input-with-icon">
+                                    <i class="fas fa-user"></i>
+                                    <input type="number" class="form-input" id="stockOutEmployeeId" min="1" placeholder="Contoh: 1">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row single">
+                            <div class="form-group">
+                                <label class="form-label">Alasan (Opsional)</label>
+                                <div class="input-with-icon">
+                                    <i class="fas fa-note-sticky"></i>
+                                    <input type="text" class="form-input" id="stockOutReason" placeholder="Contoh: Pemakaian harian / Rusak / Retur">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <div class="modal-footer-left"></div>
+                <div class="modal-footer-right">
+                    <button type="button" class="btn-modal btn-modal-cancel" id="stockOutCancelBtn">Batal</button>
+                    <button type="submit" form="stockOutForm" class="btn-modal btn-modal-save" id="stockOutSaveBtn">
+                        <i class="fas fa-check"></i>
+                        Simpan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Performance Optimizations -->
     <script src="../js/performance.js" defer></script>
     <script src="../js/performance-utilities.js" defer></script>
     <script src="../js/cache.js" defer></script>
     
     <script src="../js/auth.js?v=1769014084"></script>
-    <script src="../js/api-helper.js?v=1769014084"></script>
-    <script src="../js/top-navbar.js?v=1769014084"></script>
-    <script src="../js/sidebar-nav.js?v=1769020001"></script>
-    <script src="../js/navbar.js?v=1769014084"></script>
-    <script src="stock-manager.js?v=1769014084"></script>
+    <script src="../js/api-helper.js?v=1769014085"></script>
+    <script src="../js/top-navbar.js?v=20260510-1"></script>
+    <script src="../js/sidebar-nav.js?v=20260510-1"></script>
+    <script src="../js/navbar.js?v=20260510-1"></script>
+    <script src="stock-manager.js?v=20260506-1"></script>
 </body>
 </html>

@@ -714,6 +714,7 @@ body {
   color: #94a3b8;
 }
 
+
 /* Purchases Cell */
 .customer-purchases {
   font-weight: var(--font-weight-semibold);
@@ -834,6 +835,19 @@ body {
   color: #ffffff;
   transform: translateY(-2px);
   box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+}
+
+/* WhatsApp action button (in actions column) */
+.btn-action.wa {
+  background: #25d366;
+  color: #ffffff;
+}
+
+.btn-action.wa:hover {
+  background: #1ebe57;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(37, 211, 102, 0.25);
 }
 
 /* Pagination */

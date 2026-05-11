@@ -9,22 +9,38 @@ let currentPage = 1;
 let itemsPerPage = 10;
 let currentSort = { field: 'name', direction: 'asc' };
 let currentFilters = { search: '', category: '', status: '' };
+let isLoadingStocks = false;
+
+// Alerts state
+let currentAlerts = [];
+let currentAlertFilter = 'all';
+let readAlertKeys = new Set();
+const ALERTS_READ_STORAGE_KEY = 'digicaf.stockAlerts.readKeys';
 
 // DOM Elements
 const stockModal = document.getElementById('stockModal');
 const stockForm = document.getElementById('stockForm');
+const stockOutModal = document.getElementById('stockOutModal');
+const stockOutForm = document.getElementById('stockOutForm');
+const stockOutSelect = document.getElementById('stockOutStockId');
+const stockOutCurrentQtyInput = document.getElementById('stockOutCurrentQty');
+const stockOutQtyInput = document.getElementById('stockOutQty');
+const stockOutReasonInput = document.getElementById('stockOutReason');
+const stockOutEmployeeIdInput = document.getElementById('stockOutEmployeeId');
 const searchInput = document.getElementById('searchStockInput');
 const categoryFilter = document.getElementById('categoryFilter');
 const statusFilter = document.getElementById('statusFilter');
 const stockTableBody = document.getElementById('stockTableBody');
 const alertsWidget = document.getElementById('alertsWidget');
 const alertsList = document.getElementById('alertsList');
+const alertsPopover = document.getElementById('alertsPopover');
+const alertsToggleBtn = document.getElementById('alertsToggleBtn');
 
 // Initialize
 async function init() {
-    await loadStocks();
     setupEventListeners();
     setupSortableColumns();
+    await loadStocks();
 }
 
 function setupEventListeners() {
@@ -33,6 +49,38 @@ function setupEventListeners() {
     document.getElementById('closeModalBtn').addEventListener('click', closeModal);
     document.getElementById('cancelBtn').addEventListener('click', closeModal);
     stockForm.addEventListener('submit', saveStock);
+
+    // Stock out (Barang Keluar)
+    const stockOutBtn = document.getElementById('stockOutBtn');
+    if (stockOutBtn) {
+        stockOutBtn.addEventListener('click', () => {
+            openStockOutModal().catch((err) => {
+                showNotification('Gagal membuka form barang keluar: ' + (err?.message || err), 'error');
+            });
+        });
+    }
+    const stockOutCloseBtn = document.getElementById('stockOutCloseModalBtn');
+    if (stockOutCloseBtn) {
+        stockOutCloseBtn.addEventListener('click', closeStockOutModal);
+    }
+    const stockOutCancelBtn = document.getElementById('stockOutCancelBtn');
+    if (stockOutCancelBtn) {
+        stockOutCancelBtn.addEventListener('click', closeStockOutModal);
+    }
+    if (stockOutForm) {
+        stockOutForm.addEventListener('submit', saveStockOut);
+    }
+    if (stockOutSelect) {
+        stockOutSelect.addEventListener('change', syncStockOutSelection);
+    }
+
+    // History page
+    const historyBtn = document.getElementById('historyBtn');
+    if (historyBtn) {
+        historyBtn.addEventListener('click', () => {
+            window.location.href = 'riwayat.html';
+        });
+    }
     
     // Filters
     searchInput.addEventListener('input', debounce(() => {
@@ -58,6 +106,12 @@ function setupEventListeners() {
         if (e.target === stockModal) closeModal();
     });
 
+    if (stockOutModal) {
+        stockOutModal.addEventListener('click', (e) => {
+            if (e.target === stockOutModal) closeStockOutModal();
+        });
+    }
+
     // Export button
     document.getElementById('exportBtn').addEventListener('click', exportData);
 
@@ -69,6 +123,195 @@ function setupEventListeners() {
             filterAlerts(this.dataset.filter);
         });
     });
+
+    // Alerts popover toggle
+    if (alertsToggleBtn && alertsWidget) {
+        alertsToggleBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleAlertsPopover();
+        });
+    }
+
+    // Close popover when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!alertsWidget || !alertsPopover) return;
+        if (!alertsWidget.classList.contains('open')) return;
+        if (alertsPopover.contains(e.target)) return;
+        closeAlertsPopover();
+    });
+
+    const markAllReadBtn = document.getElementById('markAllRead');
+    if (markAllReadBtn) {
+        markAllReadBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            markAllAlertsRead();
+        });
+    }
+
+    // 'Lihat Semua' removed (popover is already scrollable)
+
+    // Mark individual alert as read when clicked (event delegation)
+    if (alertsList) {
+        alertsList.addEventListener('click', (e) => {
+            const alertItem = e.target.closest('.alert-item');
+            if (!alertItem) return;
+            const key = alertItem.dataset.alertKey;
+            if (!key) return;
+            markAlertReadByKey(key);
+        });
+    }
+}
+
+async function openStockOutModal(prefillStockId = null) {
+    if (!stockOutModal || !stockOutForm || !stockOutSelect) return;
+
+    // Open first so user sees something even if loading
+    stockOutModal.classList.add('active');
+
+    stockOutForm.reset();
+    setStockOutSelectLoading();
+    setStockOutSaveEnabled(false);
+
+    // Ensure stocks are loaded (do not block UI interactions)
+    if ((!stocks || !stocks.length) && !isLoadingStocks) {
+        try {
+            await loadStocks();
+        } catch {
+            // loadStocks already shows notification/table state
+        }
+    }
+
+    populateStockOutOptions(stocks || [], prefillStockId);
+    syncStockOutSelection();
+}
+
+function closeStockOutModal() {
+    if (!stockOutModal) return;
+    stockOutModal.classList.remove('active');
+}
+
+function populateStockOutOptions(selectableStocks, prefillStockId = null) {
+    if (!stockOutSelect) return;
+
+    const items = Array.isArray(selectableStocks) ? selectableStocks : [];
+    if (!items.length) {
+        stockOutSelect.innerHTML = '<option value="" disabled selected>Tidak ada data stok</option>';
+        return;
+    }
+
+    const optionsHtml = ['<option value="" disabled selected>Pilih barang...</option>'];
+
+    items
+        .slice()
+        .sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'id'))
+        .forEach((s) => {
+            const id = Number(s.id);
+            if (!Number.isFinite(id)) return;
+            const qty = Number(s.quantity) || 0;
+            const name = escapeHtml(String(s.name || ''));
+            const disabled = qty <= 0 ? 'disabled' : '';
+            optionsHtml.push(`<option value="${id}" ${disabled}>${name} (stok: ${qty})</option>`);
+        });
+
+    stockOutSelect.innerHTML = optionsHtml.join('');
+
+    if (prefillStockId !== null && prefillStockId !== undefined && prefillStockId !== '') {
+        const targetId = String(prefillStockId);
+        try {
+            const opt = stockOutSelect.querySelector(`option[value="${CSS.escape(targetId)}"]`);
+            if (opt && !opt.disabled) {
+                stockOutSelect.value = targetId;
+            }
+        } catch {
+            // ignore CSS.escape issues
+        }
+    }
+}
+
+function syncStockOutSelection() {
+    if (!stockOutSelect || !stockOutCurrentQtyInput || !stockOutQtyInput) return;
+
+    const selectedId = Number(stockOutSelect.value);
+    const stock = (stocks || []).find(s => Number(s.id) === selectedId);
+    const currentQty = Number(stock?.quantity) || 0;
+
+    stockOutCurrentQtyInput.value = currentQty;
+    stockOutQtyInput.max = String(Math.max(currentQty, 1));
+
+    // If current input exceeds stock, clamp it
+    const outQty = Number(stockOutQtyInput.value) || 1;
+    if (outQty > currentQty && currentQty > 0) {
+        stockOutQtyInput.value = String(currentQty);
+    }
+
+    if (!Number.isFinite(selectedId)) {
+        setStockOutSaveEnabled(false);
+        return;
+    }
+
+    if (currentQty <= 0) {
+        stockOutQtyInput.value = '1';
+        setStockOutSaveEnabled(false);
+        return;
+    }
+
+    setStockOutSaveEnabled(true);
+}
+
+function setStockOutSaveEnabled(enabled) {
+    const btn = document.getElementById('stockOutSaveBtn');
+    if (!btn) return;
+    btn.disabled = !enabled;
+}
+
+function setStockOutSelectLoading() {
+    if (!stockOutSelect) return;
+    stockOutSelect.innerHTML = '<option value="" disabled selected>Memuat daftar barang...</option>';
+}
+
+async function saveStockOut(e) {
+    e.preventDefault();
+
+    if (!stockOutSelect || !stockOutQtyInput) return;
+
+    const stockId = Number(stockOutSelect.value);
+    if (!Number.isFinite(stockId)) {
+        showNotification('Pilih barang terlebih dahulu', 'error');
+        return;
+    }
+
+    const stock = (stocks || []).find(s => Number(s.id) === stockId);
+    const currentQty = Number(stock?.quantity) || 0;
+    const outQty = Math.trunc(Number(stockOutQtyInput.value));
+
+    if (!Number.isFinite(outQty) || outQty <= 0) {
+        showNotification('Jumlah keluar harus lebih dari 0', 'error');
+        return;
+    }
+    if (outQty > currentQty) {
+        showNotification('Jumlah keluar melebihi stok saat ini', 'error');
+        return;
+    }
+
+    const newQty = currentQty - outQty;
+    const reasonRaw = stockOutReasonInput ? String(stockOutReasonInput.value || '').trim() : '';
+    const employeeIdRaw = stockOutEmployeeIdInput ? String(stockOutEmployeeIdInput.value || '').trim() : '';
+    const employeeIdNum = employeeIdRaw ? Number(employeeIdRaw) : undefined;
+    const payload = {
+        quantity: newQty,
+        change_reason: reasonRaw || 'Barang keluar',
+        employee_id: Number.isFinite(employeeIdNum) && employeeIdNum > 0 ? employeeIdNum : undefined
+    };
+
+    try {
+        await window.API.Stocks.update(stockId, payload);
+        showNotification('Barang keluar berhasil disimpan', 'success');
+        closeStockOutModal();
+        await loadStocks();
+    } catch (err) {
+        showNotification('Gagal menyimpan barang keluar: ' + (err.message || err), 'error');
+    }
 }
 
 function setupSortableColumns() {
@@ -94,6 +337,7 @@ function setupSortableColumns() {
 }
 
 async function loadStocks() {
+    isLoadingStocks = true;
     try {
         stocks = await window.API.Stocks.getAll();
         updateStats();
@@ -112,6 +356,8 @@ async function loadStocks() {
                 </td>
             </tr>
         `;
+    } finally {
+        isLoadingStocks = false;
     }
 }
 
@@ -308,49 +554,73 @@ function renderAlerts() {
     const totalAlerts = criticalStocks.length + warningStocks.length;
     
     if (totalAlerts === 0) {
-        alertsWidget.style.display = 'none';
+        if (alertsWidget) {
+            alertsWidget.style.display = 'none';
+            alertsWidget.classList.remove('open', 'expanded');
+        }
+        if (alertsToggleBtn) {
+            alertsToggleBtn.style.display = 'none';
+            alertsToggleBtn.setAttribute('aria-expanded', 'false');
+        }
         return;
     }
 
-    alertsWidget.style.display = 'block';
-    document.getElementById('alertsBadge').textContent = totalAlerts;
+    if (alertsToggleBtn) {
+        alertsToggleBtn.style.display = '';
+    }
+
+    // Widget is shown/hidden via popover toggle, but keep it in the DOM when alerts exist
+    if (alertsWidget) {
+        alertsWidget.style.display = 'block';
+    }
+
+    updateAlertBadges();
 
     const alerts = [
         ...criticalStocks.map(s => ({ ...s, type: 'critical', message: 'Stok habis, segera lakukan restock' })),
         ...warningStocks.map(s => ({ ...s, type: 'warning', message: 'Stok mendekati batas minimum' }))
     ];
 
-    alertsList.innerHTML = alerts.slice(0, 5).map(alert => `
-        <div class="alert-item ${alert.type}">
-            <div class="alert-item-icon">
-                <i class="fas fa-${alert.type === 'critical' ? 'times-circle' : 'exclamation-triangle'}"></i>
-                <span class="priority-dot"></span>
-            </div>
-            <div class="alert-item-content">
-                <div class="alert-item-header">
-                    <div class="alert-item-title">${escapeHtml(alert.name)}</div>
-                    <div class="alert-item-time">${getTimeAgo(alert.updated_at || alert.created_at)}</div>
-                </div>
-                <div class="alert-item-message">${alert.message}</div>
-                <div class="alert-item-details">
-                    <div class="alert-detail">
-                        <i class="fas fa-box"></i>
-                        Stok: <strong>${alert.quantity || 0} unit</strong>
-                    </div>
-                    <div class="alert-detail">
-                        <i class="fas fa-chart-line"></i>
-                        Min: <strong>${alert.min_stock !== undefined ? alert.min_stock : (alert.minStock || 0)} unit</strong>
-                    </div>
-                </div>
-                <div class="alert-item-actions">
-                    <button class="btn-alert-action primary" onclick="openModal(${alert.id})">
-                        <i class="fas fa-edit"></i>
-                        Edit Stok
-                    </button>
-                </div>
-            </div>
-        </div>
-    `).join('');
+    currentAlerts = alerts;
+    renderAlertsList();
+}
+
+function updateAlertBadges() {
+    const unreadCount = (currentAlerts || []).filter(a => !readAlertKeys.has(getAlertKey(a))).length;
+
+    const badgeTop = document.getElementById('alertsBadge');
+    if (badgeTop) {
+        badgeTop.textContent = unreadCount;
+        badgeTop.style.display = unreadCount > 0 ? '' : 'none';
+    }
+
+    const badgeWidget = document.getElementById('alertsBadgeWidget');
+    if (badgeWidget) {
+        badgeWidget.textContent = unreadCount;
+        badgeWidget.style.display = unreadCount > 0 ? '' : 'none';
+    }
+}
+
+function toggleAlertsPopover() {
+    if (!alertsWidget || !alertsToggleBtn) return;
+    const willOpen = !alertsWidget.classList.contains('open');
+    if (willOpen) {
+        openAlertsPopover();
+    } else {
+        closeAlertsPopover();
+    }
+}
+
+function openAlertsPopover() {
+    if (!alertsWidget || !alertsToggleBtn) return;
+    alertsWidget.classList.add('open');
+    alertsToggleBtn.setAttribute('aria-expanded', 'true');
+}
+
+function closeAlertsPopover() {
+    if (!alertsWidget || !alertsToggleBtn) return;
+    alertsWidget.classList.remove('open');
+    alertsToggleBtn.setAttribute('aria-expanded', 'false');
 }
 
 function updatePagination(totalItems) {
@@ -613,12 +883,115 @@ function showNotification(message, type = 'info') {
 }
 
 function filterAlerts(filter) {
-    // Placeholder for alert filtering
-    console.log('Filter alerts:', filter);
+    currentAlertFilter = filter || 'all';
+    renderAlertsList();
+}
+
+function loadReadAlertKeys() {
+    try {
+        const raw = localStorage.getItem(ALERTS_READ_STORAGE_KEY);
+        if (!raw) return new Set();
+        const arr = JSON.parse(raw);
+        if (!Array.isArray(arr)) return new Set();
+        return new Set(arr.filter(Boolean));
+    } catch {
+        return new Set();
+    }
+}
+
+function saveReadAlertKeys() {
+    try {
+        localStorage.setItem(ALERTS_READ_STORAGE_KEY, JSON.stringify(Array.from(readAlertKeys)));
+    } catch {
+        // ignore storage failures (private mode / quota)
+    }
+}
+
+function getAlertKey(alert) {
+    return `${alert.type}:${alert.id}`;
+}
+
+function markAlertReadByKey(key) {
+    if (!key) return;
+    if (readAlertKeys.has(key)) return;
+    readAlertKeys.add(key);
+    saveReadAlertKeys();
+    renderAlertsList();
+    updateAlertBadges();
+}
+
+function markAllAlertsRead() {
+    currentAlerts.forEach(a => readAlertKeys.add(getAlertKey(a)));
+    saveReadAlertKeys();
+    renderAlertsList();
+    updateAlertBadges();
+    showNotification('Semua notifikasi ditandai sudah dibaca', 'success');
+}
+
+function renderAlertsList() {
+    if (!alertsList) return;
+
+    let filtered = currentAlerts;
+    if (currentAlertFilter && currentAlertFilter !== 'all') {
+        filtered = currentAlerts.filter(a => a.type === currentAlertFilter);
+    }
+
+    // Keep compact behavior (first 5)
+    const visibleAlerts = filtered.slice(0, 5);
+
+    if (visibleAlerts.length === 0) {
+        alertsList.innerHTML = `
+            <div class="alerts-empty">
+                <div class="empty-alert-icon"><i class="fas fa-bell-slash"></i></div>
+                <div class="empty-alert-title">Tidak ada notifikasi</div>
+                <div class="empty-alert-text">Coba pilih filter lain</div>
+            </div>
+        `;
+        return;
+    }
+
+    alertsList.innerHTML = visibleAlerts.map(alert => {
+        const key = getAlertKey(alert);
+        const isUnread = !readAlertKeys.has(key);
+        return `
+            <div class="alert-item ${alert.type}${isUnread ? ' unread' : ''}" data-alert-key="${key}">
+                <div class="alert-item-icon">
+                    <i class="fas fa-${alert.type === 'critical' ? 'times-circle' : 'exclamation-triangle'}"></i>
+                    <span class="priority-dot"></span>
+                </div>
+                <div class="alert-item-content">
+                    <div class="alert-item-header">
+                        <div class="alert-item-title">${escapeHtml(alert.name)}</div>
+                        <div class="alert-item-time">${getTimeAgo(alert.updated_at || alert.created_at)}</div>
+                    </div>
+                    <div class="alert-item-message">${alert.message}</div>
+                    <div class="alert-item-details">
+                        <div class="alert-detail">
+                            <i class="fas fa-box"></i>
+                            Stok: <strong>${alert.quantity || 0} unit</strong>
+                        </div>
+                        <div class="alert-detail">
+                            <i class="fas fa-chart-line"></i>
+                            Min: <strong>${alert.min_stock !== undefined ? alert.min_stock : (alert.minStock || 0)} unit</strong>
+                        </div>
+                    </div>
+                    <div class="alert-item-actions">
+                        <button class="btn-alert-action primary" onclick="openModal(${alert.id})">
+                            <i class="fas fa-edit"></i>
+                            Edit Stok
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    updateAlertBadges();
 }
 
 // Initialize on load
 document.addEventListener('DOMContentLoaded', () => {
+    readAlertKeys = loadReadAlertKeys();
     init();
     // Refresh every 30 seconds
     setInterval(loadStocks, 30000);

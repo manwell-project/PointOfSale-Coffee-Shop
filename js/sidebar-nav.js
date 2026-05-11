@@ -12,13 +12,20 @@
     activeClass: 'active',
     collapsedClass: 'collapsed',
     openClass: 'open',
-    mobileBreakpoint: 1024, // Sidebar ONLY shows on desktop (>1024px)
+    mobileBreakpoint: 767, // Sidebar shows on tablet and larger
+    notificationCheckInterval: 60000
   };
+
+  // Set global opt-out flag for top navbar so pages can hide it by default
+  if (typeof window !== 'undefined') {
+    window.__DIGICAF_HIDE_TOP_NAVBAR = true;
+  }
 
   // State
   let currentUser = null;
   let isCollapsed = false;
   let isMobile = false;
+  let notifications = [];
 
   /**
    * Initialize Sidebar Navigation
@@ -35,12 +42,21 @@
     
     // Inject sidebar HTML
     injectSidebarHTML();
+
+    // This app uses the left sidebar as primary navigation.
+    // Ensure bottom navigation is disabled/removed on all viewports.
+    try {
+      document.body.classList.add('no-bottom-nav');
+      document.querySelectorAll('.bottom-nav').forEach(el => el.remove());
+    } catch (e) {}
     
     // Setup event listeners
     setupEventListeners();
     
     // Set active menu item
     setActiveMenuItem();
+
+    initializeNotificationsMenu();
     
     // Apply body class for content offset
     if (!isMobile) {
@@ -221,6 +237,12 @@
             key: 'stock'
           },
           {
+            icon: 'fas fa-utensils',
+            text: 'Kelola Menu',
+            url: '../Kelola Menu/index.html',
+            key: 'manage_menu'
+          },
+          {
             icon: 'fas fa-users',
             text: 'Karyawan',
             url: '../Manajemen_Karyawan/index.html',
@@ -237,6 +259,17 @@
             text: 'Diskon',
             url: '../Manajemen_Diskon/index.html',
             key: 'discounts'
+          }
+        ]
+      },
+      {
+        section: 'Transaksi',
+        items: [
+          {
+            icon: 'fas fa-history',
+            text: 'Riwayat Transaksi',
+            url: '../Riwayat_Transaksi/index.html',
+            key: 'history'
           }
         ]
       },
@@ -424,6 +457,100 @@
         console.error('[Sidebar] Error processing link:', err);
       }
     });
+  }
+
+  function initializeNotificationsMenu() {
+    const menuLink = document.querySelector('.sidebar-menu-link[data-key="notifications"]');
+    if (!menuLink) return;
+
+    const submenu = menuLink.parentElement?.querySelector('.sidebar-submenu');
+    if (!submenu) return;
+
+    submenu.addEventListener('click', (event) => {
+      const item = event.target.closest('.sidebar-notification-item');
+      if (!item) return;
+      event.preventDefault();
+      markNotificationAsRead(item.dataset.notificationId);
+    });
+
+    loadNotifications(submenu, menuLink);
+    setInterval(() => loadNotifications(submenu, menuLink), CONFIG.notificationCheckInterval);
+  }
+
+  async function loadNotifications(submenu, menuLink) {
+    try {
+      notifications = await getNotifications();
+      renderNotifications(submenu, menuLink);
+    } catch (err) {
+      console.error('[Sidebar] Error loading notifications:', err);
+    }
+  }
+
+  function renderNotifications(submenu, menuLink) {
+    const unreadCount = notifications.filter(n => !n.read).length;
+    const badge = menuLink.querySelector('.sidebar-menu-badge');
+
+    if (badge) {
+      if (unreadCount > 0) {
+        badge.textContent = unreadCount > 99 ? '99+' : String(unreadCount);
+        badge.style.display = 'inline-flex';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+
+    if (notifications.length === 0) {
+      submenu.innerHTML = '<div class="sidebar-submenu-empty">Tidak ada notifikasi</div>';
+      return;
+    }
+
+    submenu.innerHTML = notifications.map((n) => `
+      <a href="#" class="sidebar-submenu-link sidebar-notification-item ${n.read ? '' : 'unread'}" data-notification-id="${n.id}">
+        <span class="sidebar-notification-title">${escapeHtml(n.title)}</span>
+        <span class="sidebar-notification-message">${escapeHtml(n.message)}</span>
+        <span class="sidebar-notification-time">${escapeHtml(n.time)}</span>
+      </a>
+    `).join('');
+  }
+
+  async function getNotifications() {
+    return [
+      {
+        id: '1',
+        title: 'Stok Rendah',
+        message: 'Kopi Arabica tersisa 5 unit',
+        time: '5 menit yang lalu',
+        read: false
+      },
+      {
+        id: '2',
+        title: 'Transaksi Baru',
+        message: 'Transaksi #1234 berhasil diselesaikan',
+        time: '15 menit yang lalu',
+        read: true
+      }
+    ];
+  }
+
+  function markNotificationAsRead(notificationId) {
+    const notif = notifications.find(n => n.id === notificationId);
+    if (!notif) return;
+    notif.read = true;
+    const menuLink = document.querySelector('.sidebar-menu-link[data-key="notifications"]');
+    const submenu = menuLink?.parentElement?.querySelector('.sidebar-submenu');
+    if (submenu && menuLink) {
+      renderNotifications(submenu, menuLink);
+    }
+  }
+
+  function escapeHtml(value) {
+    if (!value) return '';
+    return String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   /**

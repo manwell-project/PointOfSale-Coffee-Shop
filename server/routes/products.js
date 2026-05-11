@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const { dbHelpers } = require('../db/connection');
+const path = require('path');
+const fs = require('fs');
 
 // GET all products
 router.get('/', async (req, res, next) => {
@@ -134,3 +136,44 @@ router.delete('/:id', async (req, res, next) => {
 });
 
 module.exports = router;
+
+// New endpoint: upload product image (accepts base64 data or image URL)
+router.post('/:id/image', async (req, res, next) => {
+  try {
+    const product = await dbHelpers.get('SELECT id FROM products WHERE id = ?', [req.params.id]);
+    if (!product) return res.status(404).json({ error: 'Product not found' });
+
+    const { imageBase64, imageUrl } = req.body;
+
+    let finalUrl = null;
+
+    if (imageUrl) {
+      // normalize incoming URL to be absolute from server root
+      if (typeof imageUrl === 'string' && imageUrl.trim().length) {
+        finalUrl = imageUrl.trim();
+        if (!finalUrl.startsWith('/')) finalUrl = '/' + finalUrl.replace(/^\.\//, '');
+      }
+    } else if (imageBase64) {
+      // Save base64 to public/uploads/products/<id>.png
+      const uploadsDir = path.join(__dirname, '..', '..', 'Transaksi', 'images', 'uploads');
+      if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+      const matches = imageBase64.match(/^data:(image\/\w+);base64,(.+)$/);
+      if (!matches) return res.status(400).json({ error: 'Invalid base64 image' });
+      const ext = matches[1].split('/')[1] || 'png';
+      const data = matches[2];
+      const filename = `product-${req.params.id}.${ext}`;
+      const filepath = path.join(uploadsDir, filename);
+      fs.writeFileSync(filepath, Buffer.from(data, 'base64'));
+      // Use absolute path so browser can request `/Transaksi/images/uploads/...`
+      finalUrl = `/Transaksi/images/uploads/${filename}`;
+    } else {
+      return res.status(400).json({ error: 'No image provided' });
+    }
+
+    await dbHelpers.run('UPDATE products SET image_url = ? WHERE id = ?', [finalUrl, req.params.id]);
+    const updated = await dbHelpers.get('SELECT * FROM products WHERE id = ?', [req.params.id]);
+    res.json(updated);
+  } catch (err) {
+    next(err);
+  }
+});

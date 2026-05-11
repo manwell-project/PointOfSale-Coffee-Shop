@@ -30,11 +30,28 @@ app.use(cors({
   allowedHeaders: ['Content-Type']
 }));
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Increase payload limits to allow image data (base64) uploads from client
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Serve static files from root directory (for frontend)
-app.use(express.static(path.join(__dirname, '..')));
+// Serve static files from root directory (for frontend) with conservative caching rules
+const staticOptions = {
+  setHeaders: (res, filePath) => {
+    const ext = path.extname(filePath).toLowerCase();
+    const nocacheExt = ['.html', '.css', '.js', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp', '.woff', '.woff2', '.ttf', '.eot'];
+    if (nocacheExt.includes(ext)) {
+      // Development-friendly: ensure browser requests fresh copies
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+    } else {
+      // allow caching for other assets briefly
+      res.setHeader('Cache-Control', 'public, max-age=3600');
+    }
+  }
+};
+app.use(express.static(path.join(__dirname, '..'), staticOptions));
 
 // Health check
 app.get('/api/health', (req, res) => {
