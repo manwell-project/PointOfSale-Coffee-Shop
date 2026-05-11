@@ -476,11 +476,11 @@ function configureTableHeaders() {
         employees: [
             { label: 'ID', sort: 'id', sortable: true, number: false },
             { label: 'Karyawan', sort: 'name', sortable: true, number: false },
-            { label: 'Shift', sort: 'shift', sortable: true, number: false },
+            { label: '', sort: '', sortable: false, number: false },
             { label: 'Transaksi', sort: 'transactions', sortable: true, number: true },
             { label: 'Total', sort: 'amount', sortable: true, number: true },
             { label: 'Rata-rata', sort: 'average', sortable: true, number: false },
-            { label: 'Status', sort: '', sortable: false, number: false }
+            { label: '', sort: '', sortable: false, number: false }
         ]
     };
 
@@ -899,11 +899,11 @@ function buildEmployeeRows(data) {
             cells: [
                 `<strong>${escapeHtml(String(employee.id))}</strong>`,
                 `${escapeHtml(employee.name)}`,
-                `${escapeHtml(employee.shift)}`,
+                ``,
                 `${employee.transactions}`,
                 `${formatCurrency(employee.amount)}`,
                 `${formatCurrency(average)}`,
-                `<span class="table-badge ${statusClass}">${statusText}</span>`
+                ``
             ]
         };
     });
