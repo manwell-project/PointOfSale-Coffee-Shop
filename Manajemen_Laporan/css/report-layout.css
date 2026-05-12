@@ -14,8 +14,12 @@
 body {
   margin: 0;
   padding: 0;
-  background: #ffffff;
+  background: var(--bg, #fcdfbb);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+}
+
+body.report-page {
+  background: #ffffff;
 }
 
 /* Bottom Navigation - handled by navbar.js */
