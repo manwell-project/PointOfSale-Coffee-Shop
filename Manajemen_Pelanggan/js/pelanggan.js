@@ -74,6 +74,7 @@ const pageSizeSelect = document.getElementById('pageSizeSelect');
 
 // Action Elements
 const addCustomerBtn = document.getElementById('addCustomerBtn');
+const exportBtn = document.querySelector('.btn-export');
 
 // ============================================
 // INITIALIZATION
@@ -132,6 +133,11 @@ function initializeEventListeners() {
             // Future: Switch between table and grid view
         });
     });
+
+    // Export button
+    if (exportBtn) {
+        exportBtn.addEventListener('click', exportCustomers);
+    }
 }
 
 // ============================================
@@ -151,7 +157,7 @@ async function loadCustomers() {
             phone: customer.phone || '',
             email: customer.email || '',
             address: customer.address || '',
-            type: customer.type || 'regular',
+            type: (customer.type || customer.customer_type || customer.type_name || 'regular').toString().toLowerCase(),
             totalPurchases: Number(customer.total_transactions || 0),
             totalAmount: Number(customer.total_spent || 0),
             lastPurchase: customer.last_purchase_date || customer.updated_at || null,
@@ -621,16 +627,61 @@ async function saveCustomer() {
 
         if (id) {
             // Update existing customer
-            await window.API.Customers.update(parseInt(id), data);
+            const updated = await window.API.Customers.update(parseInt(id), data);
+            // If API returned updated object, update local cache; otherwise reload from server
+            if (updated && updated.id) {
+                const idx = customers.findIndex(c => String(c.id) === String(id));
+                if (idx !== -1) {
+                    customers[idx] = {
+                        id: updated.id || parseInt(id),
+                        name: updated.name || data.name,
+                        phone: updated.phone || data.phone,
+                        email: updated.email || data.email,
+                        address: updated.address || data.address,
+                        type: (updated.type || updated.customer_type || data.type || 'regular').toString().toLowerCase(),
+                        totalPurchases: Number(updated.total_transactions || customers[idx].totalPurchases || 0),
+                        totalAmount: Number(updated.total_spent || customers[idx].totalAmount || 0),
+                        lastPurchase: updated.last_purchase_date || customers[idx].lastPurchase || null,
+                        isNew: isNewCustomer(updated.created_at || customers[idx].createdAt),
+                        status: updated.status || customers[idx].status || 'active',
+                        createdAt: updated.created_at || customers[idx].createdAt
+                    };
+                }
+            } else {
+                // Fallback: reload all customers from server to ensure consistency
+                await loadCustomers();
+            }
             showNotification('Pelanggan berhasil diperbarui', 'success');
         } else {
             // Create new customer
-            await window.API.Customers.create(data);
+            const created = await window.API.Customers.create(data);
+            if (created && created.id) {
+                customers.unshift({
+                    id: created.id,
+                    name: created.name || data.name,
+                    phone: created.phone || data.phone,
+                    email: created.email || data.email || '',
+                    address: created.address || data.address || '',
+                    type: (created.type || created.customer_type || data.type || 'regular').toString().toLowerCase(),
+                    totalPurchases: Number(created.total_transactions || 0),
+                    totalAmount: Number(created.total_spent || 0),
+                    lastPurchase: created.last_purchase_date || null,
+                    isNew: isNewCustomer(created.created_at || new Date().toISOString()),
+                    status: created.status || 'active',
+                    createdAt: created.created_at || new Date().toISOString()
+                });
+            } else {
+                // Fallback: reload from server
+                await loadCustomers();
+            }
             showNotification('Pelanggan berhasil ditambahkan', 'success');
         }
 
         closeModal();
-        await loadCustomers();
+        // Re-apply filters and render using updated local cache
+        applyFiltersAndRender();
+        updateStats();
+        updateBadges();
     } catch (error) {
         console.error('Error saving customer:', error);
         showNotification('Gagal menyimpan pelanggan: ' + error.message, 'error');
@@ -813,4 +864,58 @@ function sanitizePhoneForWa(phone) {
     if (!phone) return '';
     // Remove all non-digit characters
     return String(phone).replace(/\D/g, '');
+}
+
+// ============================================
+// EXPORT / CSV
+// ============================================
+
+function escapeCsv(value) {
+    if (value === null || value === undefined) return '';
+    const str = String(value);
+    if (str.indexOf('"') !== -1 || str.indexOf(',') !== -1 || str.indexOf('\n') !== -1) {
+        return '"' + str.replace(/"/g, '""') + '"';
+    }
+    return str;
+}
+
+function exportCustomers() {
+    const data = (filteredCustomers && filteredCustomers.length > 0) ? filteredCustomers : customers;
+    if (!data || data.length === 0) {
+        showNotification('Tidak ada data untuk diexport', 'info');
+        return;
+    }
+
+    const headers = ['ID','Nama','Telepon','Email','Alamat','Tipe','Total Pembelian','Total Nominal','Pembelian Terakhir','Status','Dibuat Pada'];
+
+    const rows = data.map(c => [
+        escapeCsv(c.id),
+        escapeCsv(c.name),
+        escapeCsv(c.phone),
+        escapeCsv(c.email),
+        escapeCsv(c.address),
+        escapeCsv(c.type),
+        escapeCsv(c.totalPurchases),
+        escapeCsv(c.totalAmount),
+        escapeCsv(c.lastPurchase ? new Date(c.lastPurchase).toLocaleString('id-ID') : ''),
+        escapeCsv(c.status),
+        escapeCsv(c.createdAt || '')
+    ]);
+
+    const csvContent = headers.join(',') + '\r\n' + rows.map(r => r.join(',')).join('\r\n');
+
+    // Create blob with BOM for Excel compatibility
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const now = new Date();
+    const filename = `pelanggan_export_${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}.csv`;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+
+    showNotification('Export selesai. File akan diunduh.', 'success');
 }

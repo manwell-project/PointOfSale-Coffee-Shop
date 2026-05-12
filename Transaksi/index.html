@@ -800,10 +800,16 @@
                                     try {
                                         const existing = await API.Customers.getByPhone(customerPhone);
                                         if (existing && existing.id) {
-                                            customerId = existing.id;
+                                                    customerId = existing.id;
+                                                    // attach transaction count if available
+                                                    transactionData.customerTransactions = Number(existing.total_transactions || existing.totalTransactions || 0);
+                                                    // prefer backend name if available
+                                                    if (!transactionData.customerName && existing.name) transactionData.customerName = existing.name;
+                                                    if (!transactionData.customerPhone && existing.phone) transactionData.customerPhone = existing.phone;
                                         } else {
                                             const created = await API.Customers.create({ name: customerName, phone: customerPhone });
                                             customerId = created.id;
+                                                    transactionData.customerTransactions = 0;
                                         }
                                     } catch (err) {
                                         console.warn('Customer lookup/create failed:', err.message || err);
@@ -1258,6 +1264,168 @@
         window.addEventListener('products-updated', () => {
             console.log('[POS] products-updated event received — reloading products');
             try { loadProductsWithDiscounts(); } catch(e){ console.error('Failed reloading products after update', e); }
+        });
+
+        // ==========================================
+        // CUSTOMER AUTOCOMPLETE FOR TRANSACTIONS
+        // ==========================================
+
+        let customersList = [];
+
+        async function loadCustomersForAutocomplete() {
+            try {
+                customersList = Array.isArray(await window.API.Customers.getAll()) ? await window.API.Customers.getAll() : [];
+                // Normalize fields
+                customersList = customersList.map(c => ({
+                    id: c.id,
+                    name: (c.name || '').trim(),
+                    phone: (c.phone || '').trim(),
+                    total_transactions: Number(c.total_transactions || c.totalTransactions || 0),
+                    last_purchase: c.last_purchase_date || c.lastPurchase || c.updated_at || null
+                }));
+            } catch (err) {
+                console.warn('Gagal memuat data pelanggan untuk autocomplete:', err.message || err);
+                customersList = [];
+            }
+        }
+
+        function createSuggestionBox(inputEl) {
+            // Remove existing
+            let existing = inputEl.parentElement.querySelector('.customer-suggestions');
+            if (existing) existing.remove();
+
+            const box = document.createElement('div');
+            box.className = 'customer-suggestions';
+            box.style.position = 'absolute';
+            box.style.zIndex = 9999;
+            box.style.minWidth = '220px';
+            box.style.background = '#fff';
+            box.style.border = '1px solid #e5e7eb';
+            box.style.borderRadius = '6px';
+            box.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)';
+            box.style.maxHeight = '260px';
+            box.style.overflow = 'auto';
+            box.style.padding = '6px 0';
+
+            // Position relative to input's parent and place below the input
+            const parent = inputEl.parentElement;
+            parent.style.position = parent.style.position || 'relative';
+            parent.appendChild(box);
+
+            // Compute position to avoid covering the input
+            const rect = inputEl.getBoundingClientRect();
+            const parentRect = parent.getBoundingClientRect();
+            const top = inputEl.offsetTop + inputEl.offsetHeight + 6; // small gap
+            const left = inputEl.offsetLeft;
+            box.style.top = top + 'px';
+            box.style.left = left + 'px';
+            box.style.width = Math.max(inputEl.offsetWidth, 220) + 'px';
+
+            return box;
+        }
+
+        function renderSuggestions(box, items, inputEl) {
+            box.innerHTML = '';
+            if (!items || items.length === 0) {
+                const empty = document.createElement('div');
+                empty.className = 'suggestion-empty';
+                empty.style.padding = '10px';
+                empty.style.color = '#6b7280';
+                empty.textContent = 'Tidak ada hasil';
+                box.appendChild(empty);
+                return;
+            }
+
+            items.forEach(item => {
+                const row = document.createElement('button');
+                row.type = 'button';
+                row.className = 'suggestion-row';
+                row.style.display = 'flex';
+                row.style.justifyContent = 'space-between';
+                row.style.alignItems = 'center';
+                row.style.width = '100%';
+                row.style.padding = '8px 12px';
+                row.style.border = 'none';
+                row.style.background = 'transparent';
+                row.style.cursor = 'pointer';
+
+                const left = document.createElement('div');
+                left.style.textAlign = 'left';
+                left.innerHTML = `<div style="font-weight:600">${escapeHtml(item.name || '-')}</div><div style="font-size:12px;color:#6b7280">${escapeHtml(item.phone || '-')}</div>`;
+
+                const right = document.createElement('div');
+                right.style.fontSize = '12px';
+                right.style.color = '#374151';
+                right.textContent = `${item.total_transactions || 0} trx`;
+
+                row.appendChild(left);
+                row.appendChild(right);
+
+                // Use mousedown so selection happens before input blur
+                row.addEventListener('mousedown', (ev) => {
+                    ev.preventDefault();
+                    // Fill inputs
+                    const nameEl = document.getElementById('customerName');
+                    const phoneEl = document.getElementById('customerPhone');
+                    if (nameEl) nameEl.value = item.name || '';
+                    if (phoneEl) phoneEl.value = item.phone || '';
+                    // Remove box
+                    if (box && box.remove) box.remove();
+                    // Focus back to name input for convenience
+                    if (nameEl) nameEl.focus();
+                });
+
+                box.appendChild(row);
+            });
+        }
+
+        function escapeHtml(str) {
+            return String(str).replace(/[&<>\\"]/g, function (s) {
+                return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[s]);
+            });
+        }
+
+        function attachCustomerAutocomplete(inputId, byPhone = false) {
+            const inputEl = document.getElementById(inputId);
+            if (!inputEl) return;
+
+            let suggestionBox = null;
+
+            inputEl.addEventListener('input', (e) => {
+                const val = e.target.value.trim().toLowerCase();
+                if (!val) {
+                    if (suggestionBox) suggestionBox.remove();
+                    return;
+                }
+
+                // Filter customers
+                const results = customersList.filter(c => {
+                    if (byPhone) {
+                        const digits = (c.phone || '').replace(/\D/g, '');
+                        const q = val.replace(/\D/g, '');
+                        return digits.indexOf(q) !== -1;
+                    }
+                    return (c.name || '').toLowerCase().indexOf(val) !== -1 || (c.phone || '').toLowerCase().indexOf(val) !== -1;
+                }).slice(0, 10);
+
+                if (!suggestionBox) suggestionBox = createSuggestionBox(inputEl);
+                renderSuggestions(suggestionBox, results, inputEl);
+            });
+
+            // Close on blur (delay to allow click)
+            inputEl.addEventListener('blur', () => {
+                setTimeout(() => {
+                    const box = inputEl.parentElement.querySelector('.customer-suggestions');
+                    if (box) box.remove();
+                }, 200);
+            });
+        }
+
+        // Initialize autocomplete after DOM ready and customers loaded
+        document.addEventListener('DOMContentLoaded', async function() {
+            await loadCustomersForAutocomplete();
+            attachCustomerAutocomplete('customerName', false);
+            attachCustomerAutocomplete('customerPhone', true);
         });
     </script>
 

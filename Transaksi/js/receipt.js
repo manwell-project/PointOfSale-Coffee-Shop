@@ -76,15 +76,29 @@ class ReceiptManager {
       `
         : '';
 
-    const customerHTML =
-      customerName
-        ? `
+    const hasCustomerInfo = customerName || customerPhone;
+    const customerTransactions = transactionData && transactionData.customerTransactions ? transactionData.customerTransactions : null;
+
+    const customerHTML = hasCustomerInfo
+      ? `
         <div class="receipt-info-item">
           <span class="receipt-info-label">PELANGGAN</span>
-          <span class="receipt-info-value">${customerName}</span>
+          <span class="receipt-info-value">${customerName ? customerName : customerPhone}</span>
         </div>
+        ${customerPhone ? `
+          <div class="receipt-info-item">
+            <span class="receipt-info-label">TELP</span>
+            <span class="receipt-info-value">${customerPhone}</span>
+          </div>
+        ` : ''}
+        ${customerTransactions !== null ? `
+          <div class="receipt-info-item">
+            <span class="receipt-info-label">JUMLAH TRANSAKSI</span>
+            <span class="receipt-info-value">${customerTransactions} trx</span>
+          </div>
+        ` : ''}
       `
-        : '';
+      : '';
 
     const paymentMethodLabel = {
       cash: 'Tunai',
