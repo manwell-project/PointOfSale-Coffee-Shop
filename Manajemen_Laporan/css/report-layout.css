@@ -154,6 +154,11 @@ body.report-page .page-content {
   flex-wrap: wrap;
 }
 
+.btn-export-dropdown {
+  position: relative;
+  display: inline-flex;
+}
+
 .btn-export {
   background: #ffffff;
   color: #64748b;
@@ -167,6 +172,51 @@ body.report-page .page-content {
   align-items: center;
   gap: var(--spacing-xs);
   transition: all var(--transition-base);
+}
+
+.btn-export-dropdown-toggle {
+  position: relative;
+  padding-right: calc(var(--spacing-lg) + 18px);
+}
+
+.btn-export-dropdown-caret {
+  font-size: 0.7em;
+  margin-left: var(--spacing-2xs);
+}
+
+.btn-export-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 180px;
+  padding: 6px;
+  border-radius: var(--radius-md);
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 40;
+}
+
+.btn-export-dropdown-menu[hidden] {
+  display: none;
+}
+
+.btn-export-option {
+  width: 100%;
+  justify-content: flex-start;
+  background: transparent;
+  color: #475569;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-sm);
+}
+
+.btn-export-option:hover {
+  background: #f8fafc;
+  color: #1e293b;
+  transform: none;
 }
 
 .btn-export:hover {
