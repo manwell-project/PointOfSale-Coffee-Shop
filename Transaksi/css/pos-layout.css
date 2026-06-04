@@ -2127,6 +2127,98 @@ body {
 }
 
 /* ============================================
+   BARCODE SCANNER SECTION
+   ============================================ */
+
+.barcode-scanner-section {
+  margin-bottom: var(--spacing-4);
+  padding: var(--spacing-3);
+  background: var(--color-bg-primary);
+  border-radius: var(--radius-md);
+  border: 2px solid var(--color-border-light);
+}
+
+.barcode-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-3);
+  background: var(--color-white);
+  border: 2px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  transition: all 0.3s ease;
+}
+
+.barcode-input-wrapper:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+}
+
+.barcode-icon {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.barcode-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: var(--font-size-md);
+  font-family: 'Courier New', monospace;
+  color: var(--color-text-primary);
+}
+
+.barcode-input::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.btn-clear-barcode {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  padding: var(--spacing-1);
+  font-size: var(--font-size-md);
+  flex-shrink: 0;
+  transition: color 0.2s ease;
+}
+
+.btn-clear-barcode:hover {
+  color: var(--color-danger);
+}
+
+.barcode-status {
+  margin-top: var(--spacing-2);
+  padding: var(--spacing-2);
+  font-size: var(--font-size-sm);
+  border-radius: var(--radius-sm);
+  text-align: center;
+  display: none;
+}
+
+.barcode-status.success {
+  background: rgba(76, 175, 80, 0.1);
+  color: var(--color-success);
+  border: 1px solid var(--color-success);
+  display: block;
+}
+
+.barcode-status.error {
+  background: rgba(244, 67, 54, 0.1);
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger);
+  display: block;
+}
+
+.barcode-status.info {
+  background: rgba(33, 150, 243, 0.1);
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  display: block;
+}
+
+/* ============================================
    PRINT STYLES
    ============================================ */
 

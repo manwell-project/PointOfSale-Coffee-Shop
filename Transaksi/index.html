@@ -48,6 +48,24 @@
                         Menu
                     </h1>
                     
+                    <!-- Barcode Scanning Input -->
+                    <div class="barcode-scanner-section" id="barcodeScannerSection">
+                        <div class="barcode-input-wrapper">
+                            <i class="fas fa-barcode barcode-icon"></i>
+                            <input 
+                                type="text" 
+                                id="barcodeInput" 
+                                class="barcode-input" 
+                                placeholder="Scan barcode atau ketik kode..."
+                                autocomplete="off"
+                            >
+                            <button class="btn-clear-barcode" id="clearBarcodeBtn" style="display:none;">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="barcode-status" id="barcodeStatus"></div>
+                    </div>
+                    
                     <div class="pos-filters">
                         <div class="search-box">
                             <i class="fas fa-search search-icon"></i>
@@ -396,6 +414,7 @@
     <!-- Custom Scripts -->
     <script src="../js/api-helper.js"></script>
     <script src="./js/receipt.js"></script>
+    <script src="./js/barcode-scanner.js"></script>
     <script>
         // ==========================================
         // CART STATE MANAGEMENT

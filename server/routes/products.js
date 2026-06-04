@@ -57,15 +57,23 @@ router.get('/:id', async (req, res, next) => {
 // POST create new product
 router.post('/', async (req, res, next) => {
   try {
-    const { name, category, price, description } = req.body;
+    const { name, category, price, description, barcode } = req.body;
     
     if (!name || !price) {
       return res.status(400).json({ error: 'Name and price are required' });
     }
 
+    // Check if barcode already exists
+    if (barcode) {
+      const existing = await dbHelpers.get('SELECT id FROM products WHERE barcode = ?', [barcode]);
+      if (existing) {
+        return res.status(400).json({ error: 'Barcode already exists' });
+      }
+    }
+
     const result = await dbHelpers.run(
-      'INSERT INTO products (name, category, price, description) VALUES (?, ?, ?, ?)',
-      [name, category, price, description]
+      'INSERT INTO products (name, category, price, description, barcode) VALUES (?, ?, ?, ?, ?)',
+      [name, category, price, description, barcode || null]
     );
 
     // Do NOT create a stocks row automatically anymore; products (menu) are separate from raw materials
@@ -74,7 +82,8 @@ router.post('/', async (req, res, next) => {
       name, 
       category, 
       price, 
-      description
+      description,
+      barcode
     });
   } catch (err) {
     next(err);
@@ -84,12 +93,23 @@ router.post('/', async (req, res, next) => {
 // PUT update product
 router.put('/:id', async (req, res, next) => {
   try {
-    const { name, category, price, description, is_available } = req.body;
+    const { name, category, price, description, is_available, barcode } = req.body;
     
     // Check if product exists
     const product = await dbHelpers.get('SELECT id FROM products WHERE id = ?', [req.params.id]);
     if (!product) {
       return res.status(404).json({ error: 'Product not found' });
+    }
+
+    // Check if new barcode already exists for another product
+    if (barcode !== undefined && barcode !== null) {
+      const existing = await dbHelpers.get(
+        'SELECT id FROM products WHERE barcode = ? AND id != ?', 
+        [barcode, req.params.id]
+      );
+      if (existing) {
+        return res.status(400).json({ error: 'Barcode already exists for another product' });
+      }
     }
 
     const updates = [];
@@ -100,6 +120,7 @@ router.put('/:id', async (req, res, next) => {
     if (price !== undefined) { updates.push('price = ?'); values.push(price); }
     if (description !== undefined) { updates.push('description = ?'); values.push(description); }
     if (is_available !== undefined) { updates.push('is_available = ?'); values.push(is_available ? 1 : 0); }
+    if (barcode !== undefined) { updates.push('barcode = ?'); values.push(barcode || null); }
     
     if (updates.length === 0) {
       return res.status(400).json({ error: 'No fields to update' });
@@ -115,6 +136,25 @@ router.put('/:id', async (req, res, next) => {
 
     const updated = await dbHelpers.get('SELECT * FROM products WHERE id = ?', [req.params.id]);
     res.json(updated);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET product by barcode (for POS barcode scanning)
+router.get('/barcode/:barcode', async (req, res, next) => {
+  try {
+    const product = await dbHelpers.get(`
+      SELECT p.*, s.quantity, s.min_stock 
+      FROM products p 
+      LEFT JOIN stocks s ON p.id = s.product_id 
+      WHERE p.barcode = ?
+    `, [req.params.barcode]);
+    
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found', barcode: req.params.barcode });
+    }
+    res.json(product);
   } catch (err) {
     next(err);
   }

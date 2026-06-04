@@ -29,6 +29,7 @@
     document.getElementById('productCategory').value = product ? product.category : '';
     document.getElementById('productPrice').value = product ? product.price : '';
     document.getElementById('productDesc').value = product ? product.description : '';
+    document.getElementById('productBarcode').value = product ? product.barcode : '';
     // setup image preview & controls
     const preview = document.getElementById('imagePreview');
     const removeBtn = document.getElementById('removeImageBtn');
@@ -126,7 +127,8 @@
       name: document.getElementById('productName').value.trim(),
       category: document.getElementById('productCategory').value.trim(),
       price: Number(document.getElementById('productPrice').value) || 0,
-      description: document.getElementById('productDesc').value.trim()
+      description: document.getElementById('productDesc').value.trim(),
+      barcode: document.getElementById('productBarcode').value.trim() || null
     };
 
     try {

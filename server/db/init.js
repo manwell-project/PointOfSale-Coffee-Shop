@@ -136,7 +136,7 @@ function seedEmployees() {
 
 module.exports = db;
 
-// Ensure `is_menu` column exists in products table (1 = menu, 0 = raw material)
+// Ensure required columns exist in products table
 try {
   db.serialize(() => {
     db.get("PRAGMA table_info(products)", (err) => {
@@ -146,14 +146,38 @@ try {
     db.all("PRAGMA table_info(products)", (err, rows) => {
       if (err) return;
       const hasIsMenu = (rows || []).some(r => r.name === 'is_menu');
+      const hasBarcode = (rows || []).some(r => r.name === 'barcode');
+      
       if (!hasIsMenu) {
         db.run('ALTER TABLE products ADD COLUMN is_menu INTEGER DEFAULT 1', (err) => {
           if (err) console.error('Error adding is_menu column:', err.message);
           else console.log('✅ products.is_menu column added');
         });
       }
+      
+      if (!hasBarcode) {
+        // Add barcode column without UNIQUE constraint first (will be handled in migration)
+        db.run('ALTER TABLE products ADD COLUMN barcode VARCHAR(50)', (err) => {
+          if (err) {
+            // If it fails with UNIQUE error, try without constraint
+            if (err.message.includes('UNIQUE')) {
+              console.warn('⚠️ Cannot add UNIQUE barcode column to existing table with data. Skipping...');
+              console.warn('    Please run migration: 009_add_barcode_to_products.sql manually');
+            } else {
+              console.error('Error adding barcode column:', err.message);
+            }
+          } else {
+            console.log('✅ products.barcode column added');
+            // Create index for faster barcode lookup
+            db.run('CREATE INDEX IF NOT EXISTS idx_products_barcode ON products(barcode)', (err) => {
+              if (err) console.error('Error creating barcode index:', err.message);
+              else console.log('✅ Barcode index created');
+            });
+          }
+        });
+      }
     });
   });
 } catch (e) {
-  console.warn('Could not ensure is_menu column:', e && e.message ? e.message : e);
+  console.warn('Could not ensure products columns:', e && e.message ? e.message : e);
 }
