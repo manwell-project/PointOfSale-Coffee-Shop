@@ -2030,22 +2030,10 @@ function renderAlertsList() {
 
 
 
-// Initialize on load
-document.addEventListener('DOMContentLoaded', () => {
-    readAlertKeys = loadReadAlertKeys();
-    init();
-    // Refresh every 30 seconds
-    setInterval(loadStocks, 30000);
-});
 
 
-// Initialize on load
-document.addEventListener('DOMContentLoaded', () => {
-    readAlertKeys = loadReadAlertKeys();
-    init();
-    // Refresh every 30 seconds
-    setInterval(loadStocks, 30000);
-});
+
+
 
 
 // Initialize on load

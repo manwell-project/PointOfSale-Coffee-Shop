@@ -178,7 +178,7 @@ try {
       if (err) return;
       const hasSku = (rows || []).some(r => r.name === 'sku');
       if (!hasSku) {
-        db.run('ALTER TABLE raw_materials ADD COLUMN sku VARCHAR(100) UNIQUE', (err) => {
+        db.run('ALTER TABLE raw_materials ADD COLUMN sku VARCHAR(100)', (err) => {
           if (!err) console.log('✅ raw_materials.sku column added');
         });
       }
