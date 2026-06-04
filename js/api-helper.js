@@ -40,6 +40,7 @@ const ProductsAPI = {
 const StocksAPI = {
   getAll: () => apiFetch('/stocks'),
   getById: (id) => apiFetch(`/stocks/${id}`),
+  getBySku: (sku) => apiFetch(`/stocks/sku/${sku}`),
   getLowStock: () => apiFetch('/stocks/low-stock/list'),
   update: (id, data) => apiFetch(`/stocks/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   create: (data) => apiFetch('/stocks', { method: 'POST', body: JSON.stringify(data) }),

@@ -110,6 +110,8 @@ CREATE INDEX IF NOT EXISTS idx_stock_history_product ON stock_history(product_id
 CREATE TABLE IF NOT EXISTS raw_materials (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name VARCHAR(100) NOT NULL,
+  sku VARCHAR(100) UNIQUE,
+  unit VARCHAR(50),
   category VARCHAR(50),
   price INTEGER DEFAULT 0,
   description TEXT,
@@ -124,6 +126,7 @@ CREATE TABLE IF NOT EXISTS raw_stocks (
   raw_material_id INTEGER NOT NULL UNIQUE,
   quantity INTEGER NOT NULL DEFAULT 0,
   min_stock INTEGER NOT NULL DEFAULT 5,
+  expiry_date DATE,
   last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (raw_material_id) REFERENCES raw_materials(id) ON DELETE CASCADE
 );

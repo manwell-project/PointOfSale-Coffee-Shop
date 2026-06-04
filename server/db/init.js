@@ -139,10 +139,6 @@ module.exports = db;
 // Ensure required columns exist in products table
 try {
   db.serialize(() => {
-    db.get("PRAGMA table_info(products)", (err) => {
-      // query table info list and check column presence
-    });
-
     db.all("PRAGMA table_info(products)", (err, rows) => {
       if (err) return;
       const hasIsMenu = (rows || []).some(r => r.name === 'is_menu');
@@ -177,7 +173,33 @@ try {
         });
       }
     });
+
+    db.all("PRAGMA table_info(raw_materials)", (err, rows) => {
+      if (err) return;
+      const hasSku = (rows || []).some(r => r.name === 'sku');
+      if (!hasSku) {
+        db.run('ALTER TABLE raw_materials ADD COLUMN sku VARCHAR(100) UNIQUE', (err) => {
+          if (!err) console.log('✅ raw_materials.sku column added');
+        });
+      }
+      const hasUnit = (rows || []).some(r => r.name === 'unit');
+      if (!hasUnit) {
+        db.run('ALTER TABLE raw_materials ADD COLUMN unit VARCHAR(50)', (err) => {
+          if (!err) console.log('✅ raw_materials.unit column added');
+        });
+      }
+    });
+
+    db.all("PRAGMA table_info(raw_stocks)", (err, rows) => {
+      if (err) return;
+      const hasExpiryDate = (rows || []).some(r => r.name === 'expiry_date');
+      if (!hasExpiryDate) {
+        db.run('ALTER TABLE raw_stocks ADD COLUMN expiry_date DATE', (err) => {
+          if (!err) console.log('✅ raw_stocks.expiry_date column added');
+        });
+      }
+    });
   });
 } catch (e) {
-  console.warn('Could not ensure products columns:', e && e.message ? e.message : e);
+  console.warn('Could not ensure new columns:', e && e.message ? e.message : e);
 }

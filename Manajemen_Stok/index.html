@@ -96,6 +96,10 @@
                             <i class="fas fa-download"></i>
                             Export
                         </button>
+                        <button onclick="window.location.href='scanner.html'" class="btn-export" id="scanBarcodeBtn" type="button" style="display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-qrcode"></i>
+                            Scan Barcode
+                        </button>
                         <button class="btn-add-stock" id="addStockBtn">
                             <i class="fas fa-plus"></i>
                             Tambah Stok
@@ -104,6 +108,31 @@
                             <i class="fas fa-arrow-up"></i>
                             Barang Keluar
                         </button>
+                    </div>
+                </div>
+
+                <!-- Inline Scanner Container -->
+                <div id="inlineScannerContainer" style="display: none; background: var(--bg-card); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border: 1px solid var(--border-color);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <div>
+                            <h3 style="margin: 0; font-size: 1.1rem; color: var(--text-color); display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-camera text-primary"></i>
+                                Scan Barcode / SKU
+                            </h3>
+                            <p style="margin: 0.25rem 0 0 0; font-size: 0.875rem; color: var(--text-muted);">Arahkan kamera ke barcode kemasan barang</p>
+                        </div>
+                        <button id="closeInlineScannerBtn" style="background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.25rem; padding: 0.5rem; transition: color 0.2s;" onmouseover="this.style.color='var(--danger-color)'" onmouseout="this.style.color='var(--text-muted)'">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                        <div id="inlineReader" style="width: 100%; max-width: 500px; margin: 0 auto; border-radius: var(--radius-md); overflow: hidden;"></div>
+                        <div id="inlineScannerStatus" style="text-align: center; margin-top: 0.5rem; color: var(--text-muted); font-size: 0.9rem;">Memulai kamera...</div>
+                        
+                        <div style="margin-top: 1rem; text-align: center; border-top: 1px dashed var(--border-color); padding-top: 1rem;">
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">Kamera laptop buram? Unggah foto barcode:</p>
+                            <input type="file" id="scanImageInput" accept="image/*" class="form-input" style="max-width: 300px; margin: 0 auto; padding: 0.4rem; font-size: 0.85rem;">
+                        </div>
                     </div>
                 </div>
 
@@ -274,11 +303,11 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label class="form-label">
-                                    SKU <span class="required">*</span>
+                                    SKU / Barcode
                                 </label>
                                 <div class="input-with-icon">
                                     <i class="fas fa-barcode"></i>
-                                    <input type="text" class="form-input" id="productSku" required placeholder="SKU-001">
+                                    <input type="text" class="form-input" id="productSku" placeholder="SKU-001 / Barcode">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -289,6 +318,17 @@
                                     <option value="snack">Snack</option>
                                     <option value="ingredient">Bahan</option>
                                 </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Satuan (Unit)
+                                </label>
+                                <div class="input-with-icon">
+                                    <i class="fas fa-balance-scale"></i>
+                                    <input type="text" class="form-input" id="productUnit" placeholder="Contoh: Botol, Kg, Pcs">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -321,6 +361,18 @@
                                     <span class="input-unit">Unit</span>
                                 </div>
                                 <span class="form-hint">Notifikasi ketika stok mencapai nilai ini</span>
+                            </div>
+                        </div>
+
+                        <div class="form-row single">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Tanggal Kedaluwarsa (Opsional)
+                                </label>
+                                <div class="input-with-icon">
+                                    <i class="fas fa-calendar"></i>
+                                    <input type="date" class="form-input" id="expiryDate">
+                                </div>
                             </div>
                         </div>
 
@@ -505,6 +557,9 @@
             </div>
         </div>
     </div>
+
+    <!-- html5-qrcode for barcode scanning -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
     <!-- Performance Optimizations -->
     <script src="../js/performance.js" defer></script>

@@ -14,7 +14,7 @@ router.get('/', async (req, res, next) => {
   try {
     // List raw material stocks (separate from menu products)
     const stocks = await dbHelpers.all(`
-      SELECT rs.*, rm.name, rm.category, rm.price
+      SELECT rs.*, rm.name, rm.category, rm.price, rm.sku, rm.unit
       FROM raw_stocks rs
       JOIN raw_materials rm ON rs.raw_material_id = rm.id
       ORDER BY rm.name ASC
@@ -29,7 +29,7 @@ router.get('/', async (req, res, next) => {
 router.get('/low-stock/list', async (req, res, next) => {
   try {
     const lowStocks = await dbHelpers.all(`
-      SELECT rs.*, rm.name, rm.category, rm.price
+      SELECT rs.*, rm.name, rm.category, rm.price, rm.sku, rm.unit
       FROM raw_stocks rs
       JOIN raw_materials rm ON rs.raw_material_id = rm.id
       WHERE rs.quantity <= rs.min_stock
@@ -109,7 +109,7 @@ router.get('/product/:product_id/history', async (req, res, next) => {
 router.get('/:id', async (req, res, next) => {
   try {
     const stock = await dbHelpers.get(`
-      SELECT rs.*, rm.name, rm.category, rm.price
+      SELECT rs.*, rm.name, rm.category, rm.price, rm.sku, rm.unit
       FROM raw_stocks rs
       JOIN raw_materials rm ON rs.raw_material_id = rm.id
       WHERE rs.id = ?
@@ -127,7 +127,7 @@ router.get('/:id', async (req, res, next) => {
 // PUT update stock (add/reduce quantity)
 router.put('/:id', async (req, res, next) => {
   try {
-    const { quantity, min_stock, change_reason, employee_id } = req.body;
+    const { quantity, min_stock, change_reason, employee_id, expiry_date } = req.body;
 
     const stock = await dbHelpers.get('SELECT * FROM raw_stocks WHERE id = ?', [req.params.id]);
     if (!stock) {
@@ -144,6 +144,10 @@ router.put('/:id', async (req, res, next) => {
     if (min_stock !== undefined) { 
       updates.push('min_stock = ?'); 
       values.push(min_stock);
+    }
+    if (expiry_date !== undefined) {
+      updates.push('expiry_date = ?');
+      values.push(expiry_date);
     }
     
     updates.push('last_updated = CURRENT_TIMESTAMP');
@@ -171,7 +175,7 @@ router.put('/:id', async (req, res, next) => {
     }
 
     const updated = await dbHelpers.get(`
-      SELECT rs.*, rm.name, rm.category, rm.price
+      SELECT rs.*, rm.name, rm.category, rm.price, rm.sku, rm.unit
       FROM raw_stocks rs
       JOIN raw_materials rm ON rs.raw_material_id = rm.id
       WHERE rs.id = ?
@@ -186,21 +190,21 @@ router.put('/:id', async (req, res, next) => {
 // POST create new raw material + raw_stock
 router.post('/', async (req, res, next) => {
   try {
-    const { name, quantity = 0, min_stock = 0, category = 'Raw Material', price = 0, description = '' } = req.body;
+    const { name, quantity = 0, min_stock = 0, category = 'Raw Material', price = 0, description = '', sku = null, unit = null, expiry_date = null } = req.body;
 
     if (!name) return res.status(400).json({ error: 'name is required' });
 
     // Create raw_material then raw_stock in a transaction
     const queries = [
-      { sql: 'INSERT INTO raw_materials (name, category, price, description) VALUES (?, ?, ?, ?)', params: [name, category, price, description] }
+      { sql: 'INSERT INTO raw_materials (name, category, price, description, sku, unit) VALUES (?, ?, ?, ?, ?, ?)', params: [name, category, price, description, sku, unit] }
     ];
 
     const results = await dbHelpers.transaction(queries);
     const rawMaterialId = results[0].id;
 
     const stockRes = await dbHelpers.run(
-      'INSERT INTO raw_stocks (raw_material_id, quantity, min_stock) VALUES (?, ?, ?)',
-      [rawMaterialId, quantity, min_stock]
+      'INSERT INTO raw_stocks (raw_material_id, quantity, min_stock, expiry_date) VALUES (?, ?, ?, ?)',
+      [rawMaterialId, quantity, min_stock, expiry_date]
     );
 
     // Log initial stock so "barang masuk" is visible in Riwayat Stok.
@@ -210,9 +214,28 @@ router.post('/', async (req, res, next) => {
       [rawMaterialId, 0, initialQty, initialQty > 0 ? 'Stok masuk' : 'Stok awal', null]
     );
 
-    const created = await dbHelpers.get('SELECT rs.*, rm.name, rm.category, rm.price, rm.id as raw_material_id FROM raw_stocks rs JOIN raw_materials rm ON rs.raw_material_id = rm.id WHERE rs.id = ?', [stockRes.id]);
+    const created = await dbHelpers.get('SELECT rs.*, rm.name, rm.category, rm.price, rm.sku, rm.unit, rm.id as raw_material_id FROM raw_stocks rs JOIN raw_materials rm ON rs.raw_material_id = rm.id WHERE rs.id = ?', [stockRes.id]);
 
     res.status(201).json(created);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET stock by SKU
+router.get('/sku/:sku', async (req, res, next) => {
+  try {
+    const stock = await dbHelpers.get(`
+      SELECT rs.*, rm.name, rm.category, rm.price, rm.sku, rm.unit
+      FROM raw_stocks rs
+      JOIN raw_materials rm ON rs.raw_material_id = rm.id
+      WHERE rm.sku = ?
+    `, [req.params.sku]);
+    
+    if (!stock) {
+      return res.status(404).json({ error: 'Stock not found' });
+    }
+    res.json(stock);
   } catch (err) {
     next(err);
   }
