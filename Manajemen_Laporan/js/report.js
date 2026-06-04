@@ -56,9 +56,10 @@ const avgTransactionEl = document.getElementById('avgTransaction');
 const summaryLabels = document.querySelectorAll('.summary-card .summary-label');
 
 const exportPdfBtn = document.getElementById('exportPdfBtn');
-const exportExcelBtn = document.getElementById('exportExcelBtn');
-const exportCsvBtn = document.getElementById('exportCsvBtn');
 const printReportBtn = document.getElementById('printReportBtn');
+const exportExcelMenuBtn = document.getElementById('exportExcelMenuBtn');
+const exportExcelMenu = document.getElementById('exportExcelMenu');
+const exportFormatButtons = document.querySelectorAll('[data-export-format]');
 
 const profitRevenueEl = document.getElementById('profitRevenue');
 const profitExpenseEl = document.getElementById('profitExpense');
@@ -224,12 +225,24 @@ function initializeEventListeners() {
         exportPdfBtn.addEventListener('click', handleExportPdf);
     }
 
-    if (exportExcelBtn) {
-        exportExcelBtn.addEventListener('click', handleExportExcel);
-    }
+    if (exportExcelMenuBtn && exportExcelMenu) {
+        exportExcelMenuBtn.addEventListener('click', toggleExportMenu);
 
-    if (exportCsvBtn) {
-        exportCsvBtn.addEventListener('click', handleExportCsv);
+        exportFormatButtons.forEach((button) => {
+            button.addEventListener('click', () => {
+                const format = button.getAttribute('data-export-format');
+                closeExportMenu();
+
+                if (format === 'xlsx') {
+                    handleExportExcel();
+                } else if (format === 'csv') {
+                    handleExportCsv();
+                }
+            });
+        });
+
+        document.addEventListener('click', handleExportMenuOutsideClick);
+        document.addEventListener('keydown', handleExportMenuKeydown);
     }
 
     if (printReportBtn) {
@@ -1242,7 +1255,33 @@ async function handleExportPdf() {
     }
 }
 
-function handleExportExcel() {
+function handleExportSpreadsheet(format) {
+    if (format === 'csv') {
+        const csvRows = [];
+        const headers = getTableHeaders();
+        const bodyRows = getExportRows();
+        const totalText = formatCurrency(getExportTotal());
+
+        if (headers.length > 0) {
+            csvRows.push(convertToCsvRow(headers));
+        }
+
+        bodyRows.forEach((row) => {
+            csvRows.push(convertToCsvRow(row));
+        });
+
+        if (totalText) {
+            csvRows.push(convertToCsvRow(['', '', '', 'Total', totalText, '', '']));
+        }
+
+        const csvContent = `\uFEFF${csvRows.join('\n')}`;
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const filename = `laporan-${generateFileDate()}.csv`;
+        downloadBlob(blob, filename);
+        showReportMessage('Export CSV berhasil.', 'success');
+        return;
+    }
+
     const headers = getTableHeaders();
     const bodyRows = getExportRows();
     const totalText = formatCurrency(getExportTotal());
@@ -1323,29 +1362,58 @@ function handleExportExcel() {
         });
 }
 
+function handleExportExcel() {
+    handleExportSpreadsheet('xlsx');
+}
+
 function handleExportCsv() {
-    const csvRows = [];
-    const headers = getTableHeaders();
-    const bodyRows = getExportRows();
-    const totalText = formatCurrency(getExportTotal());
+    handleExportSpreadsheet('csv');
+}
 
-    if (headers.length > 0) {
-        csvRows.push(convertToCsvRow(headers));
+function toggleExportMenu(event) {
+    if (!exportExcelMenu || !exportExcelMenuBtn) {
+        return;
     }
 
-    bodyRows.forEach((row) => {
-        csvRows.push(convertToCsvRow(row));
-    });
-
-    if (totalText) {
-        csvRows.push(convertToCsvRow(['', '', '', 'Total', totalText, '', '']));
+    if (event) {
+        event.stopPropagation();
     }
 
-    const csvContent = `\uFEFF${csvRows.join('\n')}`;
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const filename = `laporan-${generateFileDate()}.csv`;
-    downloadBlob(blob, filename);
-    showReportMessage('Export CSV berhasil.', 'success');
+    const isOpen = !exportExcelMenu.hasAttribute('hidden');
+    if (isOpen) {
+        closeExportMenu();
+        return;
+    }
+
+    exportExcelMenu.removeAttribute('hidden');
+    exportExcelMenuBtn.setAttribute('aria-expanded', 'true');
+}
+
+function closeExportMenu() {
+    if (!exportExcelMenu || !exportExcelMenuBtn) {
+        return;
+    }
+
+    exportExcelMenu.setAttribute('hidden', 'hidden');
+    exportExcelMenuBtn.setAttribute('aria-expanded', 'false');
+}
+
+function handleExportMenuOutsideClick(event) {
+    if (!exportExcelMenu || !exportExcelMenuBtn) {
+        return;
+    }
+
+    if (exportExcelMenu.contains(event.target) || exportExcelMenuBtn.contains(event.target)) {
+        return;
+    }
+
+    closeExportMenu();
+}
+
+function handleExportMenuKeydown(event) {
+    if (event.key === 'Escape') {
+        closeExportMenu();
+    }
 }
 
 function openPrintWindow(mode) {

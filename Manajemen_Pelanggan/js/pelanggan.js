@@ -151,20 +151,30 @@ async function loadCustomers() {
         // Load customers from API
         const response = await window.API.Customers.getAll();
         console.debug('DEBUG: /api/customers response', response);
-        customers = response.map(customer => ({
-            id: customer.id,
-            name: customer.name || '',
-            phone: customer.phone || '',
-            email: customer.email || '',
-            address: customer.address || '',
-            type: (customer.type || customer.customer_type || customer.type_name || 'regular').toString().toLowerCase(),
-            totalPurchases: Number(customer.total_transactions || 0),
-            totalAmount: Number(customer.total_spent || 0),
-            lastPurchase: customer.last_purchase_date || customer.updated_at || null,
-            isNew: isNewCustomer(customer.created_at),
-            status: customer.status || 'active',
-            createdAt: customer.created_at
-        }));
+        customers = response.map(customer => {
+            const totalPurchases = Number(customer.total_transactions || 0);
+            let type = (customer.type || customer.customer_type || customer.type_name || 'new').toString().toLowerCase();
+            
+            // Logic otomatis: Jika lebih dari 5 transaksi, otomatis jadi Reguler (jika bukan VIP)
+            if (type !== 'vip' && totalPurchases > 5) {
+                type = 'regular';
+            }
+
+            return {
+                id: customer.id,
+                name: customer.name || '',
+                phone: customer.phone || '',
+                email: customer.email || '',
+                address: customer.address || '',
+                type: type,
+                totalPurchases: totalPurchases,
+                totalAmount: Number(customer.total_spent || 0),
+                lastPurchase: customer.last_purchase_date || customer.updated_at || null,
+                isNew: isNewCustomer(customer.created_at, totalPurchases, type),
+                status: customer.status || 'active',
+                createdAt: customer.created_at
+            };
+        });
 
         applyFiltersAndRender();
         updateStats();
@@ -176,8 +186,11 @@ async function loadCustomers() {
     }
 }
 
-function isNewCustomer(createdAt) {
-    if (!createdAt) return false;
+function isNewCustomer(createdAt, totalPurchases = 0, type = '') {
+    // Jika tipe sudah regular atau vip, atau transaksi > 5, maka bukan pelanggan 'Baru'
+    if (type === 'regular' || type === 'vip' || totalPurchases > 5) return false;
+    
+    if (!createdAt) return true;
     const created = new Date(createdAt);
     const now = new Date();
     const diffTime = Math.abs(now - created);
@@ -632,17 +645,23 @@ async function saveCustomer() {
             if (updated && updated.id) {
                 const idx = customers.findIndex(c => String(c.id) === String(id));
                 if (idx !== -1) {
+                    const totalPurchases = Number(updated.total_transactions || customers[idx].totalPurchases || 0);
+                    let type = (updated.type || updated.customer_type || data.type || 'new').toString().toLowerCase();
+                    if (type !== 'vip' && totalPurchases > 5) {
+                        type = 'regular';
+                    }
+
                     customers[idx] = {
                         id: updated.id || parseInt(id),
                         name: updated.name || data.name,
                         phone: updated.phone || data.phone,
                         email: updated.email || data.email,
                         address: updated.address || data.address,
-                        type: (updated.type || updated.customer_type || data.type || 'regular').toString().toLowerCase(),
-                        totalPurchases: Number(updated.total_transactions || customers[idx].totalPurchases || 0),
+                        type: type,
+                        totalPurchases: totalPurchases,
                         totalAmount: Number(updated.total_spent || customers[idx].totalAmount || 0),
                         lastPurchase: updated.last_purchase_date || customers[idx].lastPurchase || null,
-                        isNew: isNewCustomer(updated.created_at || customers[idx].createdAt),
+                        isNew: isNewCustomer(updated.created_at || customers[idx].createdAt, totalPurchases, type),
                         status: updated.status || customers[idx].status || 'active',
                         createdAt: updated.created_at || customers[idx].createdAt
                     };
@@ -656,17 +675,23 @@ async function saveCustomer() {
             // Create new customer
             const created = await window.API.Customers.create(data);
             if (created && created.id) {
+                const totalPurchases = Number(created.total_transactions || 0);
+                let type = (created.type || created.customer_type || data.type || 'new').toString().toLowerCase();
+                if (type !== 'vip' && totalPurchases > 5) {
+                    type = 'regular';
+                }
+
                 customers.unshift({
                     id: created.id,
                     name: created.name || data.name,
                     phone: created.phone || data.phone,
                     email: created.email || data.email || '',
                     address: created.address || data.address || '',
-                    type: (created.type || created.customer_type || data.type || 'regular').toString().toLowerCase(),
-                    totalPurchases: Number(created.total_transactions || 0),
+                    type: type,
+                    totalPurchases: totalPurchases,
                     totalAmount: Number(created.total_spent || 0),
                     lastPurchase: created.last_purchase_date || null,
-                    isNew: isNewCustomer(created.created_at || new Date().toISOString()),
+                    isNew: isNewCustomer(created.created_at || new Date().toISOString(), totalPurchases, type),
                     status: created.status || 'active',
                     createdAt: created.created_at || new Date().toISOString()
                 });

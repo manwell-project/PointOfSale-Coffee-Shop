@@ -33,14 +33,23 @@
                                             <i class="fas fa-file-pdf"></i>
                                             PDF
                                         </button>
-                                        <button class="btn-export excel" id="exportExcelBtn" type="button">
-                                            <i class="fas fa-file-excel"></i>
-                                            Excel
-                                        </button>
-                                        <button class="btn-export csv" id="exportCsvBtn" type="button">
-                                            <i class="fas fa-file-csv"></i>
-                                            CSV
-                                        </button>
+                                        <div class="btn-export-dropdown">
+                                            <button class="btn-export excel btn-export-dropdown-toggle" id="exportExcelMenuBtn" type="button" aria-haspopup="true" aria-expanded="false">
+                                                <i class="fas fa-file-excel"></i>
+                                                Excel
+                                                <i class="fas fa-chevron-down btn-export-dropdown-caret"></i>
+                                            </button>
+                                            <div class="btn-export-dropdown-menu" id="exportExcelMenu" hidden>
+                                                <button class="btn-export btn-export-option" type="button" data-export-format="xlsx">
+                                                    <i class="fas fa-file-excel"></i>
+                                                    .XLSX
+                                                </button>
+                                                <button class="btn-export btn-export-option" type="button" data-export-format="csv">
+                                                    <i class="fas fa-file-csv"></i>
+                                                    .CSV
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                     <button class="btn-print" id="printReportBtn" type="button">
                                         <i class="fas fa-print"></i>
