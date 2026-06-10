@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { dbHelpers } = require('../db/connection');
+const supabase = require('../db/supabase');
 const crypto = require('crypto');
 
 function hashPassword(password) {
@@ -9,7 +9,6 @@ function hashPassword(password) {
 }
 
 // POST /auth/login
-// body: { identifier: 'email or username', password }
 router.post('/login', async (req, res, next) => {
   try {
     const { identifier, password } = req.body;
@@ -17,10 +16,11 @@ router.post('/login', async (req, res, next) => {
 
     const id = String(identifier).trim();
 
-    // Try username first, then email
-    let employee = await dbHelpers.get('SELECT * FROM employees WHERE username = ? COLLATE NOCASE', [id]);
+    let { data: employee } = await supabase.from('employees').select('*').ilike('username', id).maybeSingle();
+    
     if (!employee) {
-      employee = await dbHelpers.get('SELECT * FROM employees WHERE email = ? COLLATE NOCASE', [id]);
+      const { data: empByEmail } = await supabase.from('employees').select('*').ilike('email', id).maybeSingle();
+      employee = empByEmail;
     }
 
     if (!employee) {
@@ -36,7 +36,6 @@ router.post('/login', async (req, res, next) => {
       return res.status(401).json({ error: 'Password salah' });
     }
 
-    // Successful
     const session = {
       id: employee.id,
       userName: employee.username || employee.name,

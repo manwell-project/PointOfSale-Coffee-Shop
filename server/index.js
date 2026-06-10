@@ -3,8 +3,8 @@ const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
 
-// Initialize database
-require('./db/init');
+// Initialize database (SQLite disabled after migration to Supabase)
+// require('./db/init');
 
 // Import routes
 const productsRoutes = require('./routes/products');

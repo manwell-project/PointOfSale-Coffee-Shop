@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { dbHelpers } = require('../db/connection');
+const supabase = require('../db/supabase');
 const crypto = require('crypto');
 
 function hashPassword(password) {
@@ -11,10 +11,8 @@ function hashPassword(password) {
 // GET all employees
 router.get('/', async (req, res, next) => {
   try {
-    const employees = await dbHelpers.all(`
-      SELECT * FROM employees 
-      ORDER BY name ASC
-    `);
+    const { data: employees, error } = await supabase.from('employees').select('*').order('name', { ascending: true });
+    if (error) throw error;
     res.json(employees);
   } catch (err) {
     next(err);
@@ -24,11 +22,8 @@ router.get('/', async (req, res, next) => {
 // GET employees by shift
 router.get('/shift/:shift', async (req, res, next) => {
   try {
-    const employees = await dbHelpers.all(`
-      SELECT * FROM employees 
-      WHERE shift = ? AND status = 'aktif'
-      ORDER BY name ASC
-    `, [req.params.shift]);
+    const { data: employees, error } = await supabase.from('employees').select('*').eq('shift', req.params.shift).eq('status', 'aktif').order('name', { ascending: true });
+    if (error) throw error;
     res.json(employees);
   } catch (err) {
     next(err);
@@ -38,10 +33,10 @@ router.get('/shift/:shift', async (req, res, next) => {
 // GET single employee
 router.get('/:id', async (req, res, next) => {
   try {
-    const employee = await dbHelpers.get('SELECT * FROM employees WHERE id = ?', [req.params.id]);
-    
-    if (!employee) {
-      return res.status(404).json({ error: 'Employee not found' });
+    const { data: employee, error } = await supabase.from('employees').select('*').eq('id', req.params.id).single();
+    if (error) {
+      if (error.code === 'PGRST116') return res.status(404).json({ error: 'Employee not found' });
+      throw error;
     }
     res.json(employee);
   } catch (err) {
@@ -58,9 +53,8 @@ router.post('/', async (req, res, next) => {
       return res.status(400).json({ error: 'Name and shift are required' });
     }
 
-    // If username provided, ensure it's unique
     if (username) {
-      const existing = await dbHelpers.get('SELECT id FROM employees WHERE username = ?', [username]);
+      const { data: existing } = await supabase.from('employees').select('id').eq('username', username).maybeSingle();
       if (existing) {
         return res.status(400).json({ error: 'Username sudah dipakai' });
       }
@@ -68,31 +62,16 @@ router.post('/', async (req, res, next) => {
 
     const password_hash = password ? hashPassword(password) : null;
 
-    console.log('Attempting to insert employee with data:', {
-      name, shift, phone, email, status: status || 'aktif', username, role, position, address, joinDate, notes
-    });
+    const { data: result, error } = await supabase.from('employees').insert([{
+      name, shift, phone: phone || null, email: email || null, status: status || 'aktif',
+      username: username || null, password_hash, role: role || null, position: position || null,
+      address: address || null, "joinDate": joinDate || null, notes: notes || null
+    }]).select().single();
 
-    const result = await dbHelpers.run(
-      `INSERT INTO employees (name, shift, phone, email, status, username, password_hash, role, position, address, joinDate, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [name, shift, phone || null, email || null, status || 'aktif', username || null, password_hash, role || null, position || null, address || null, joinDate || null, notes || null]
-    );
-
-    res.status(201).json({ 
-      id: result.id, 
-      name, 
-      shift, 
-      phone, 
-      email,
-      username: username || null,
-      role: role || null,
-      position: position || null,
-      address: address || null,
-      joinDate: joinDate || null,
-      notes: notes || null,
-      status: status || 'aktif'
-    });
+    if (error) throw error;
+    res.status(201).json(result);
   } catch (err) {
-    console.error('Detailed error in POST /employees:', err.message, err.stack);
+    console.error('Detailed error in POST /employees:', err);
     next(err);
   }
 });
@@ -102,40 +81,33 @@ router.put('/:id', async (req, res, next) => {
   try {
     const { name, shift, phone, email, status, username, password, role, position, address, joinDate, notes } = req.body;
     
-    const employee = await dbHelpers.get('SELECT id FROM employees WHERE id = ?', [req.params.id]);
+    const { data: employee } = await supabase.from('employees').select('id').eq('id', req.params.id).maybeSingle();
     if (!employee) {
       return res.status(404).json({ error: 'Employee not found' });
     }
 
-    const updates = [];
-    const values = [];
+    const updates = {};
+    if (name !== undefined) updates.name = name;
+    if (shift !== undefined) updates.shift = shift;
+    if (phone !== undefined) updates.phone = phone;
+    if (email !== undefined) updates.email = email;
+    if (status !== undefined) updates.status = status;
+    if (username !== undefined) updates.username = username || null;
+    if (role !== undefined) updates.role = role || null;
+    if (position !== undefined) updates.position = position || null;
+    if (address !== undefined) updates.address = address || null;
+    if (joinDate !== undefined) updates["joinDate"] = joinDate || null;
+    if (notes !== undefined) updates.notes = notes || null;
+    if (password !== undefined && password !== '') updates.password_hash = hashPassword(password);
     
-    if (name !== undefined) { updates.push('name = ?'); values.push(name); }
-    if (shift !== undefined) { updates.push('shift = ?'); values.push(shift); }
-    if (phone !== undefined) { updates.push('phone = ?'); values.push(phone); }
-    if (email !== undefined) { updates.push('email = ?'); values.push(email); }
-    if (status !== undefined) { updates.push('status = ?'); values.push(status); }
-    if (username !== undefined) { updates.push('username = ?'); values.push(username || null); }
-    if (role !== undefined) { updates.push('role = ?'); values.push(role || null); }
-    if (position !== undefined) { updates.push('position = ?'); values.push(position || null); }
-    if (address !== undefined) { updates.push('address = ?'); values.push(address || null); }
-    if (joinDate !== undefined) { updates.push('joinDate = ?'); values.push(joinDate || null); }
-    if (notes !== undefined) { updates.push('notes = ?'); values.push(notes || null); }
-    if (password !== undefined && password !== '') { updates.push('password_hash = ?'); values.push(hashPassword(password)); }
-    
-    if (updates.length === 0) {
+    updates.updated_at = new Date().toISOString();
+
+    if (Object.keys(updates).length === 1) {
       return res.status(400).json({ error: 'No fields to update' });
     }
 
-    updates.push('updated_at = CURRENT_TIMESTAMP');
-    values.push(req.params.id);
-
-    await dbHelpers.run(
-      `UPDATE employees SET ${updates.join(', ')} WHERE id = ?`,
-      values
-    );
-
-    const updated = await dbHelpers.get('SELECT * FROM employees WHERE id = ?', [req.params.id]);
+    const { data: updated, error } = await supabase.from('employees').update(updates).eq('id', req.params.id).select().single();
+    if (error) throw error;
     res.json(updated);
   } catch (err) {
     next(err);
@@ -145,12 +117,13 @@ router.put('/:id', async (req, res, next) => {
 // DELETE employee
 router.delete('/:id', async (req, res, next) => {
   try {
-    const employee = await dbHelpers.get('SELECT id FROM employees WHERE id = ?', [req.params.id]);
+    const { data: employee } = await supabase.from('employees').select('id').eq('id', req.params.id).maybeSingle();
     if (!employee) {
       return res.status(404).json({ error: 'Employee not found' });
     }
 
-    await dbHelpers.run('DELETE FROM employees WHERE id = ?', [req.params.id]);
+    const { error } = await supabase.from('employees').delete().eq('id', req.params.id);
+    if (error) throw error;
     res.json({ success: true, message: 'Employee deleted' });
   } catch (err) {
     next(err);

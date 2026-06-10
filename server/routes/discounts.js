@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { dbHelpers } = require('../db/connection');
+const supabase = require('../db/supabase');
 
 function toIsoOrNull(value) {
   if (!value) return null;
@@ -33,48 +33,50 @@ function isDiscountCurrentlyActive(discount) {
 }
 
 async function getDiscountById(id) {
-  const discount = await dbHelpers.get(
-    `SELECT d.*, p.name AS product_name, p.price AS product_price
-     FROM discounts d
-     JOIN products p ON p.id = d.product_id
-     WHERE d.id = ?`,
-    [id]
-  );
+  const { data: discount, error } = await supabase
+    .from('discounts')
+    .select('*, products(name, price)')
+    .eq('id', id)
+    .single();
 
-  if (!discount) return null;
+  if (error || !discount) return null;
 
-  const discounted_price = computeDiscountedPrice(
-    discount.product_price,
-    discount.discount_type,
-    discount.discount_value
-  );
+  const p = Array.isArray(discount.products) ? discount.products[0] : discount.products;
+  const product_price = p ? p.price : 0;
+  const discounted_price = computeDiscountedPrice(product_price, discount.discount_type, discount.discount_value);
 
   return {
     ...discount,
+    product_name: p ? p.name : null,
+    product_price,
     discounted_price,
-    is_currently_active: isDiscountCurrentlyActive(discount)
+    is_currently_active: isDiscountCurrentlyActive(discount),
+    products: undefined
   };
 }
 
 // GET all discounts
 router.get('/', async (req, res, next) => {
   try {
-    const rows = await dbHelpers.all(
-      `SELECT d.*, p.name AS product_name, p.price AS product_price
-       FROM discounts d
-       JOIN products p ON p.id = d.product_id
-       ORDER BY d.created_at DESC`
-    );
+    const { data: discounts, error } = await supabase
+      .from('discounts')
+      .select('*, products(name, price)')
+      .order('created_at', { ascending: false });
 
-    const mapped = rows.map((discount) => ({
-      ...discount,
-      discounted_price: computeDiscountedPrice(
-        discount.product_price,
-        discount.discount_type,
-        discount.discount_value
-      ),
-      is_currently_active: isDiscountCurrentlyActive(discount)
-    }));
+    if (error) throw error;
+
+    const mapped = discounts.map((d) => {
+      const p = Array.isArray(d.products) ? d.products[0] : d.products;
+      const product_price = p ? p.price : 0;
+      return {
+        ...d,
+        product_name: p ? p.name : null,
+        product_price,
+        discounted_price: computeDiscountedPrice(product_price, d.discount_type, d.discount_value),
+        is_currently_active: isDiscountCurrentlyActive(d),
+        products: undefined
+      };
+    });
 
     res.json(mapped);
   } catch (err) {
@@ -85,27 +87,26 @@ router.get('/', async (req, res, next) => {
 // GET active discounts list
 router.get('/active/list', async (req, res, next) => {
   try {
-    const nowIso = new Date().toISOString();
-    const rows = await dbHelpers.all(
-      `SELECT d.*, p.name AS product_name, p.price AS product_price
-       FROM discounts d
-       JOIN products p ON p.id = d.product_id
-       WHERE d.is_active = 1
-         AND (d.start_date IS NULL OR d.start_date <= ?)
-         AND (d.end_date IS NULL OR d.end_date >= ?)
-       ORDER BY d.created_at DESC`,
-      [nowIso, nowIso]
-    );
+    const { data: discounts, error } = await supabase
+      .from('discounts')
+      .select('*, products(name, price)')
+      .eq('is_active', 1)
+      .order('created_at', { ascending: false });
 
-    const mapped = rows.map((discount) => ({
-      ...discount,
-      discounted_price: computeDiscountedPrice(
-        discount.product_price,
-        discount.discount_type,
-        discount.discount_value
-      ),
-      is_currently_active: true
-    }));
+    if (error) throw error;
+
+    const mapped = discounts.filter(isDiscountCurrentlyActive).map((d) => {
+      const p = Array.isArray(d.products) ? d.products[0] : d.products;
+      const product_price = p ? p.price : 0;
+      return {
+        ...d,
+        product_name: p ? p.name : null,
+        product_price,
+        discounted_price: computeDiscountedPrice(product_price, d.discount_type, d.discount_value),
+        is_currently_active: true,
+        products: undefined
+      };
+    });
 
     res.json(mapped);
   } catch (err) {
@@ -117,11 +118,7 @@ router.get('/active/list', async (req, res, next) => {
 router.get('/:id', async (req, res, next) => {
   try {
     const discount = await getDiscountById(req.params.id);
-
-    if (!discount) {
-      return res.status(404).json({ error: 'Discount not found' });
-    }
-
+    if (!discount) return res.status(404).json({ error: 'Discount not found' });
     res.json(discount);
   } catch (err) {
     next(err);
@@ -131,20 +128,10 @@ router.get('/:id', async (req, res, next) => {
 // POST create discount
 router.post('/', async (req, res, next) => {
   try {
-    const {
-      product_id,
-      discount_type,
-      discount_value,
-      start_date,
-      end_date,
-      is_active,
-      notes
-    } = req.body;
+    const { product_id, discount_type, discount_value, start_date, end_date, is_active, notes } = req.body;
 
     if (!product_id || !discount_type || discount_value === undefined) {
-      return res.status(400).json({
-        error: 'product_id, discount_type, and discount_value are required'
-      });
+      return res.status(400).json({ error: 'product_id, discount_type, and discount_value are required' });
     }
 
     if (!['percentage', 'fixed'].includes(discount_type)) {
@@ -160,13 +147,8 @@ router.post('/', async (req, res, next) => {
       return res.status(400).json({ error: 'percentage discount cannot exceed 100' });
     }
 
-    const product = await dbHelpers.get(
-      'SELECT id, price FROM products WHERE id = ?',
-      [product_id]
-    );
-    if (!product) {
-      return res.status(404).json({ error: 'Product not found' });
-    }
+    const { data: product } = await supabase.from('products').select('id, price').eq('id', product_id).single();
+    if (!product) return res.status(404).json({ error: 'Product not found' });
 
     if (discount_type === 'fixed' && numericValue > Number(product.price || 0)) {
       return res.status(400).json({ error: 'fixed discount cannot exceed product price' });
@@ -175,33 +157,20 @@ router.post('/', async (req, res, next) => {
     const startIso = toIsoOrNull(start_date);
     const endIso = toIsoOrNull(end_date);
 
-    if (start_date && !startIso) {
-      return res.status(400).json({ error: 'Invalid start_date format' });
-    }
-
-    if (end_date && !endIso) {
-      return res.status(400).json({ error: 'Invalid end_date format' });
-    }
-
+    if (start_date && !startIso) return res.status(400).json({ error: 'Invalid start_date format' });
+    if (end_date && !endIso) return res.status(400).json({ error: 'Invalid end_date format' });
     if (startIso && endIso && new Date(startIso) > new Date(endIso)) {
       return res.status(400).json({ error: 'end_date must be after start_date' });
     }
 
-    const result = await dbHelpers.run(
-      `INSERT INTO discounts
-       (product_id, discount_type, discount_value, start_date, end_date, is_active, notes)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [
-        product_id,
-        discount_type,
-        Math.round(numericValue),
-        startIso,
-        endIso,
-        is_active === undefined ? 1 : (is_active ? 1 : 0),
-        notes || null
-      ]
-    );
+    const { data: result, error } = await supabase.from('discounts').insert([{
+      product_id, discount_type, discount_value: Math.round(numericValue),
+      start_date: startIso, end_date: endIso, is_active: is_active === undefined ? 1 : (is_active ? 1 : 0),
+      notes: notes || null
+    }]).select().single();
 
+    if (error) throw error;
+    
     const created = await getDiscountById(result.id);
     res.status(201).json(created);
   } catch (err) {
@@ -212,21 +181,14 @@ router.post('/', async (req, res, next) => {
 // PUT update discount
 router.put('/:id', async (req, res, next) => {
   try {
-    const existing = await dbHelpers.get('SELECT * FROM discounts WHERE id = ?', [req.params.id]);
-    if (!existing) {
-      return res.status(404).json({ error: 'Discount not found' });
-    }
+    const existing = await getDiscountById(req.params.id);
+    if (!existing) return res.status(404).json({ error: 'Discount not found' });
 
-    const updates = [];
-    const params = [];
-
+    const updates = {};
     if (req.body.product_id !== undefined) {
-      const product = await dbHelpers.get('SELECT id, price FROM products WHERE id = ?', [req.body.product_id]);
-      if (!product) {
-        return res.status(404).json({ error: 'Product not found' });
-      }
-      updates.push('product_id = ?');
-      params.push(req.body.product_id);
+      const { data: product } = await supabase.from('products').select('id, price').eq('id', req.body.product_id).single();
+      if (!product) return res.status(404).json({ error: 'Product not found' });
+      updates.product_id = req.body.product_id;
     }
 
     const nextType = req.body.discount_type !== undefined ? req.body.discount_type : existing.discount_type;
@@ -234,84 +196,54 @@ router.put('/:id', async (req, res, next) => {
       if (!['percentage', 'fixed'].includes(req.body.discount_type)) {
         return res.status(400).json({ error: 'discount_type must be percentage or fixed' });
       }
-      updates.push('discount_type = ?');
-      params.push(req.body.discount_type);
+      updates.discount_type = req.body.discount_type;
     }
 
-    const nextValue = req.body.discount_value !== undefined
-      ? Number(req.body.discount_value)
-      : Number(existing.discount_value);
-
+    const nextValue = req.body.discount_value !== undefined ? Number(req.body.discount_value) : Number(existing.discount_value);
     if (req.body.discount_value !== undefined) {
-      if (!Number.isFinite(nextValue) || nextValue <= 0) {
-        return res.status(400).json({ error: 'discount_value must be greater than 0' });
-      }
-      updates.push('discount_value = ?');
-      params.push(Math.round(nextValue));
+      if (!Number.isFinite(nextValue) || nextValue <= 0) return res.status(400).json({ error: 'discount_value must be greater than 0' });
+      updates.discount_value = Math.round(nextValue);
     }
 
     if (nextType === 'percentage' && nextValue > 100) {
       return res.status(400).json({ error: 'percentage discount cannot exceed 100' });
     }
 
-    const productIdForValidation = req.body.product_id !== undefined
-      ? req.body.product_id
-      : existing.product_id;
-    const productForValidation = await dbHelpers.get('SELECT price FROM products WHERE id = ?', [productIdForValidation]);
+    const productIdForValidation = req.body.product_id !== undefined ? req.body.product_id : existing.product_id;
+    const { data: productForValidation } = await supabase.from('products').select('price').eq('id', productIdForValidation).single();
+    
     if (nextType === 'fixed' && nextValue > Number(productForValidation?.price || 0)) {
       return res.status(400).json({ error: 'fixed discount cannot exceed product price' });
     }
 
     if (req.body.start_date !== undefined) {
       const startIso = toIsoOrNull(req.body.start_date);
-      if (req.body.start_date && !startIso) {
-        return res.status(400).json({ error: 'Invalid start_date format' });
-      }
-      updates.push('start_date = ?');
-      params.push(startIso);
+      if (req.body.start_date && !startIso) return res.status(400).json({ error: 'Invalid start_date format' });
+      updates.start_date = startIso;
     }
 
     if (req.body.end_date !== undefined) {
       const endIso = toIsoOrNull(req.body.end_date);
-      if (req.body.end_date && !endIso) {
-        return res.status(400).json({ error: 'Invalid end_date format' });
-      }
-      updates.push('end_date = ?');
-      params.push(endIso);
+      if (req.body.end_date && !endIso) return res.status(400).json({ error: 'Invalid end_date format' });
+      updates.end_date = endIso;
     }
 
-    const startForCompare = req.body.start_date !== undefined
-      ? toIsoOrNull(req.body.start_date)
-      : existing.start_date;
-    const endForCompare = req.body.end_date !== undefined
-      ? toIsoOrNull(req.body.end_date)
-      : existing.end_date;
+    const startForCompare = req.body.start_date !== undefined ? toIsoOrNull(req.body.start_date) : existing.start_date;
+    const endForCompare = req.body.end_date !== undefined ? toIsoOrNull(req.body.end_date) : existing.end_date;
 
     if (startForCompare && endForCompare && new Date(startForCompare) > new Date(endForCompare)) {
       return res.status(400).json({ error: 'end_date must be after start_date' });
     }
 
-    if (req.body.is_active !== undefined) {
-      updates.push('is_active = ?');
-      params.push(req.body.is_active ? 1 : 0);
-    }
+    if (req.body.is_active !== undefined) updates.is_active = req.body.is_active ? 1 : 0;
+    if (req.body.notes !== undefined) updates.notes = req.body.notes || null;
+    
+    updates.updated_at = new Date().toISOString();
 
-    if (req.body.notes !== undefined) {
-      updates.push('notes = ?');
-      params.push(req.body.notes || null);
-    }
+    if (Object.keys(updates).length === 1) return res.status(400).json({ error: 'No fields to update' });
 
-    if (updates.length === 0) {
-      return res.status(400).json({ error: 'No fields to update' });
-    }
-
-    updates.push('updated_at = CURRENT_TIMESTAMP');
-    params.push(req.params.id);
-
-    await dbHelpers.run(
-      `UPDATE discounts SET ${updates.join(', ')} WHERE id = ?`,
-      params
-    );
+    const { error } = await supabase.from('discounts').update(updates).eq('id', req.params.id);
+    if (error) throw error;
 
     const updated = await getDiscountById(req.params.id);
     res.json(updated);
@@ -323,12 +255,11 @@ router.put('/:id', async (req, res, next) => {
 // DELETE discount
 router.delete('/:id', async (req, res, next) => {
   try {
-    const existing = await dbHelpers.get('SELECT id FROM discounts WHERE id = ?', [req.params.id]);
-    if (!existing) {
-      return res.status(404).json({ error: 'Discount not found' });
-    }
+    const { data: existing } = await supabase.from('discounts').select('id').eq('id', req.params.id).maybeSingle();
+    if (!existing) return res.status(404).json({ error: 'Discount not found' });
 
-    await dbHelpers.run('DELETE FROM discounts WHERE id = ?', [req.params.id]);
+    const { error } = await supabase.from('discounts').delete().eq('id', req.params.id);
+    if (error) throw error;
     res.json({ success: true, message: 'Discount deleted' });
   } catch (err) {
     next(err);

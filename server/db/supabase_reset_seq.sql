@@ -1,0 +1,11 @@
+SELECT setval('products_id_seq', COALESCE((SELECT MAX(id) FROM products), 1));
+SELECT setval('employees_id_seq', COALESCE((SELECT MAX(id) FROM employees), 1));
+SELECT setval('customers_id_seq', COALESCE((SELECT MAX(id) FROM customers), 1));
+SELECT setval('raw_materials_id_seq', COALESCE((SELECT MAX(id) FROM raw_materials), 1));
+SELECT setval('stocks_id_seq', COALESCE((SELECT MAX(id) FROM stocks), 1));
+SELECT setval('discounts_id_seq', COALESCE((SELECT MAX(id) FROM discounts), 1));
+SELECT setval('raw_stocks_id_seq', COALESCE((SELECT MAX(id) FROM raw_stocks), 1));
+SELECT setval('transactions_id_seq', COALESCE((SELECT MAX(id) FROM transactions), 1));
+SELECT setval('transaction_items_id_seq', COALESCE((SELECT MAX(id) FROM transaction_items), 1));
+SELECT setval('stock_history_id_seq', COALESCE((SELECT MAX(id) FROM stock_history), 1));
+SELECT setval('raw_stock_history_id_seq', COALESCE((SELECT MAX(id) FROM raw_stock_history), 1));

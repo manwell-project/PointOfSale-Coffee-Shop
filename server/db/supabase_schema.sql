@@ -1,0 +1,128 @@
+-- DigiCaf Database Schema for Supabase (PostgreSQL)
+
+CREATE TABLE IF NOT EXISTS products (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  category VARCHAR(50),
+  price INTEGER NOT NULL,
+  description TEXT,
+  image_url VARCHAR(255),
+  barcode VARCHAR(50),
+  is_available INTEGER DEFAULT 1,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS employees (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  shift VARCHAR(50) NOT NULL,
+  phone VARCHAR(15),
+  email VARCHAR(100),
+  status VARCHAR(20) DEFAULT 'aktif',
+  username VARCHAR(100),
+  password_hash VARCHAR(255),
+  role VARCHAR(50),
+  position VARCHAR(50),
+  address TEXT,
+  joinDate TEXT,
+  notes TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS customers (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  phone VARCHAR(15),
+  email VARCHAR(100),
+  address TEXT,
+  total_transactions INTEGER DEFAULT 0,
+  total_spent INTEGER DEFAULT 0,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS raw_materials (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  sku VARCHAR(100) UNIQUE,
+  unit VARCHAR(50),
+  category VARCHAR(50),
+  price INTEGER DEFAULT 0,
+  description TEXT,
+  is_available INTEGER DEFAULT 1,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS stocks (
+  id SERIAL PRIMARY KEY,
+  product_id INTEGER NOT NULL UNIQUE REFERENCES products(id) ON DELETE CASCADE,
+  quantity INTEGER NOT NULL DEFAULT 0,
+  min_stock INTEGER NOT NULL DEFAULT 5,
+  last_updated TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS discounts (
+  id SERIAL PRIMARY KEY,
+  product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  discount_type VARCHAR(20) NOT NULL CHECK (discount_type IN ('percentage', 'fixed')),
+  discount_value INTEGER NOT NULL CHECK (discount_value > 0),
+  start_date TEXT,
+  end_date TEXT,
+  is_active INTEGER DEFAULT 1,
+  notes TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS raw_stocks (
+  id SERIAL PRIMARY KEY,
+  raw_material_id INTEGER NOT NULL UNIQUE REFERENCES raw_materials(id) ON DELETE CASCADE,
+  quantity INTEGER NOT NULL DEFAULT 0,
+  min_stock INTEGER NOT NULL DEFAULT 5,
+  expiry_date DATE,
+  last_updated TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS transactions (
+  id SERIAL PRIMARY KEY,
+  transaction_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  customer_id INTEGER REFERENCES customers(id) ON DELETE SET NULL,
+  employee_id INTEGER REFERENCES employees(id) ON DELETE SET NULL,
+  total_amount INTEGER NOT NULL,
+  payment_method VARCHAR(50),
+  status VARCHAR(20) DEFAULT 'completed',
+  notes TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS transaction_items (
+  id SERIAL PRIMARY KEY,
+  transaction_id INTEGER NOT NULL REFERENCES transactions(id) ON DELETE CASCADE,
+  product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  quantity INTEGER NOT NULL,
+  unit_price INTEGER NOT NULL,
+  subtotal INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS stock_history (
+  id SERIAL PRIMARY KEY,
+  product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  quantity_before INTEGER NOT NULL,
+  quantity_after INTEGER NOT NULL,
+  change_reason VARCHAR(100),
+  changed_by_employee_id INTEGER REFERENCES employees(id) ON DELETE SET NULL,
+  changed_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS raw_stock_history (
+  id SERIAL PRIMARY KEY,
+  raw_material_id INTEGER NOT NULL REFERENCES raw_materials(id) ON DELETE CASCADE,
+  quantity_before INTEGER NOT NULL,
+  quantity_after INTEGER NOT NULL,
+  change_reason VARCHAR(100),
+  changed_by_employee_id INTEGER REFERENCES employees(id) ON DELETE SET NULL,
+  changed_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
