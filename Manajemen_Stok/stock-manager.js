@@ -59,8 +59,8 @@ const stockOutEmployeeIdInput = document.getElementById('stockOutEmployeeId');
 const searchInput = document.getElementById('searchStockInput');
 
 const categoryFilter = document.getElementById('categoryFilter');
-
 const statusFilter = document.getElementById('statusFilter');
+const sortFilter = document.getElementById('sortFilter');
 
 const stockTableBody = document.getElementById('stockTableBody');
 
@@ -241,14 +241,19 @@ function setupEventListeners() {
     
 
     statusFilter.addEventListener('change', () => {
-
         currentFilters.status = statusFilter.value;
-
         currentPage = 1;
-
         renderTable();
-
     });
+
+    if (sortFilter) {
+        sortFilter.addEventListener('change', () => {
+            currentSort.field = 'updated';
+            currentSort.direction = sortFilter.value === 'terbaru' ? 'desc' : 'asc';
+            currentPage = 1;
+            renderTable();
+        });
+    }
 
 
 
@@ -912,31 +917,17 @@ function renderTable() {
 
                     </span>
 
-                </td>
-
-                <td class="price-cell">
-
-                    <div class="price-display">
-
-                        <div class="price-label">Harga Jual</div>
-
-                        <div class="price-value">Rp ${formatNumber(stock.sellPrice || 0)}</div>
-
-                    </div>
-
-                </td>
-
                 <td class="updated-cell">
 
                     <div class="updated-time">
 
-                        <div class="updated-date">${formatDate(stock.updated_at || stock.created_at)}</div>
+                        <div class="updated-date">${formatDate(stock.last_updated || stock.updated_at || stock.created_at)}</div>
 
                         <div class="updated-ago">
 
                             <i class="fas fa-clock"></i>
 
-                            ${getTimeAgo(stock.updated_at || stock.created_at)}
+                            ${getTimeAgo(stock.last_updated || stock.updated_at || stock.created_at)}
 
                         </div>
 
@@ -945,17 +936,11 @@ function renderTable() {
                 </td>
 
                 <td class="actions-cell">
-
                     <div class="table-actions">
-
-                        <button class="btn-icon edit" onclick="openModal(${stock.id})" title="Edit">
-
+                        <button class="btn-icon edit" onclick="openModal(${stock.id})" title="Edit" aria-label="Edit">
                             <i class="fas fa-edit"></i>
-
                         </button>
-
-                        <button class="btn-icon delete" onclick="deleteStock(${stock.id})" title="Hapus">
-
+                        <button class="btn-icon delete" onclick="deleteStock(${stock.id})" title="Hapus" aria-label="Hapus">
                             <i class="fas fa-trash"></i>
 
                         </button>
@@ -1077,10 +1062,8 @@ function sortStocks(stocks) {
                 break;
 
             case 'updated':
-
-                aVal = new Date(a.updated_at || a.created_at || 0);
-
-                bVal = new Date(b.updated_at || b.created_at || 0);
+                aVal = new Date(a.last_updated || a.updated_at || a.created_at || 0);
+                bVal = new Date(b.last_updated || b.updated_at || b.created_at || 0);
 
                 break;
 
@@ -1152,69 +1135,54 @@ function renderAlerts() {
 
 
 
-    const totalAlerts = criticalStocks.length + warningStocks.length;
+    const now = new Date();
+    const approachingExpiryStocks = stocks.filter(s => {
+        if (!s.expiry_date) return false;
+        const expiryDate = new Date(s.expiry_date);
+        const daysToExpiry = (expiryDate - now) / (1000 * 60 * 60 * 24);
+        return daysToExpiry > 0 && daysToExpiry <= 7;
+    });
+
+    const expiredStocks = stocks.filter(s => {
+        if (!s.expiry_date) return false;
+        const expiryDate = new Date(s.expiry_date);
+        return expiryDate <= now;
+    });
+
+    const totalAlerts = criticalStocks.length + warningStocks.length + approachingExpiryStocks.length + expiredStocks.length;
 
     
-
     if (totalAlerts === 0) {
-
         if (alertsWidget) {
-
             alertsWidget.style.display = 'none';
-
             alertsWidget.classList.remove('open', 'expanded');
-
         }
-
         if (alertsToggleBtn) {
-
             alertsToggleBtn.style.display = 'none';
-
             alertsToggleBtn.setAttribute('aria-expanded', 'false');
-
         }
-
         return;
-
     }
-
-
 
     if (alertsToggleBtn) {
-
         alertsToggleBtn.style.display = '';
-
     }
-
-
 
     // Widget is shown/hidden via popover toggle, but keep it in the DOM when alerts exist
-
     if (alertsWidget) {
-
         alertsWidget.style.display = 'block';
-
     }
 
-
-
-    updateAlertBadges();
-
-
-
     const alerts = [
-
+        ...expiredStocks.map(s => ({ ...s, type: 'critical', message: `Barang sudah kedaluwarsa pada ${formatDate(s.expiry_date)}` })),
         ...criticalStocks.map(s => ({ ...s, type: 'critical', message: 'Stok habis, segera lakukan restock' })),
-
+        ...approachingExpiryStocks.map(s => ({ ...s, type: 'warning', message: `Mendekati kedaluwarsa pada ${formatDate(s.expiry_date)}` })),
         ...warningStocks.map(s => ({ ...s, type: 'warning', message: 'Stok mendekati batas minimum' }))
-
     ];
 
-
-
     currentAlerts = alerts;
-
     renderAlertsList();
+    updateAlertBadges();
 
 }
 
@@ -1424,23 +1392,19 @@ function openModal(id = null) {
 
         document.getElementById('costPrice').value = stock.costPrice || 0;
 
-        document.getElementById('sellPrice').value = stock.sellPrice || 0;
-
         document.getElementById('supplierName').value = stock.supplierName || '';
-
         document.getElementById('supplierContact').value = stock.supplierContact || '';
+        document.getElementById('expiryDate').value = stock.expiry_date ? stock.expiry_date.split('T')[0] : '';
 
     } else {
 
         titleEl.className = 'fas fa-plus-circle';
 
         titleText.innerHTML = '<i class="fas fa-plus-circle"></i> Tambah Stok Baru';
-
         document.querySelector('.modal-subtitle').textContent = 'Lengkapi informasi produk di bawah ini';
-
         stockForm.reset();
-
         document.getElementById('stockId').value = '';
+        document.getElementById('expiryDate').value = '';
 
     }
 
@@ -1479,13 +1443,9 @@ async function saveStock(e) {
         min_stock: parseInt(document.getElementById('minStock').value) || 0,
 
         costPrice: parseInt(document.getElementById('costPrice').value) || 0,
-
-        sellPrice: parseInt(document.getElementById('sellPrice').value) || 0,
-
         supplierName: document.getElementById('supplierName').value.trim(),
-
-        supplierContact: document.getElementById('supplierContact').value.trim()
-
+        supplierContact: document.getElementById('supplierContact').value.trim(),
+        expiry_date: document.getElementById('expiryDate').value || null
     };
 
 

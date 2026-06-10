@@ -27,7 +27,7 @@
     <link rel="stylesheet" href="../css/tablet.css">
     
     <!-- Page Specific CSS -->
-    <link rel="stylesheet" href="css/stock-layout.css?v=20260506-1">
+    <link rel="stylesheet" href="css/stock-layout.css?v=7">
     <link rel="stylesheet" href="../css/shared-ui.css">
     
     <!-- Page Adjustments - MUST BE LAST to override local CSS -->
@@ -107,6 +107,10 @@
                         <button class="btn-export" id="stockOutBtn" type="button">
                             <i class="fas fa-arrow-up"></i>
                             Barang Keluar
+                        </button>
+                        <button onclick="window.location.href='barang-rusak.html'" class="btn-export" id="barangRusakBtn" type="button">
+                            <i class="fas fa-heart-broken"></i>
+                            Barang Rusak/Kadaluarsa
                         </button>
                     </div>
                 </div>
@@ -204,6 +208,12 @@
                                 <option value="out-stock">Habis</option>
                             </select>
                         </div>
+                        <div class="filter-select">
+                            <select id="sortFilter">
+                                <option value="terbaru">Terakhir Update: Terbaru</option>
+                                <option value="terlama">Terakhir Update: Terlama</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
@@ -222,20 +232,17 @@
                                     <th class="sortable" data-sort="status">
                                         Status
                                     </th>
-                                    <th class="sortable" data-sort="price">
-                                        Harga
-                                    </th>
                                     <th class="sortable" data-sort="updated">
                                         Terakhir Update
                                     </th>
-                                    <th>
+                                    <th style="text-align: center;">
                                         Aksi
                                     </th>
                                 </tr>
                             </thead>
                             <tbody id="stockTableBody">
                                 <tr>
-                                    <td colspan="6">
+                                    <td colspan="5">
                                         <div class="empty-state">
                                             <div class="empty-icon">
                                                 <i class="fas fa-spinner fa-spin"></i>
@@ -404,13 +411,6 @@
                                     <span class="input-unit">IDR</span>
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label">Harga Jual</label>
-                                <div class="input-with-unit">
-                                    <input type="number" class="form-input" id="sellPrice" min="0" value="0" step="100">
-                                    <span class="input-unit">IDR</span>
-                                </div>
-                            </div>
                         </div>
                     </div>
 
@@ -562,15 +562,15 @@
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
     <!-- Performance Optimizations -->
-    <script src="../js/performance.js" defer></script>
-    <script src="../js/performance-utilities.js" defer></script>
-    <script src="../js/cache.js" defer></script>
+    <script src="../js/performance.js?v=7" defer></script>
+    <script src="../js/performance-utilities.js?v=7" defer></script>
+    <script src="../js/cache.js?v=7" defer></script>
     
-    <script src="../js/auth.js?v=1769014084"></script>
-    <script src="../js/api-helper.js?v=1769014085"></script>
-    <script src="../js/top-navbar.js?v=20260510-1"></script>
-    <script src="../js/sidebar-nav.js?v=20260511-9"></script>
-    <script src="../js/navbar.js?v=20260510-1"></script>
-    <script src="stock-manager.js?v=20260506-1"></script>
+    <script src="../js/auth.js?v=7"></script>
+    <script src="../js/api-helper.js?v=7"></script>
+    <script src="../js/top-navbar.js?v=7"></script>
+    <script src="../js/sidebar-nav.js?v=7"></script>
+    <script src="../js/navbar.js?v=7"></script>
+    <script src="stock-manager.js?v=7"></script>
 </body>
 </html>

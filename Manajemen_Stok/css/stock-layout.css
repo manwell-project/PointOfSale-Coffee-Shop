@@ -958,13 +958,13 @@ body {
 /* Actions Column */
 .actions-cell {
   min-width: 120px;
-  text-align: right;
+  text-align: center;
 }
 
 .table-actions {
   display: flex;
   gap: var(--spacing-xs);
-  justify-content: flex-end;
+  justify-content: center;
   align-items: center;
 }
 
