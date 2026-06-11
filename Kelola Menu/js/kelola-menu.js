@@ -70,20 +70,26 @@
       const card = document.createElement('div');
       card.className = 'product-card';
       // allow clicking on card to not add to cart; override pointer events on buttons
+      card.style.cssText = 'display: flex; flex-direction: column; height: 100%; border: 1px solid #e2d5cc; border-top: 4px solid var(--color-primary); box-shadow: 0 4px 12px rgba(139, 90, 43, 0.08); border-radius: 12px; overflow: hidden; background: #fff; transition: transform 0.2s ease, box-shadow 0.2s ease;';
+      card.onmouseenter = () => { card.style.transform = 'translateY(-4px)'; card.style.boxShadow = '0 8px 16px rgba(139, 90, 43, 0.15)'; };
+      card.onmouseleave = () => { card.style.transform = 'translateY(0)'; card.style.boxShadow = '0 4px 12px rgba(139, 90, 43, 0.08)'; };
+      
       card.innerHTML = `
-        <div class="product-image-wrapper">
-          ${isValidImageUrl(p.image_url) ? `<div class="product-image"><img src="${p.image_url}" alt="${escapeHtml(p.name)}" /></div>` : `<div class="product-image-placeholder"><i class="fas fa-utensils"></i></div>`}
+        <div class="product-image-wrapper" style="margin-bottom: 0; border-radius: 12px 12px 0 0; border-bottom: 1px solid #f0e6e0;">
+          ${isValidImageUrl(p.image_url) 
+            ? `<div class="product-image"><img src="${p.image_url}" alt="${escapeHtml(p.name)}" /></div>` 
+            : `<div class="product-image-placeholder"><i class="fas fa-coffee"></i></div>`}
+          <span style="position: absolute; top: 12px; right: 12px; background: rgba(139, 90, 43, 0.9); color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); z-index: 2;">${escapeHtml(p.category || 'Menu')}</span>
         </div>
-        <div class="product-info">
-          <div class="product-name">${escapeHtml(p.name)}</div>
-          <div class="product-price">${formatRupiah(p.price || 0)}</div>
-          <div class="product-desc">${escapeHtml(p.description || '')}</div>
+        <div class="product-info" style="padding: 16px; flex-grow: 1; display: flex; flex-direction: column;">
+          <div class="product-name" style="font-size: 1.15rem; font-weight: 700; color: #4a3b32; margin-bottom: 8px;">${escapeHtml(p.name)}</div>
+          <div class="product-price" style="font-size: 1.25rem; font-weight: 800; color: var(--color-primary); margin-bottom: 12px;">${formatRupiah(p.price || 0)}</div>
+          <div class="product-desc" style="font-size: 0.85rem; color: #6b5c53; flex-grow: 1; margin-bottom: 12px; line-height: 1.5;">${escapeHtml(p.description || 'Tidak ada keterangan.')}</div>
+          ${p.barcode ? `<div style="font-size: 0.8rem; color: #8c7a6b; display: flex; align-items: center; gap: 6px; padding: 6px 8px; background: #f9f5f2; border-radius: 6px; border: 1px dashed #d7c9bf;"><i class="fas fa-barcode"></i> ${escapeHtml(p.barcode)}</div>` : ''}
         </div>
-        <div class="product-card-footer">
-          <div style="display:flex;gap:8px;align-items:center;">
-            <button class="btn btn-icon btn-edit" data-id="${p.id}" title="Edit"><i class="fas fa-pen"></i></button>
-            <button class="btn btn-icon btn-delete" data-id="${p.id}" title="Hapus"><i class="fas fa-trash"></i></button>
-          </div>
+        <div class="product-card-footer" style="padding: 12px 16px; background: #faf6f3; border-top: 1px solid #f0e6e0; display: flex; justify-content: flex-end; gap: 8px;">
+          <button class="btn-edit" data-id="${p.id}" title="Edit" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; background: white; border: 1px solid var(--color-primary); color: var(--color-primary); padding: 8px 12px; border-radius: 6px; cursor: pointer; transition: all 0.2s; font-weight: 600;"><i class="fas fa-pen"></i> Edit</button>
+          <button class="btn-delete" data-id="${p.id}" title="Hapus" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; background: white; border: 1px solid #e74c3c; color: #e74c3c; padding: 8px 12px; border-radius: 6px; cursor: pointer; transition: all 0.2s; font-weight: 600;"><i class="fas fa-trash"></i> Hapus</button>
         </div>
       `;
 
