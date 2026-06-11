@@ -100,115 +100,7 @@
                 
                 <div class="product-grid-wrapper">
                     <div class="product-grid" id="productGrid">
-                        <!-- Sample products for demo - will be loaded dynamically via JS -->
-                        
-                        <!-- Product Card Example 1 - With image -->
-                        <div class="product-card" onclick="addToCart(1, 'Espresso', 25000)">
-                            <span class="product-badge hot">Hot</span>
-                            <div class="product-image-wrapper">
-                                <div class="product-image-placeholder">
-                                    <i class="fas fa-coffee"></i>
-                                </div>
-                            </div>
-                            <div class="product-info">
-                                <div class="product-name">Espresso</div>
-                                <div class="product-price">Rp 25.000</div>
-                                <div class="product-stock in-stock">
-                                    <i class="fas fa-circle"></i>
-                                    <span>Stok: 15</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Product Card Example 2 -->
-                        <div class="product-card" onclick="addToCart(2, 'Cappuccino', 30000)">
-                            <span class="product-badge new">New</span>
-                            <div class="product-image-wrapper">
-                                <div class="product-image-placeholder">
-                                    <i class="fas fa-mug-hot"></i>
-                                </div>
-                            </div>
-                            <div class="product-info">
-                                <div class="product-name">Cappuccino</div>
-                                <div class="product-price">Rp 30.000</div>
-                                <div class="product-stock in-stock">
-                                    <i class="fas fa-circle"></i>
-                                    <span>Stok: 20</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Product Card Example 3 - Low stock -->
-                        <div class="product-card" onclick="addToCart(3, 'Latte', 32000)">
-                            <div class="product-image-wrapper">
-                                <div class="product-image-placeholder">
-                                    <i class="fas fa-coffee"></i>
-                                </div>
-                            </div>
-                            <div class="product-info">
-                                <div class="product-name">Caffe Latte</div>
-                                <div class="product-price">Rp 32.000</div>
-                                <div class="product-stock low-stock">
-                                    <i class="fas fa-circle"></i>
-                                    <span>Stok: 3</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Product Card Example 4 - Promo -->
-                        <div class="product-card" onclick="addToCart(4, 'Americano', 28000)">
-                            <span class="product-badge promo">Promo</span>
-                            <div class="product-image-wrapper">
-                                <div class="product-image-placeholder">
-                                    <i class="fas fa-coffee"></i>
-                                </div>
-                            </div>
-                            <div class="product-info">
-                                <div class="product-name">Americano</div>
-                                <div class="product-price">Rp 28.000</div>
-                                <div class="product-stock in-stock">
-                                    <i class="fas fa-circle"></i>
-                                    <span>Stok: 18</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Product Card Example 5 - Out of stock -->
-                        <div class="product-card out-of-stock">
-                            <div class="product-image-wrapper">
-                                <div class="product-image-placeholder">
-                                    <i class="fas fa-mug-hot"></i>
-                                </div>
-                            </div>
-                            <div class="product-info">
-                                <div class="product-name">Mocha</div>
-                                <div class="product-price">Rp 35.000</div>
-                                <div class="product-stock out-of-stock">
-                                    <i class="fas fa-circle"></i>
-                                    <span>Stok: 0</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Product Card Example 6 - Limited -->
-                        <div class="product-card" onclick="addToCart(6, 'Affogato', 38000)">
-                            <span class="product-badge limited">Limited</span>
-                            <div class="product-image-wrapper">
-                                <div class="product-image-placeholder">
-                                    <i class="fas fa-ice-cream"></i>
-                                </div>
-                            </div>
-                            <div class="product-info">
-                                <div class="product-name">Affogato</div>
-                                <div class="product-price">Rp 38.000</div>
-                                <div class="product-stock in-stock">
-                                    <i class="fas fa-circle"></i>
-                                    <span>Stok: 10</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- More products will be loaded here via JavaScript -->
+                        <!-- Product cards will be loaded here via JavaScript -->
                     </div>
                 </div>
             </div>
@@ -438,36 +330,23 @@
         /**
          * Add item to cart or increase quantity if exists
          */
-        function addToCart(productId, productName, productPrice, maxStock) {
-            // Treat undefined, null or non-number maxStock as "unlimited" (large number)
-            if (typeof maxStock !== 'number' || isNaN(maxStock)) {
-                maxStock = 9999;
-            }
+        function addToCart(productId, productName, productPrice) {
             
             // Check if item already exists in cart
             const existingItem = cartItems.find(item => item.id === productId);
             
             if (existingItem) {
-                if (existingItem.quantity >= maxStock) {
-                    showToast('🔴 Stok produk tidak mencukupi', 'error');
-                    return;
-                }
                 // Increase quantity
                 existingItem.quantity += 1;
                 existingItem.subtotal = existingItem.price * existingItem.quantity;
             } else {
-                if (maxStock <= 0) {
-                    showToast('🔴 Produk kehabisan stok', 'error');
-                    return;
-                }
                 // Add new item
                 cartItems.push({
                     id: productId,
                     name: productName,
                     price: productPrice,
                     quantity: 1,
-                    subtotal: productPrice,
-                    maxStock: maxStock
+                    subtotal: productPrice
                 });
             }
             
@@ -507,8 +386,8 @@
             if (item) {
                 const newQuantity = item.quantity + change;
                 
-                if (change > 0 && newQuantity > item.maxStock) {
-                    showToast('🔴 Stok produk tidak mencukupi', 'error');
+                if (change > 0 && newQuantity > 9999) {
+                    showToast('🔴 Limit pembelian tercapai', 'error');
                     return;
                 }
                 
@@ -1164,35 +1043,17 @@
                     const discount = discountMap[product.id];
                     const hasDiscount = !!discount;
                     const displayPrice = hasDiscount ? discount.discounted_price : product.price;
-                    
-                    // Treat missing quantity as "not managed" on POS — do not mark as out-of-stock
-                    const stockQuantity = (typeof product.quantity === 'number') ? product.quantity : null;
-                    const stockMin = (typeof product.min_stock === 'number') ? product.min_stock : null;
 
-                    let stockClass = 'in-stock';
-                    if (stockQuantity !== null) {
-                        if (stockQuantity <= 0) {
-                            stockClass = 'out-of-stock';
-                        } else if (stockMin !== null && stockQuantity <= stockMin) {
-                            stockClass = 'low-stock';
-                        }
-                    }
-                    
                     // helper to escape HTML in product name/alt
                     function escapeHtml(s){ if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
                     const card = document.createElement('div');
-                    card.className = `product-card ${stockClass}`;
-                    // Allow adding to cart when stock is not managed (null) or when quantity > 0
-                    if (stockQuantity === null || stockQuantity > 0) {
-                        card.onclick = () => addToCart(product.id, product.name, displayPrice, stockQuantity);
-                    }
+                    card.className = `product-card`;
+                    card.onclick = () => addToCart(product.id, product.name, displayPrice);
                     
                     // Build badge HTML
                     let badgeHTML = '';
-                    if (stockQuantity !== null && stockQuantity <= 0) {
-                        badgeHTML = `<span class="product-badge out">Habis</span>`;
-                    } else if (hasDiscount) {
+                    if (hasDiscount) {
                         const discountLabel = discount.discount_type === 'percentage' 
                             ? `${discount.discount_value}%` 
                             : `Rp ${parseInt(discount.discount_value).toLocaleString('id-ID')}`;
@@ -1227,7 +1088,6 @@
                         <div class="product-info">
                             <div class="product-name">${escapeHtml(product.name)}</div>
                             ${priceHTML}
-                            ${stockQuantity !== null ? `<div class="product-stock ${stockClass}"><i class="fas fa-circle"></i><span>Stok: ${stockQuantity}</span></div>` : ''}
                         </div>
                     `;
                     
