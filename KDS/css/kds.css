@@ -1,0 +1,108 @@
+.kds-container {
+    display: flex;
+    flex-direction: row;
+    height: calc(100vh - 56px); /* minus navbar */
+    padding: 10px;
+    gap: 15px;
+    overflow-x: auto;
+}
+
+.kds-column {
+    flex: 1;
+    min-width: 300px;
+    background: var(--component-bg, #ffffff);
+    border-radius: var(--radius-lg, 12px);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.kds-column-header {
+    padding: 15px;
+    border-top-left-radius: var(--radius-lg, 12px);
+    border-top-right-radius: var(--radius-lg, 12px);
+    text-align: center;
+}
+
+.kds-column-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.kds-column-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    background: var(--surface-bg-alt, #f5f6f8);
+    border-bottom-left-radius: var(--radius-lg, 12px);
+    border-bottom-right-radius: var(--radius-lg, 12px);
+}
+
+/* Order Card */
+.order-card {
+    background: #fff;
+    border-radius: var(--radius-md, 8px);
+    padding: 12px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-left: 5px solid #ccc;
+    transition: transform 0.2s;
+}
+
+.order-card:active {
+    transform: scale(0.98);
+}
+
+.order-card.status-pending { border-left-color: var(--f7-theme-color-orange, #ff9500); }
+.order-card.status-preparing { border-left-color: var(--f7-theme-color-blue, #007aff); }
+.order-card.status-completed { border-left-color: var(--f7-theme-color-green, #34c759); }
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px dashed #eee;
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+}
+
+.order-id {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.order-time {
+    font-size: 0.85rem;
+    color: var(--text-color-secondary, #8e8e93);
+}
+
+.order-items {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.order-items li {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    font-size: 1rem;
+}
+
+.item-qty {
+    font-weight: bold;
+    min-width: 25px;
+}
+
+.order-actions {
+    margin-top: 15px;
+    display: flex;
+    gap: 8px;
+}
+
+.btn-status {
+    flex: 1;
+    height: 36px;
+    line-height: 36px;
+}

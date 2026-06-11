@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Shift - Buka/Tutup Kasir</title>
+  <link rel="stylesheet" href="../css/shared-ui.css">
+  <link rel="stylesheet" href="../css/components/top-navbar-simple.css">
+  <link rel="stylesheet" href="css/shift.css">
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <a href="index.html" class="back">← Kembali</a>
+      <h1>Manajemen Shift</h1>
+    </header>
+
+    <main class="container">
+      <section class="card">
+        <h2>Buka Shift</h2>
+        <div class="form-row">
+          <label>Pilih Karyawan</label>
+          <select id="employeeSelect"></select>
+        </div>
+        <div class="form-row">
+          <label>Modal Awal (Rp)</label>
+          <input type="number" id="startingCash" value="0">
+        </div>
+        <div class="form-row">
+          <button id="openShiftBtn" class="btn btn-primary">Buka Shift</button>
+        </div>
+      </section>
+
+      <section class="card" id="activeShiftCard" style="display:none;">
+        <h2>Shift Aktif</h2>
+        <div id="activeShiftInfo"></div>
+        <div class="form-row">
+          <label>Perkiraan Uang Akhir (dihitung saat tutup)</label>
+          <div id="expectedCash">-</div>
+        </div>
+        <div class="form-row">
+          <label>Jumlah Fisik di Laci (Rp)</label>
+          <input type="number" id="actualEndingCash" value="0">
+        </div>
+        <div class="form-row">
+          <label>Catatan (opsional)</label>
+          <input type="text" id="shiftNotes">
+        </div>
+        <div class="form-row">
+          <button id="closeShiftBtn" class="btn btn-danger">Tutup Shift</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Riwayat Shift (Terakhir)</h2>
+        <div id="shiftList"></div>
+      </section>
+    </main>
+
+  <script src="../js/framework7-bundle.min.js"></script>
+  <script src="../js/api-helper.js"></script>
+  <script src="js/shift.js"></script>
+  </body>
+</html>

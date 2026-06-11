@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kitchen Display System (KDS) - DigiCaf</title>
+    <!-- Framework7 CSS -->
+    <link rel="stylesheet" href="../css/app.css">
+    <link rel="stylesheet" href="../css/icons.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/design-tokens.css">
+    <link rel="stylesheet" href="../css/layout-system.css">
+    <link rel="stylesheet" href="../css/typography.css">
+    <link rel="stylesheet" href="../css/components/badges-labels.css">
+    <link rel="stylesheet" href="../css/components/buttons.css">
+    <link rel="stylesheet" href="../css/components/cards.css">
+    <link rel="stylesheet" href="../css/components/top-navbar.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="css/kds.css">
+</head>
+<body class="theme-light">
+    <div id="app">
+        <div class="view view-main">
+            <div class="page" data-name="kds">
+                
+                <!-- Navbar -->
+                <div class="navbar">
+                    <div class="navbar-bg"></div>
+                    <div class="navbar-inner">
+                        <div class="left">
+                            <a href="../Dashboard/index.html" class="link external">
+                                <i class="icon f7-icons">arrow_left</i>
+                                <span class="if-not-md">Kembali</span>
+                            </a>
+                        </div>
+                        <div class="title" style="flex:1; text-align:center;">Kitchen Display System (KDS)</div>
+                        <div class="right">
+                           <div class="chip color-blue">
+                             <div class="chip-media"><i class="icon f7-icons">clock</i></div>
+                             <div class="chip-label" id="clock">00:00:00</div>
+                           </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scrollable Page Content -->
+                <div class="page-content" style="background: var(--surface-bg);">
+                   
+                    <div class="kds-container">
+                        <!-- Kolom Menunggu -->
+                        <div class="kds-column" id="col-pending">
+                            <div class="kds-column-header bg-color-orange text-color-white">
+                                <h3>Baru (<span id="count-pending">0</span>)</h3>
+                            </div>
+                            <div class="kds-column-content" id="list-pending">
+                                <!-- Cards will be injected here -->
+                            </div>
+                        </div>
+
+                        <!-- Kolom Sedang Dibuat -->
+                        <div class="kds-column" id="col-preparing">
+                            <div class="kds-column-header bg-color-blue text-color-white">
+                                <h3>Sedang Dibuat (<span id="count-preparing">0</span>)</h3>
+                            </div>
+                            <div class="kds-column-content" id="list-preparing">
+                                <!-- Cards will be injected here -->
+                            </div>
+                        </div>
+
+                        <!-- Kolom Selesai -->
+                        <div class="kds-column" id="col-completed">
+                            <div class="kds-column-header bg-color-green text-color-white">
+                                <h3>Selesai / Siap (<span id="count-completed">0</span>)</h3>
+                            </div>
+                            <div class="kds-column-content" id="list-completed">
+                                <!-- Cards will be injected here -->
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Framework7 Library -->
+    <script src="../js/framework7-bundle.min.js"></script>
+    <script src="../js/api-helper.js"></script>
+    <script src="js/kds.js"></script>
+</body>
+</html>
