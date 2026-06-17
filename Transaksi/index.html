@@ -1015,11 +1015,9 @@
         async function loadProductsWithDiscounts() {
             try {
                 showLoadingSkeletons();
-                const API_BASE = 'http://localhost:3000/api';
-                
                 // Load products and active discounts in parallel
-                const productsRes = await fetch(`${API_BASE}/products`).then(r => r.json());
-                const discountsRes = await fetch(`${API_BASE}/discounts/active/list`).then(r => r.json());
+                const productsRes = await window.API.Products.getAll();
+                const discountsRes = await window.API.Discounts.getActive();
                 
                 const products = Array.isArray(productsRes) ? productsRes : [];
                 const activeDiscounts = Array.isArray(discountsRes) ? discountsRes : [];

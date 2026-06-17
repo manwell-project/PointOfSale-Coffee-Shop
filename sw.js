@@ -4,7 +4,7 @@
  * Offline-first caching strategy
  */
 
-const CACHE_VERSION = 'digicaf-v2';
+const CACHE_VERSION = 'digicaf-v3';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 const IMAGE_CACHE = `${CACHE_VERSION}-images`;
@@ -111,23 +111,22 @@ async function handleStaticRequest(request) {
   const cache = await caches.open(STATIC_CACHE);
   const cached = await cache.match(request);
   
-  if (cached) {
-    console.log('[SW] Serving from static cache:', request.url);
-    return cached;
-  }
-  
-  try {
-    const response = await fetch(request);
-    
+  const networkFetch = fetch(request).then(response => {
     if (response.ok) {
       cache.put(request, response.clone());
     }
-    
     return response;
-  } catch (error) {
+  }).catch(error => {
     console.error('[SW] Static fetch failed:', error);
     return new Response('Offline', { status: 503 });
+  });
+  
+  if (cached) {
+    console.log('[SW] Serving from static cache (stale-while-revalidate):', request.url);
+    return cached;
   }
+  
+  return networkFetch;
 }
 
 /**
