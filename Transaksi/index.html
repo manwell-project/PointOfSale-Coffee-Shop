@@ -1266,10 +1266,10 @@
             const inputEl = document.getElementById(inputId);
             if (!inputEl) return;
 
-            let suggestionBox = null;
-
             inputEl.addEventListener('input', (e) => {
                 const val = e.target.value.trim().toLowerCase();
+                let suggestionBox = inputEl.parentElement.querySelector('.customer-suggestions');
+
                 if (!val) {
                     if (suggestionBox) suggestionBox.remove();
                     return;
@@ -1285,7 +1285,9 @@
                     return (c.name || '').toLowerCase().indexOf(val) !== -1 || (c.phone || '').toLowerCase().indexOf(val) !== -1;
                 }).slice(0, 10);
 
-                if (!suggestionBox) suggestionBox = createSuggestionBox(inputEl);
+                if (!suggestionBox) {
+                    suggestionBox = createSuggestionBox(inputEl);
+                }
                 renderSuggestions(suggestionBox, results, inputEl);
             });
 

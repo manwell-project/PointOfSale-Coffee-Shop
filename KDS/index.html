@@ -25,33 +25,33 @@
             <div class="page" data-name="kds">
                 
                 <!-- Navbar -->
-                <div class="navbar">
-                    <div class="navbar-bg"></div>
+                <div class="navbar" style="background: var(--color-primary, #8B5A2B); color: white; border-bottom: none; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                    <div class="navbar-bg" style="background: transparent;"></div>
                     <div class="navbar-inner">
                         <div class="left">
-                            <a href="../Dashboard/index.html" class="link external">
-                                <i class="icon f7-icons">arrow_left</i>
-                                <span class="if-not-md">Kembali</span>
+                            <a href="../Dashboard/index.html" class="link external" style="color: white; display: flex; align-items: center; gap: 8px; font-weight: 600; padding: 0 16px; background: rgba(255,255,255,0.1); border-radius: 8px; height: 36px;">
+                                <i class="fas fa-arrow-left"></i>
+                                <span>Kembali</span>
                             </a>
                         </div>
-                        <div class="title" style="flex:1; text-align:center;">Kitchen Display System (KDS)</div>
-                        <div class="right">
-                           <div class="chip color-blue">
-                             <div class="chip-media"><i class="icon f7-icons">clock</i></div>
-                             <div class="chip-label" id="clock">00:00:00</div>
+                        <div class="title" style="flex:1; text-align:center; font-size: 1.25rem; font-weight: 700; letter-spacing: 0.5px;">👨‍🍳 Layar Dapur (KDS)</div>
+                        <div class="right" style="padding-right: 16px;">
+                           <div style="background: rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 20px; display: flex; align-items: center; gap: 8px; font-weight: 600;">
+                             <i class="fas fa-clock"></i>
+                             <div id="clock">00:00:00</div>
                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Scrollable Page Content -->
-                <div class="page-content" style="background: var(--surface-bg);">
+                <div class="page-content" style="background: #F8F5F2;">
                    
                     <div class="kds-container">
                         <!-- Kolom Menunggu -->
                         <div class="kds-column" id="col-pending">
-                            <div class="kds-column-header bg-color-orange text-color-white">
-                                <h3>Baru (<span id="count-pending">0</span>)</h3>
+                            <div class="kds-column-header" style="background: #E74C3C; color: white;">
+                                <h3><i class="fas fa-fire" style="margin-right: 8px;"></i> Baru (<span id="count-pending">0</span>)</h3>
                             </div>
                             <div class="kds-column-content" id="list-pending">
                                 <!-- Cards will be injected here -->
@@ -60,8 +60,8 @@
 
                         <!-- Kolom Sedang Dibuat -->
                         <div class="kds-column" id="col-preparing">
-                            <div class="kds-column-header bg-color-blue text-color-white">
-                                <h3>Sedang Dibuat (<span id="count-preparing">0</span>)</h3>
+                            <div class="kds-column-header" style="background: #F39C12; color: white;">
+                                <h3><i class="fas fa-blender" style="margin-right: 8px;"></i> Sedang Dibuat (<span id="count-preparing">0</span>)</h3>
                             </div>
                             <div class="kds-column-content" id="list-preparing">
                                 <!-- Cards will be injected here -->
@@ -70,8 +70,8 @@
 
                         <!-- Kolom Selesai -->
                         <div class="kds-column" id="col-completed">
-                            <div class="kds-column-header bg-color-green text-color-white">
-                                <h3>Selesai / Siap (<span id="count-completed">0</span>)</h3>
+                            <div class="kds-column-header" style="background: #27AE60; color: white;">
+                                <h3><i class="fas fa-check-circle" style="margin-right: 8px;"></i> Selesai (<span id="count-completed">0</span>)</h3>
                             </div>
                             <div class="kds-column-content" id="list-completed">
                                 <!-- Cards will be injected here -->

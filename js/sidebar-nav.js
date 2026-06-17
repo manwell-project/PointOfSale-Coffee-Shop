@@ -231,6 +231,12 @@
             text: 'Point of Sale',
             url: '../Transaksi/index.html',
             key: 'pos'
+          },
+          {
+            icon: 'fas fa-tv',
+            text: 'Kitchen Display',
+            url: '../KDS/index.html',
+            key: 'kds'
           }
         ]
       },

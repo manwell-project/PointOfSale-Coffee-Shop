@@ -84,7 +84,9 @@ const TransactionsAPI = {
   create: (data) => apiFetch('/transactions', { method: 'POST', body: JSON.stringify(data) }),
   getByDate: (date) => apiFetch(`/transactions/date/${date}`),
   getDailySummary: () => apiFetch('/transactions/summary/daily'),
-  getRecent: (limit = 5) => apiFetch(`/transactions?limit=${limit}&sort=desc`)
+  getRecent: (limit = 5) => apiFetch(`/transactions?limit=${limit}&sort=desc`),
+  getActiveKdsOrders: () => apiFetch('/transactions/kds/active'),
+  updateKdsStatus: (id, status) => apiFetch(`/transactions/kds/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) })
 };
 
 // ============ REPORTS ============

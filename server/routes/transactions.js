@@ -291,4 +291,76 @@ router.get('/summary/daily', async (req, res, next) => {
   }
 });
 
+// ======================= KDS ROUTES =======================
+
+// GET active KDS orders (Today's orders not completed in KDS)
+router.get('/kds/active', async (req, res, next) => {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    
+    // We try to query using kds_status. If column doesn't exist, we fallback safely.
+    const { data: transactions, error } = await supabase
+      .from('transactions')
+      .select(`
+        *,
+        customers (name),
+        transaction_items (
+          quantity,
+          products (name)
+        )
+      `)
+      .gte('created_at', today)
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      // If error is about kds_status not existing, just return empty to not break app
+      console.warn('KDS query error:', error.message);
+      return res.json([]);
+    }
+
+    // Format the items nicely
+    const formatted = transactions
+      .filter(t => t.kds_status !== 'completed' && t.kds_status !== 'Selesai')
+      .map(t => {
+        const c = Array.isArray(t.customers) ? t.customers[0] : t.customers;
+        const items = (t.transaction_items || []).map(i => {
+          const p = Array.isArray(i.products) ? i.products[0] : i.products;
+          return {
+            quantity: i.quantity,
+            product_name: p ? p.name : 'Unknown'
+          };
+        });
+        
+        return {
+          id: t.id,
+          transaction_no: t.id,
+          time: t.created_at,
+          status: t.kds_status || 'pending',
+          customer: c ? c.name : 'Walk-in',
+          items: items
+        };
+      });
+
+    res.json(formatted);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// PUT update KDS status
+router.put('/kds/:id/status', async (req, res, next) => {
+  try {
+    const { status } = req.body;
+    const { error } = await supabase
+      .from('transactions')
+      .update({ kds_status: status })
+      .eq('id', req.params.id);
+
+    if (error) throw error;
+    res.json({ success: true, status });
+  } catch (err) {
+    next(err);
+  }
+});
+
 module.exports = router;
