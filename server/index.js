@@ -81,9 +81,10 @@ app.use((req, res) => {
 // Error handler middleware
 app.use(errorHandler);
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`
+// Start server if not running on Vercel
+if (process.env.NODE_ENV !== 'production' || process.env.VERCEL !== '1') {
+  app.listen(PORT, () => {
+    console.log(`
 ╔════════════════════════════════════════╗
 ║     ☕ DigiCaf POS Server Started     ║
 ╚════════════════════════════════════════╝
@@ -103,11 +104,14 @@ Available endpoints:
   GET/POST/PUT/DELETE /api/discounts
 
 Type Ctrl+C to stop the server
-  `);
-});
+    `);
+  });
+}
 
 // Handle graceful shutdown
 process.on('SIGINT', () => {
   console.log('\n\n🛑 Shutting down server...');
   process.exit(0);
 });
+
+module.exports = app;

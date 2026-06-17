@@ -3,7 +3,7 @@
  * Centralized API functions untuk semua modul
  */
 
-const API_BASE = (window.DIGICAF_API_BASE || 'http://localhost:3000/api').replace(/\/$/, '');
+const API_BASE = (window.DIGICAF_API_BASE || (window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api')).replace(/\/$/, '');
 
 // Generic API fetch helper
 async function apiFetch(endpoint, options = {}) {
