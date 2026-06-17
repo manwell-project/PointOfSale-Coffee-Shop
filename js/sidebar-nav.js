@@ -43,11 +43,15 @@
     // Inject sidebar HTML
     injectSidebarHTML();
 
-    // This app uses the left sidebar as primary navigation.
-    // Ensure bottom navigation is disabled/removed on all viewports.
+    // This app uses the left sidebar as primary navigation on desktop.
+    // Keep mobile snackbar navigation available on narrow viewports.
     try {
-      document.body.classList.add('no-bottom-nav');
-      document.querySelectorAll('.bottom-nav').forEach(el => el.remove());
+      if (!isMobile) {
+        document.body.classList.add('no-bottom-nav');
+        document.querySelectorAll('.bottom-nav').forEach(el => el.remove());
+      } else {
+        document.body.classList.remove('no-bottom-nav');
+      }
     } catch (e) {}
     
     // Setup event listeners
